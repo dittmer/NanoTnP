@@ -38,11 +38,10 @@ int main(int argc, char **argv) {
     // post-processing
     auto df2 = FindGoodElectron(df1);
     auto df3 = FindGoodJet(df2);
-    auto df4 = FilterGoodEvents(df3);
-    auto df5 = FindCleanFromJet(df4);
-    auto df6 = FindPassTightCutBased(df5);
-    ////
-    auto df7 = FindTnP(df6);
+    auto df4 = FindCleanFromJet(df3);
+    auto df5 = FindPassTightCutBased(df4);
+    auto df6 = FindTriggerMatchedElectron(df5);
+    //auto df7 = FindTnP(df6);
     // analysis, select ONLY Two
 
     // should be applied last step
