@@ -59,9 +59,9 @@ namespace Helper {
  */
 template <typename T>
 auto Filterbaseline(T &df) {
-  return df.Filter("nElectron>0","None zero electrons")
-    .Filter("nMuon==0","no Muon")
-    .Filter("nJet>0","at least 1 jet");
+  return df.Filter("nElectron>0"," --> Event has none zero electrons")
+    .Filter("nMuon==0"," --> Event has no Muon")
+    .Filter("nJet>0"," --> Event has at least 1 jet");
 }
 
 
@@ -72,7 +72,7 @@ auto Filterbaseline(T &df) {
 template <typename T>
 auto FindGoodElectron(T &df) {
   return df.Define("goodElectron","Electron_pt > 5 && abs(Electron_eta) < 2.1 && Electron_cutBased > 0")
-    .Filter("Sum(goodElectron)>0","Event has good electrons");
+    .Filter("Sum(goodElectron)>0"," --> Event has good electrons");
 }
 
 /*
@@ -82,7 +82,7 @@ auto FindGoodElectron(T &df) {
 template <typename T>
 auto FindGoodJet(T &df) {
   return df.Define("goodJet","Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4")
-    .Filter("Sum(goodJet)>0","Event has good jets");
+    .Filter("Sum(goodJet)>0"," --> Event has good jets");
 }
 
 /*
@@ -119,7 +119,7 @@ auto FindCleanFromJet(T &df) {
   return df.Define("cleanFromJet", pair_Builder,
 		   {"goodElectron", "Electron_eta", "Electron_phi",
                        "goodJet", "Jet_eta" , "Jet_phi"})
-    .Filter("Sum(cleanFromJet==1)>=2","At least two Clean Electrons");
+    .Filter("Sum(cleanFromJet==1)>=2"," --> Event has at least two Clean Electrons");
 }
 
 /*
@@ -130,7 +130,7 @@ auto FindPassTightCutBased(T &df) { // tight cut base , detector-level cuts??
 
   //https://cms-nanoaod-integration.web.cern.ch/integration/master-106X/mc102X_doc.html#Electron
   return df.Define("passTightCutBased","Electron_cutBased == 4")
-    .Filter("Sum(passTightCutBased==1)>=1","At least one electron pass Tight");
+    .Filter("Sum(passTightCutBased==1)>=1"," --> Event has at least one electron pass Tight");
 }
 
 /*
@@ -167,7 +167,7 @@ auto FindTriggerMatchedElectron(T &df) {
       return MatchElectron;
     };
   return df.Define("triggerMatchedElectron",trig_Matcher,{"TrigObj_id","TrigObj_filterBits","TrigObj_eta","TrigObj_phi","Electron_pt","Electron_eta","Electron_phi"})
-    .Filter("Sum(triggerMatchedElectron==1)>=1","at least one electron match to trigger");
+    .Filter("Sum(triggerMatchedElectron==1)>=1"," --> Event has at least one electron match to trigger");
 }
 
 
@@ -181,51 +181,53 @@ auto FindTnP(T &df) {
   auto tnp_pair = [](RVec<int>& cleanFromJet, RVec<int>& passTightCutBased, RVec<int>& triggerMatchedElectron, RVec<float>& pt , RVec<float>& eta , RVec<float>& phi , RVec<float>& mass)
     {
 
-      // Build collection of clean electron with pT ordered
+      // Build collection of Clean electron
       std::vector<std::pair<int,double>> pT_unordered;
       const auto elec_size = cleanFromJet.size();
-      // consider only clean Electron
+      
       for(size_t i = 0 ; i < elec_size ; i++) {
-	if (cleanFromJet[i]==1 && passTightCutBased[i] == 1 && triggerMatchedElectron[1]==1)
+	if (cleanFromJet[i]==1)
 	  pT_unordered.push_back(std::make_pair(i,pt[i]));
       }
 
       // sorted in descending Pt
       std::vector<std::pair<int,double>> pT = Helper::IndexBypT(pT_unordered);
       
-      // randomly selecting Tag and Probe
+      // randomly selecting Tag
       TRandom3 rand(0);
       int TagIdx = -1;
-      TagIdx = pT[ static_cast<int>(rand.Uniform()*10) % 2 ].first;
-      
-      // match tag to trigger filter
-      
-      // probe
-      double mindis= 99999.;
       int ProbeIdx = -1;
-      TLorentzVector tag, probe, tot;
-      tag.SetPtEtaPhiM( pt[TagIdx] , eta[TagIdx] , phi[TagIdx] , mass[TagIdx] );
-      for(size_t j = 0 ; j < pT.size() ; j++ ){
-	tot.SetPtEtaPhiM(0. , 0. , 0. , 0.);
-	tot = tag;
-	if ( static_cast<int>(j) == TagIdx ) continue;
-	probe.SetPtEtaPhiM( pt[j] , eta[j] , phi[j] , mass[j] );
-	tot+=probe;
-	// pair which closest to the Z mass pole
-	if ( abs(tot.M() - 91.14) < mindis ){
-	  mindis = abs(tot.M() - 91.14);
-	  ProbeIdx = j;
+      TagIdx = pT[ static_cast<int>(rand.Uniform()*10) % 2 ].first;
+      // match tag to trigger filter
+      if ( passTightCutBased[TagIdx] != 1 ) TagIdx = -1;
+      if ( triggerMatchedElectron[TagIdx] != 1) TagIdx = -1;
+
+      if (TagIdx != -1){
+	// probe
+	double mindis= 99999.;
+	TLorentzVector tag, probe, tot;
+	tag.SetPtEtaPhiM( pt[TagIdx] , eta[TagIdx] , phi[TagIdx] , mass[TagIdx] );
+	for(size_t j = 0 ; j < pT.size() ; j++ ){
+	  tot.SetPtEtaPhiM(0. , 0. , 0. , 0.);
+	  tot = tag;
+	  if ( static_cast<int>(j) == TagIdx ) continue;
+	  probe.SetPtEtaPhiM( pt[j] , eta[j] , phi[j] , mass[j] );
+	  tot+=probe;
+	  // pair which closest to the Z mass pole
+	  if ( abs(tot.M() - 91.14) < mindis ){
+	    mindis = abs(tot.M() - 91.14);
+	    ProbeIdx = j;
+	  }
 	}
       }
       return std::vector<int>({TagIdx, ProbeIdx});
     };
-
+  
   return df.Define("TnPIdx", tnp_pair,
 		   {"cleanFromJet","passTightCutBased","triggerMatchedElectron","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
     .Define("tag_Idx" , "TnPIdx[0]")
     .Define("probe_Idx" , "TnPIdx[1]")
-    .Filter("tag_Idx != -1" , "Valid tag")
-    .Filter("probe_Idx != -1" , "Valid probe");
+    .Filter("tag_Idx!=-1 && probe_Idx != -1" , " --> Event has valid tag and probe");
 }
 
 /*
@@ -240,12 +242,49 @@ auto FindTnP(T &df) {
 
 template <typename T>
 auto DeclareVariables(T &df) {
-
-  return df.Define("ele_pt1","Electron_pt[0]")
-           .Define("ele_pt2","Electron_pt[1]")
-           .Define("ele_eta1","Electron_eta[0]")
-           .Define("ele_eta2","Electron_eta[1]")
-           .Define("isZmassW","60 < mll && mll < 120");
+  
+  auto add_p4 = [](float pt, float eta, float phi, float mass)
+    {
+      return ROOT::Math::PtEtaPhiMVector(pt, eta, phi, mass);
+    };
+  
+  auto pair_pt = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+    {
+      return float((p4_1+p4_2).Pt());
+    };
+  
+  auto pair_eta = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+    {
+      return float((p4_1+p4_2).Eta());
+    };
+  
+  auto pair_phi = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+    {
+      return float((p4_1+p4_2).Phi());
+    };
+  
+  auto pair_mass = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+    {
+      return float((p4_1+p4_2).M());
+    };
+  
+  
+  return df
+    .Define("tag_Ele_pt" ,"Electron_pt[tag_Idx]")
+    .Define("tag_Ele_eta","Electron_eta[tag_Idx]")
+    .Define("tag_Ele_phi","Electron_phi[tag_Idx]")
+    .Define("tag_Ele_mass","Electron_mass[tag_Idx]")
+    .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
+    .Define("probe_Ele_pt" ,"Electron_pt[probe_Idx]")
+    .Define("probe_Ele_eta","Electron_eta[probe_Idx]")
+    .Define("probe_Ele_phi","Electron_phi[probe_Idx]")
+    .Define("probe_Ele_mass","Electron_mass[probe_Idx]")
+    .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
+    .Define("pair_pt" ,pair_pt,{"tag_Ele","probe_Ele"})
+    .Define("pair_eta" ,pair_eta,{"tag_Ele","probe_Ele"})
+    .Define("pair_phi" ,pair_phi,{"tag_Ele","probe_Ele"})
+    .Define("pair_mass" ,pair_mass,{"tag_Ele","probe_Ele"})
+    ;
 }
 
 /*
@@ -269,5 +308,5 @@ auto AddEventWeight(T &df, const std::string& path, const std::string& sample, c
  * Declare all variables which will end up in the final reduced dataset
  */
 const std::vector<std::string> finalVariables = {
-  "ele_pt1" , "ele_pt2" , "ele_eta1" , "ele_eta2", "weight", "cleanFromJet", "passTightCutBased", "triggerMatchedElectron" //, "tag_Idx" , "probe_Idx"
+  "tag_Ele_pt" , "tag_Ele_eta" , "tag_Ele_phi" , "probe_Ele_pt", "probe_Ele_eta" , "probe_Ele_phi" , "weight", "pair_pt" , "pair_eta" , "pair_phi" , "pair_mass"
 };

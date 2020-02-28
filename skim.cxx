@@ -41,14 +41,14 @@ int main(int argc, char **argv) {
     auto df4 = FindCleanFromJet(df3);
     auto df5 = FindPassTightCutBased(df4);
     auto df6 = FindTriggerMatchedElectron(df5);
-    //auto df7 = FindTnP(df6);
-    // analysis, select ONLY Two
+    
+    auto df7 = FindTnP(df6);
 
     // should be applied last step
-    auto df7 = DeclareVariables(df6);
-    auto df8 = AddEventWeight(df7 , path, sample , lumi , weight1 , weight2 );
+    auto df8 = DeclareVariables(df7);
+    auto df9 = AddEventWeight(df8 , path, sample , lumi , weight1 , weight2 );
 
-    auto dfFinal = df8;
+    auto dfFinal = df9;
     auto report = dfFinal.Report();
     const std::string output = argv[2];
     std::cout << "Output name: " << output << std::endl;
