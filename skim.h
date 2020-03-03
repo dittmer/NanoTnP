@@ -1,4 +1,5 @@
 #include "ROOT/RDataFrame.hxx"
+#include "ROOT/RDFHelpers.hxx"
 #include "ROOT/RVec.hxx"
 
 #include "Math/Vector4D.h"
@@ -242,6 +243,7 @@ auto tagEle(T &df) {
  * cms.sequence of WPs
  * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L172-L205
  */
+
 template <typename T>
 auto WPsequence(T &df) {
 
@@ -255,58 +257,83 @@ auto WPsequence(T &df) {
 
 /*************************************************** tnpPairingEleIDs ***************************************************/
 /*
- * EDProducer
+ * EDProducer + EDAnalyzer
  * tnpPairingEleIDs
  * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L105-L111
+ * pair collection
  */
 template <typename T>
 auto tnpPairingEleIDs(T &df) {
   using namespace ROOT::VecOps;
-  auto tnpPairingEleIDs = [](RVec<int>& tagEle_flag, RVec<int>& probeEle_flag, RVec<float>& pt , RVec<float>& eta , RVec<float>& phi , RVec<float>& m){
+  auto tnpPairingEleIDs = [](RVec<int>& tagEle_flag, RVec<int>& probeEle_flag , RVec<float>& pt , RVec<float>& eta , RVec<float>& phi , RVec<float>& m){
 
-  // Build collection of tagEle and probeEle
-  std::vector<std::pair<int,float>> tagEle_unpt;
-  std::vector<std::pair<int,float>> probeEle_unpt;
-  const auto ptsize = pt.size();
-
-  for (size_t i = 0 ; i < ptsize ; i++){
-    if (tagEle_flag[i] == 1) tagEle_unpt.push_back(std::make_pair(i,pt[i]));
-    if (probeEle_flag[i] == 1) probeEle_unpt.push_back(std::make_pair(i,pt[i]));
-  }
-  // order in ascending pT
-  RVec<int> tagEle_Idx = Helper::IndexBypT(tagEle_unpt);
-  RVec<int> probeEle_Idx = Helper::IndexBypT(probeEle_unpt);
-
-  //TRandom3 rand(0);
-  int TagIdx = -1;
-  int ProbeIdx = -1;
-
-  float mindis= 99999.;
-	TLorentzVector probe, tot;
-
-  auto comb = Combinations(tagEle_Idx,probeEle_Idx);
+  auto comb = Combinations(tagEle_flag,probeEle_flag);
   const auto tagcomb = comb[0].size();
-  // Find valid pair based on minimal distance to Z mass pole
+  RVec<std::pair<int,int>> TnPCandidate;
+
   for(size_t i = 0; i < tagcomb; i++) {
-    const auto tagIdx = comb[0][i];
-    const auto probeIdx = comb[1][i];
-    tot.SetPtEtaPhiM(0. , 0. , 0. , 0.); probe.SetPtEtaPhiM(0. , 0. , 0. , 0.);
-    tot.SetPtEtaPhiM(pt[tagIdx] , eta[tagIdx] , phi[tagIdx] , m[tagIdx]);
-    probe.SetPtEtaPhiM(pt[probeIdx] , eta[probeIdx] , phi[probeIdx] , m[probeIdx]); tot += probe;
-    if ( 50 > tot.M() && tot.M() > 130 ) continue;
-    if ( abs(tot.M() - 91.14) < mindis ){
-      mindis = abs(tot.M() - 91.14);
-      TagIdx = tagIdx;
-      ProbeIdx = probeIdx;
-   }
+    const auto tag = comb[0][i];
+    const auto probe = comb[1][i];
+
+    if (tagEle_flag[tag] != 1) continue;
+    if (probeEle_flag[probe] != 1) continue;
+
+    TLorentzVector tot, LVprobe;
+    tot.SetPtEtaPhiM( pt[tag] , eta[tag] , phi[tag] , m[tag] );
+    LVprobe.SetPtEtaPhiM( pt[probe] , eta[probe] , phi[probe] , m[probe] );
+    tot+=LVprobe;
+    if ( tot.M() < 50 && tot.M() > 130 ) continue;
+    TnPCandidate.push_back(std::make_pair(tagEle_flag[tag],probeEle_flag[probe]));
  }
-   return std::vector<int>({TagIdx, ProbeIdx});
+   return TnPCandidate;
 }; // end of lambda function
 
-return df.Define("tnpPairingEleIDs", tnpPairingEleIDs, {"tagEle","probeEle","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
-    .Define("tag_Idx" , "tnpPairingEleIDs[0]")
-    .Define("probe_Idx" , "tnpPairingEleIDs[1]");
+return df.Define("tnpPairingEleIDs", tnpPairingEleIDs, {"tagEle","probeEle","Electron_pt","Electron_eta","Electron_phi","Electron_mass"});
   }
+
+/*
+ * EDAnalyzer
+ * TagProbeFitTreeProducer
+ * InputTag = tnpPairingEleIDs, genProbeEle, probeEle
+ * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/TnPTreeProducer_cfg.py#L265-L307
+ */
+
+template <typename T>
+auto tnpEleIDs(T &df) {
+  using namespace ROOT::VecOps;
+  auto tnpEleIDs = [](RVec<std::pair<int,int>>&  tnpPairingEleIDs , RVec<int>& genTagEle , RVec<int>& genProbeEle){
+
+    const auto num = tnpPairingEleIDs.size();
+    TRandom3 rand(0);
+    bool valid=false;
+    int irand, tidx = -1, pidx = -1;
+
+    // throw random number on the tag-probe pair, if the pair is the same, reselect (since no resolving ambiguity in making pair)
+    while(!valid){
+      irand = static_cast<int>(rand.Uniform(0,num)*10) % 2;
+      std::cout<<"throwing random number : "<<irand<<std::endl;
+      tidx = tnpPairingEleIDs[irand].first;
+      pidx = tnpPairingEleIDs[irand].second;
+      if ( tidx != pidx ){
+        std::cout<<"break while loop"<<std::endl;
+        valid=true;
+      }
+    }
+    // data by default is true
+    int mcTrue = genTagEle[tidx] && genProbeEle[pidx];
+    return std::vector<int>({tidx , pidx , mcTrue});
+  };
+return df.Define("tnpEleIDs", tnpEleIDs, {"tnpPairingEleIDs","genTagEle","genProbeEle"})
+         .Define("tag_Idx", "tnpEleIDs[0]")
+         .Define("probe_Idx","tnpEleIDs[1]")
+         .Define("mcTruth","tnpEleIDs[2]")
+         // WP
+         .Define("passingVeto","probeEleCutBasedVeto[probe_Idx]")
+         .Define("passingLoose","probeEleCutBasedLoose[probe_Idx]")
+         .Define("passingMedium","probeEleCutBasedMedium[probe_Idx]")
+         .Define("passingTight","probeEleCutBasedTight[probe_Idx]")
+         .Define("passingMVAtth","probeEleMVAtth[probe_Idx]");
+}
 
 /*
  * Declare variables for analysis
@@ -320,26 +347,10 @@ auto DeclareVariables(T &df) {
       return ROOT::Math::PtEtaPhiMVector(pt, eta, phi, mass);
     };
 
-  auto pair_pt = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+  auto pair_kin = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
     {
-      return float((p4_1+p4_2).Pt());
+      return std::vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
     };
-
-  auto pair_eta = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
-    {
-      return float((p4_1+p4_2).Eta());
-    };
-
-  auto pair_phi = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
-    {
-      return float((p4_1+p4_2).Phi());
-    };
-
-  auto pair_mass = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
-    {
-      return float((p4_1+p4_2).M());
-    };
-
 
   return df
     .Define("tag_Ele_pt" ,"Electron_pt[tag_Idx]")
@@ -348,19 +359,19 @@ auto DeclareVariables(T &df) {
     .Define("tag_Ele_mass","Electron_mass[tag_Idx]")
     .Define("tag_Ele_q","Electron_charge[tag_Idx]")
     .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
+
     .Define("probe_Ele_pt" ,"Electron_pt[probe_Idx]")
     .Define("probe_Ele_eta","Electron_eta[probe_Idx]")
     .Define("probe_Ele_phi","Electron_phi[probe_Idx]")
     .Define("probe_Ele_mass","Electron_mass[probe_Idx]")
     .Define("probe_Ele_q","Electron_charge[probe_Idx]")
     .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
-    .Define("pair_pt" ,pair_pt,{"tag_Ele","probe_Ele"})
-    .Define("pair_eta" ,pair_eta,{"tag_Ele","probe_Ele"})
-    .Define("pair_phi" ,pair_phi,{"tag_Ele","probe_Ele"})
-    .Define("pair_mass" ,pair_mass,{"tag_Ele","probe_Ele"})
-    .Define("passingCutBasedIDFall17V2","Electron_cutBased[probe_Idx] == 4") // cut-based ID Fall17 V2 ; https://cms-nanoaod-integration.web.cern.ch/integration/master-106X/mc102X_doc.html#Electron
-    .Define("passingmvaTTH","Electron_mvaTTH[probe_Idx] > 0.7")
-    ;
+
+    .Define("pair_kin" ,pair_kin,{"tag_Ele","probe_Ele"})
+    .Define("pair_pt" ,"pair_kin[0]")
+    .Define("pair_eta" ,"pair_kin[1]")
+    .Define("pair_phi" ,"pair_kin[2]")
+    .Define("pair_m" ,"pair_kin[3]");
 }
 
 /*
@@ -374,7 +385,7 @@ auto AddEventWeight(T &df, const std::string& path, const std::string& sample, c
     weights = "METFilter_DATA*"+weight1+"*"+weight2;
   }
   else {
-    weights = lumi+"*XSWeight*PrefireWeight*GenLepMatch2l*METFilter_MC*("+weight1+")*("+weight2+")";
+    weights = lumi+"*XSWeight*PrefireWeight*puWeight*GenLepMatch2l*METFilter_MC*("+weight1+")*("+weight2+")";
   }
   std::cout<<" weights interpreted : "<<weights<<std::endl;
   return df.Define( "weight", weights );
@@ -383,8 +394,9 @@ auto AddEventWeight(T &df, const std::string& path, const std::string& sample, c
 /*
  * Declare all variables which will end up in the final reduced dataset
  */
+
 const std::vector<std::string> finalVariables = {
   "tag_Ele_pt" , "tag_Ele_eta" , "tag_Ele_phi" , "probe_Ele_pt", "probe_Ele_eta" ,
   "probe_Ele_phi" , "weight", "pair_pt" , "pair_eta" , "pair_phi" , "pair_mass" ,
-  "passingCutBasedIDFall17V2" , "passingmvaTTH"
+  "passingCutBasedIDFall17V2" , "passingmvaTTH" , "tagEle" , "probeEle" , "nElectron"
 };

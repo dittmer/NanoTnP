@@ -52,16 +52,19 @@ int main(int argc, char **argv) {
     auto df8 = genTagEle(df7,isMC);
     auto df9 = WPsequence(df8);
     auto df10 = tnpPairingEleIDs(df9);
+    auto df11 = tnpEleIDs(df10);
 
     // should be applied last step
-    auto df11 = DeclareVariables(df10);
-    auto df12 = AddEventWeight(df11 , path, sample , lumi , weight1 , weight2 );
+    auto df12 = DeclareVariables(df11);
+    auto df13 = AddEventWeight(df12 , path, sample , lumi , weight1 , weight2 );
 
     auto dfFinal = df12;
     auto report = dfFinal.Report();
     const std::string output = argv[2];
     std::cout << "Output name: " << output << std::endl;
-    dfFinal.Snapshot("Events", output, finalVariables);
+    //dfFinal.Snapshot("Events", output, finalVariables);
+    dfFinal.Snapshot("Events", output, df.GetDefinedColumnNames());
+    ROOT::RDF::SaveGraph(df12,"graph_"+sample+".dot");
     time.Stop();
 
     report->Print();
