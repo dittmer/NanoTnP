@@ -7,6 +7,7 @@
 int main(int argc, char **argv) {
 
   ROOT::EnableImplicitMT(10);
+  bool isMC=false;
 
   if(argc != 7) {
         std::cout << "Use executable with following arguments: ./skim input output integrated_luminosity weight1 weight2" << std::endl;
@@ -17,6 +18,15 @@ int main(int argc, char **argv) {
 
     const std::string path = argv[1];
     const std::string sample = argv[3];
+
+    if (path.find("DATA") != std::string::npos) {
+      std::cout << "The dataset is DATA"<< std::endl;
+    }
+    else{
+      std::cout << "The dataset is MC"<< std::endl;
+      isMC=true;
+    }
+
     std::cout << "Looking at : " << path+"*"+sample+"*.root" << std::endl;
 
     const auto lumi = argv[4];
@@ -32,23 +42,22 @@ int main(int argc, char **argv) {
 
     ROOT::RDataFrame df("Events", path+"*"+sample+"*.root" );
 
-    // skimming
-    auto df1 = Filterbaseline(df);
 
-    // post-processing
-    auto df2 = FindGoodElectron(df1);
-    auto df3 = FindGoodJet(df2);
-    auto df4 = FindCleanFromJet(df3);
-    auto df5 = FindPassTightCutBased(df4);
-    auto df6 = FindTriggerMatchedElectron(df5);
-    
-    auto df7 = FindTnP(df6);
+    auto df2 = Filterbaseline(df);
+    auto df3 = goodElectrons(df2);
+    auto df4 = goodJets(df3);
+    auto df5 = cleanFromJet(df4);
+    auto df6 = tagEleCutBasedTight(df5);
+    auto df7 = tagEle(df6);
+    auto df8 = genTagEle(df7,isMC);
+    auto df9 = WPsequence(df8);
+    auto df10 = tnpPairingEleIDs(df9);
 
     // should be applied last step
-    auto df8 = DeclareVariables(df7);
-    auto df9 = AddEventWeight(df8 , path, sample , lumi , weight1 , weight2 );
+    auto df11 = DeclareVariables(df10);
+    auto df12 = AddEventWeight(df11 , path, sample , lumi , weight1 , weight2 );
 
-    auto dfFinal = df9;
+    auto dfFinal = df12;
     auto report = dfFinal.Report();
     const std::string output = argv[2];
     std::cout << "Output name: " << output << std::endl;

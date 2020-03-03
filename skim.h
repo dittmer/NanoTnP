@@ -39,7 +39,7 @@ namespace Helper {
     std::vector<int> indecies;
     std::sort (v.begin() , v.end() , comparator);
     for (auto it = v.begin() ; it != v.end() ; ++it){
-      indecies.push_back(*it.first);
+      indecies.push_back((*it).first);
     }
     return indecies;
   }
@@ -67,7 +67,9 @@ namespace Helper {
  */
 template <typename T>
 auto Filterbaseline(T &df) {
-  return df.Filter("nElectron>0"," --> At least one electron")
+  return df.Define("isMC", "run==1")
+           .Filter("nElectron>0"," --> At least one electron")
+           ;
 }
 
 /*************************************************** tag_sequence ***************************************************/
@@ -80,7 +82,7 @@ auto Filterbaseline(T &df) {
 template <typename T>
 auto goodElectrons(T &df) {
   return df.Define("goodElectrons","abs(Electron_eta) < 2.5 && Electron_pt > 5")
-    .Filter("Sum(goodElectron==0)==0"," --> ELECTRON_CUTS : the baseline cuts");
+    .Filter("Sum(goodElectrons==0)==0"," --> ELECTRON_CUTS : the baseline cuts");
 }
 
 /*
@@ -151,7 +153,7 @@ template<typename T>
 auto tagEle(T &df) {
   using namespace ROOT::VecOps;
   // lambda function
-  auto tagEle = [](RVec<int>& tagEleCutBasedTight , RVec<int>& id, RVec<int>& filterBits , RVec<float>& eta_1 , RVec<float>& phi_1 , RVec<float>& pt_2 , RVec<float>& eta_2 , RVec<float>& phi_2)
+  auto tagEle = [](RVec<int>& tagEleCutBasedTight , RVec<int>& id, RVec<int>& filterBits , RVec<float>& eta_1 , RVec<float>& phi_1 , RVec<float>& eta_2 , RVec<float>& phi_2)
     {
       // get combination
       auto comb = Combinations(eta_2,eta_1); // electron-trig object pair
@@ -178,9 +180,60 @@ auto tagEle(T &df) {
 
       return MatchElectron;
     };
-  return df.Define("tagEle",tagEle,{"tagEleCutBasedTight","TrigObj_id","TrigObj_filterBits","TrigObj_eta","TrigObj_phi","Electron_pt","Electron_eta","Electron_phi"});
+  return df.Define("tagEle",tagEle,{"tagEleCutBasedTight","TrigObj_id","TrigObj_filterBits","TrigObj_eta","TrigObj_phi","Electron_eta","Electron_phi"});
     //.Filter("Sum(triggerMatchedElectron==1)>=1"," --> Event has at least one electron match to trigger");
 }
+
+/*
+ * EDFilter + EDProducer
+ * genEle + genTagEle + genProbeEle
+ * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L83-L86
+ */
+
+ template<typename T>
+ auto genTagEle(T &df, bool& isMC) {
+  using namespace ROOT::VecOps;
+  auto genTagEle = [](RVec<int>& tagEle , RVec<float>& ele_eta , RVec<float>& ele_phi ,
+    RVec<int>& gen_pdgId , RVec<float>& gen_pt , RVec<float>& gen_eta , RVec<float>& gen_phi , RVec<int>& statusflag) {
+    auto comb = Combinations(ele_eta,gen_eta);
+    const auto numComb = comb[0].size();
+
+    // genmatch
+    RVec<int> tagEle_GenEleIdx(numComb,-1);
+
+    for (size_t i = 0 ; i < numComb ; i++) {
+      const auto i1 = comb[0][i]; // tagEle
+      const auto i2 = comb[1][i]; // genTagEle
+      if (tagEle[i1]!=1) continue;
+      if (abs(gen_pdgId[i2]) != 11) continue; // do not check charge
+      if (gen_pt[i2] < 3) continue;
+      if (abs(gen_eta[i2]) > 2.7) continue;
+      float mindr= 99999.;
+      // isPromptFinalState = isPrompt + isLastCopy
+      // resolve ambiguity, pick lowest deltaR pair first
+      if ( (statusflag[i2] & ( 1 << 0 )) && (statusflag[i2] & ( 1 << 13 ))  ){
+        const auto deltar = sqrt(
+                                 pow(ele_eta[i1] - gen_eta[i2], 2) +
+                                 pow(Helper::DeltaPhi(ele_phi[i1], gen_phi[i2]), 2));
+        if (mindr > deltar ) {
+          mindr = deltar;
+        }
+      }
+      if (mindr < 0.2){
+        tagEle_GenEleIdx[i] = i2;
+      }
+    } // end numComb loop
+    return tagEle_GenEleIdx;
+  }; // end lambda function
+  if (!isMC){
+    return df.Define("genTagEle","tagEle")
+             .Define("genProbeEle","tagEleCutBasedTight==1");
+  }
+  else
+    return df.Define("genTagEle",genTagEle,{"tagEle","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"})
+             .Define("genProbeEle","tagEleCutBasedTight==1");
+  }
+
 
 /*************************************************** ele_sequence ***************************************************/
 
@@ -197,8 +250,7 @@ auto WPsequence(T &df) {
            .Define("probeEleCutBasedMedium" , "goodElectrons==1 && cleanFromJet==1 && Electron_cutBased==3")
            .Define("probeEleCutBasedTight"  , "goodElectrons==1 && cleanFromJet==1 && Electron_cutBased==4")
            .Define("probeEleMVAtth"         , "goodElectrons==1 && cleanFromJet==1 && Electron_mvaTTH>0.7")
-           .Define("probeEle"               , "tagEleCutBasedTight==1")
-           ;
+           .Define("probeEle"               , "tagEleCutBasedTight==1");
 }
 
 /*************************************************** tnpPairingEleIDs ***************************************************/
@@ -222,8 +274,8 @@ auto tnpPairingEleIDs(T &df) {
     if (probeEle_flag[i] == 1) probeEle_unpt.push_back(std::make_pair(i,pt[i]));
   }
   // order in ascending pT
-  std::vector<int> tagEle_Idx = Helper::IndexBypT(tagEle_unpt);
-  std::vector<int> probeEle_Idx = Helper::IndexBypT(probeEle_unpt);
+  RVec<int> tagEle_Idx = Helper::IndexBypT(tagEle_unpt);
+  RVec<int> probeEle_Idx = Helper::IndexBypT(probeEle_unpt);
 
   //TRandom3 rand(0);
   int TagIdx = -1;
@@ -241,23 +293,20 @@ auto tnpPairingEleIDs(T &df) {
     tot.SetPtEtaPhiM(0. , 0. , 0. , 0.); probe.SetPtEtaPhiM(0. , 0. , 0. , 0.);
     tot.SetPtEtaPhiM(pt[tagIdx] , eta[tagIdx] , phi[tagIdx] , m[tagIdx]);
     probe.SetPtEtaPhiM(pt[probeIdx] , eta[probeIdx] , phi[probeIdx] , m[probeIdx]); tot += probe;
-    if ( 50 > tot.M && tot.M > 130 ) continue;
+    if ( 50 > tot.M() && tot.M() > 130 ) continue;
     if ( abs(tot.M() - 91.14) < mindis ){
       mindis = abs(tot.M() - 91.14);
       TagIdx = tagIdx;
       ProbeIdx = probeIdx;
    }
+ }
    return std::vector<int>({TagIdx, ProbeIdx});
-  }
-  return df.Define("tnpPairingEleIDs", tnpPairingEleIDs, {"tagEle","probeEle","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
-    .Define("tag_Idx" , "tnpPairingEleIDs[0]")
-    .Define("probe_Idx" , "tnpPairingEleIDs[1]")
-    ;
-  }
+}; // end of lambda function
 
-  /*
-  * tnpEleIDs
-  */
+return df.Define("tnpPairingEleIDs", tnpPairingEleIDs, {"tagEle","probeEle","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
+    .Define("tag_Idx" , "tnpPairingEleIDs[0]")
+    .Define("probe_Idx" , "tnpPairingEleIDs[1]");
+  }
 
 /*
  * Declare variables for analysis
