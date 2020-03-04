@@ -21,7 +21,7 @@ do
     if [ ! -e ${OUTPUT_DIR}/${YEAR} ]; then
 	mkdir -p ${OUTPUT_DIR}/${YEAR}
     fi
-    
+
     echo ">>> Skim sample ${SAMPLE}"
     INPUT=${INPUT_DIR}${DIR}/
     if [[ $DIR == *"fake"* ]]; then
@@ -29,7 +29,7 @@ do
     else
 	OUTPUT=${OUTPUT_DIR}/${YEAR}/${SAMPLE}_Skim.root
     fi
-    echo "./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2"
-    ./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1 $WEIGHT2
+    echo "./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1"
+    ./skim $INPUT $OUTPUT $SAMPLE $LUMI $WEIGHT1
 
 done < skim.csv
