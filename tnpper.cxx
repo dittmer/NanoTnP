@@ -53,10 +53,14 @@ int main(int argc, char **argv) {
 
     ROOT::RDataFrame df("Events", infiles);
     std::string dummy="HLT_Ele35_WPTight_Gsf";
+
+    // skim plus object cleaning
     auto df1 = Filterbaseline(df, dummy );
     auto df2 = goodElectrons(df1);
     auto df3 = goodJets(df2);
     auto df4 = cleanFromJet(df3);
+    // skim plus object cleaning
+
     auto df5 = tagEle(df4);
     auto df6 = genTagEle(df5,isMC);
     auto df7 = tnpPairingEleIDs(df6);
