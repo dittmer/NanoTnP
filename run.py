@@ -60,9 +60,10 @@ if len(samplelists)!=3: print("ERROR: len(samplelists)!=3"); sys.exit(0);
 trun = time.time();
 for iproc in samplelists:
     sample = iproc.split('/')[-1].split('.txt')[0]
-    cmd="./skim"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
+    cmd="./tnpper"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
     tproc = time.time()
     print(cmd)
     os.system(cmd)
+    sys.exit()
     print("--- running on %s took : %.3f seconds (%.3f minutes) ---" % ( sample , (time.time() - tproc) , (time.time() - tproc)/60. ) )
 print("--- Total run time : %.3f seconds (%.3f minutes) ---" % ( (time.time() - trun) , (time.time() - trun)/60. ) )

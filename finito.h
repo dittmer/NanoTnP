@@ -1,6 +1,6 @@
 #ifndef FINITO_H
 #define FINITO_H
-#include "skim.h"
+#include "tnpper.h"
 
 /*
  * Declare variables for analysis
@@ -48,15 +48,10 @@ auto DeclareVariables(T &df) {
  */
 
 template <typename T>
-auto AddEventWeight(T &df, const std::string& path, const std::string& lumi, const std::string& kfactor) {
-  std::string weights;
-  if (path.find("DATA") != std::string::npos) {
-    weights = "METFilter_DATA";
-  }
-  else {
-    weights = lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC*("+kfactor+")";
-  }
-  std::cout<<" weights interpreted : "<<weights<<std::endl;
+auto AddEventWeight(T &df, const std::string& lumi, const bool isMC) {
+
+  std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; //PromptGenLepMatch2l
+  std::cout<<">>> weights interpreted : "<<weights<<std::endl;
   return df.Define( "weight", weights );
 }
 
@@ -72,7 +67,7 @@ const std::vector<std::string> finalVariables = {
   "passingVeto" , "passingLoose" , "passingMedium" , "passingTight" , "passingMVAtth",
 
   // sanity checks variables
-  "isMC" , "goodElectrons" , "goodJets" , "cleanFromJet" ,
+  "goodElectrons" , "goodJets" , "cleanFromJet" ,
   "tagEle" , "TagEle" , "nElectron" , "tag_Idx" , "probe_Idx" , "nTnP"
 };
 

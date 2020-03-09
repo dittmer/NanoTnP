@@ -1,71 +1,85 @@
 #ifndef SKIM_H
 #define SKIM_H
-#include "ROOT/RDataFrame.hxx"
-#include "ROOT/RDFHelpers.hxx"
-#include "ROOT/RVec.hxx"
+#include "tnpper.h"
 
-#include "Math/Vector4D.h"
-#include "TStopwatch.h"
+/*
+ * EDFilter
+ * goodElectron
+ */
+template <typename T>
+auto Filterbaseline(T &df, std::string HLT) {
+  HLT+=" == true";
+  return df
+    .Filter(HLT, " --> Passes trigger "+HLT)
+    .Filter("nElectron>=2"," --> At least two electrons")
+    ;
+}
 
-#include <stdlib.h>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <cmath>
+/*************************************************** tag_sequence ***************************************************/
 
-#include "utility" // std::pair
-#include <algorithm> // for std::find
-#include <iterator> // for std::begin, std::end
+/*
+ * EDFilter
+ * Kinematically good electrons
+ * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmGoodParticlesDef_cff.py#L75-L79
+ */
+template <typename T>
+auto goodElectrons(T &df) {
+  return df
+    .Define("goodElectrons","abs(Electron_eta) < 2.5 && Electron_pt > 5")
+    .Define("probeEle","goodElectrons==1")
+    .Filter("Sum(goodElectrons==0)==0"," --> All good electrons")
+    ;
+}
 
-#include "TRandom3.h"
-#include "TLorentzVector.h"
+/*
+ * EDProducer
+ * Kinematically good jets
+ */
+template <typename T>
+auto goodJets(T &df) {
+  return df
+    .Define("goodJets","Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4")
+    .Filter("Sum(goodJets)>0"," --> At least 1 good jets")
+    ;
+}
 
-namespace Helper {
-
-  /*
-   * sort TnP electron candidates in pT descending order
-   */
-  struct pTSorter {
-    bool operator() (std::pair<int,float> i , std::pair<int,float> j) { return ( (i.second) > (j.second) ); }
-  };
-
-  template <typename T>
-    std::vector<int> IndexBypT(T v){
-    pTSorter comparator;
-    std::vector<int> indecies;
-    std::sort (v.begin() , v.end() , comparator);
-    for (auto it = v.begin() ; it != v.end() ; ++it){
-      indecies.push_back((*it).first);
-    }
-    return indecies;
-  }
-
-  /*
-   * bit decoder
-   */
-  template <typename T>
-    int bitdecoder( T decimal , T kbit){
-      // shift bit from the left to right and inspect with AND operator
-      int on=0;
-      if ( decimal & ( 1 << kbit ) ) on=1;
-      return on;
-    }
-
-  /*
-   * Compute the difference in the azimuth coordinate taking the boundary conditions at 2*pi into account.
-   */
-  template <typename T>
-    float DeltaPhi(T v1, T v2, const T c = M_PI)
+/*
+ * EDProducer
+ * clean electron from jets
+ * Bool Vector
+ */
+template <typename T>
+auto cleanFromJet(T &df) {
+  using namespace ROOT::VecOps;
+  auto cleanFromJet = [](RVec<int>& goodElectron, RVec<float>& eta_1, RVec<float>& phi_1,
+			 RVec<int>& goodJet, RVec<float>& eta_2, RVec<float>& phi_2)
     {
-      auto r = std::fmod(v2 - v1, 2.0 * c);
-      if (r < -c) {
-	r += 2.0 * c;
+
+      // Get indices of all possible combinations
+      auto comb = Combinations(eta_1,eta_2);
+      const auto numComb = comb[0].size();
+      // Find match pair and eliminate the electron
+      RVec<int> CleanElectron(eta_1.size(),0);
+      for (size_t i = 0 ; i < numComb ; i++) {
+        const auto i1 = comb[0][i];
+        const auto i2 = comb[1][i];
+        if( goodElectron[i1] == 1 && goodJet[i2] == 1 ){
+          const auto deltar = sqrt(
+				   pow(eta_1[i1] - eta_2[i2], 2) +
+				   pow(Helper::DeltaPhi(phi_1[i1], phi_2[i2]), 2));
+          if (deltar > 0.3) {
+	    CleanElectron[i1] = 1; // no match, good electron
+	  }
+	}
       }
-      else if (r > c) {
-	r -= 2.0 * c;
-      }
-      return r;
-    }
+
+      return CleanElectron;
+    };
+
+  return df
+    .Define("cleanFromJet", cleanFromJet, {"goodElectrons", "Electron_eta", "Electron_phi", "goodJets", "Jet_eta" , "Jet_phi"})
+    .Filter("Sum(cleanFromJet==0)==0"," --> All electrons are cleaned")
+    ;
 }
 
 #endif
