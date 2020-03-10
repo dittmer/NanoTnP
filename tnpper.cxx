@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     const std::string output = argv[2];
     const std::string lumi = argv[3];
     const bool isMC = (input.find("Electron") != std::string::npos) ? false : true;
-
+    std::cout<<"isMC : "<<isMC<<std::endl;
 
     std::cout << ">>> Process input: " << input << std::endl;
     std::cout << ">>> Process output: " << output << std::endl;
@@ -62,10 +62,10 @@ int main(int argc, char **argv) {
 
     // tag and probe producer
     auto df5 = tagCandProducer(df4);
-    auto df6 = (isMC==false) ? tagMatchProducer(df5,"trigger") : df5; // data: tag matched with trigger
-    auto df7 = (isMC==true) ? tagMatchProducer(df6,"gen") : df6; // mc: tag match with gen
+    auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger") : df5; // data: tag matched with trigger
+    auto df7 = ( isMC ) ? tagMatchProducer(df6,"gen") : df6; // mc: tag match with gen
     auto df8 = tagProducer(df7,isMC);
-    auto df9 = probeProducer(df8);
+    auto df9 = probeProducer(df8,"Electron_mvaTTH > 0.7"); // <-- insert testflag
 
     // tag-probe pair producer (return pair Idx)
     auto df10 = pairProducer(df9);

@@ -26,7 +26,6 @@ template <typename T>
 auto goodElectrons(T &df) {
   return df
     .Define("goodElectrons","abs(Electron_eta) < 2.5 && Electron_pt > 5")
-    .Define("probeEle","goodElectrons==1")
     .Filter("Sum(goodElectrons==0)==0"," --> All good electrons")
     ;
 }
@@ -39,7 +38,6 @@ template <typename T>
 auto goodJets(T &df) {
   return df
     .Define("goodJets","Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4")
-    .Filter("Sum(goodJets)>0"," --> At least 1 good jets")
     ;
 }
 
@@ -61,16 +59,13 @@ auto cleanFromJet(T &df) {
       // Find match pair and eliminate the electron
       RVec<int> CleanElectron(eta_1.size(),0);
       for (size_t i = 0 ; i < numComb ; i++) {
-        const auto i1 = comb[0][i]; // ele
-        const auto i2 = comb[1][i]; // jets
-        if( goodElectron[i1] == 1 && goodJet[i2] == 1 ){
-          const auto deltar = sqrt(pow(eta_1[i1] - eta_2[i2], 2) + pow(Helper::DeltaPhi(phi_1[i1], phi_2[i2]), 2));
-          if (deltar > 0.3) {
-	           CleanElectron[i1] = 1; // no match, clean electron
-	        }
-	       }
+        const auto iele = comb[0][i]; // ele
+        const auto ijet = comb[1][i]; // jets
+        if ( goodElectron[iele] != 1 ) continue;
+        if ( goodJet[ijet] !=1 ) continue;
+        const auto deltar = sqrt(pow(eta_1[iele] - eta_2[ijet], 2) + pow(Helper::DeltaPhi(phi_1[iele], phi_2[ijet]), 2));
+        if (deltar > 0.3) CleanElectron[iele] = 1; // no match, clean electron
       }
-
       return CleanElectron;
     };
 
