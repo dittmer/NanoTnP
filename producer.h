@@ -21,9 +21,9 @@
  */
 
 template<typename T>
-  auto tagMatchProducer(T &df, std::string &flag) {
+  auto tagMatchProducer(T &df, const char* s) {
   using namespace ROOT::VecOps;
-
+  std::string flag(s);
   // trigger matching producer
   auto trg_matchCandi = [](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg) {
 
@@ -59,8 +59,8 @@ template<typename T>
 
         //genpart selection
         if (abs(gen_pdgId[iele]) != 11) continue;
-        if (gen_pt[igen] < 3) continue;
-        if (abs(gen_eta[igen]) > 2.7) continue;
+        if (pt_gen[igen] < 3) continue;
+        if (abs(eta_gen[igen]) > 2.7) continue;
         //isPromptFinalState = isPrompt + isLastCopy
         if ( ( statusflag[igen] & 0 ) != 0) continue;
         //genpart selection
@@ -71,20 +71,21 @@ template<typename T>
       }
       return gen_matchCandidate;
   };
-
-  if (flag.compare("trigger")){
-    return df.Define("trg_match",trg_matchCandi,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi"});
+  auto out=df;
+  if (flag=="trigger"){
+    out = df.Define("trg_match",trg_matchCandi,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi"});
   }
-  else if (flag.compare("gen")){
-    return df.Define("gen_match",gen_matchCandi,{"Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"});
+  else if (flag=="gen"){
+    out = df.Define("gen_match",gen_matchCandi,{"Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"});
   }
+  return out;
 }
 
 template <typename T>
-auto tagProducer(T &df, bool &isMC){
+auto tagProducer(T &df, const bool &isMC){
 
   auto out = (isMC==true) ? df.Define("isTag","tagCand==1 && gen_match==1") : df.Define("isTag","tagCand==1 && trg_match==1");
-  return out
+  return out;
 }
 
 template <typename T>

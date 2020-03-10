@@ -84,7 +84,7 @@ struct config_t {
   // tag passing flag
   bool passfilter=false;
   float passfilter_dR=0.2;
-  boll genMatch=false;
+  bool genMatch=false;
   float genMatch_dR=0.3;
   // tag passing flag
   std::string tag_WP;

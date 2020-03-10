@@ -1,7 +1,7 @@
 #include "tnpper.h"
+#include "config.h"
 #include "skim.h"
 #include "producer.h"
-#include "finito.h"
 
 /*
  * Main function, skimming step of analysis
@@ -41,8 +41,6 @@ int main(int argc, char **argv) {
       cfg.bit = "hltEle32WPTightGsfTrackIsoFilter";
     }
 
-    cfg.
-
     TStopwatch time;
     time.Start();
 
@@ -64,9 +62,9 @@ int main(int argc, char **argv) {
 
     // tag and probe producer
     auto df5 = tagCandProducer(df4);
-    auto df6 = (isMC==false) ? tagMatchProducer(df5,"trigger") : df5.Define("trg_match","-1*(run==1)"); // data
-    auto df7 = (isMC==true) ? tagMatchProducer(df6,"gen") : df6.Define("gen_match","-1*(run>0)"); // mc
-    auto df8 = tagProducer(df7);
+    auto df6 = (isMC==false) ? tagMatchProducer(df5,"trigger") : df5; // data: tag matched with trigger
+    auto df7 = (isMC==true) ? tagMatchProducer(df6,"gen") : df6; // mc: tag match with gen
+    auto df8 = tagProducer(df7,isMC);
     auto df9 = probeProducer(df8);
 
     // tag-probe pair producer (return pair Idx)
@@ -74,9 +72,9 @@ int main(int argc, char **argv) {
 
     // should be applied last step
     auto df11 = DeclareVariables(df10);
-    auto df10 = AddEventWeight(df11 , lumi , isMC );
+    auto df12 = AddEventWeight(df11 , lumi , isMC );
 
-    auto dfFinal = df10;
+    auto dfFinal = df12;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("Events", output, finalVariables);
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
