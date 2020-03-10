@@ -81,8 +81,10 @@ template<typename T>
 }
 
 template <typename T>
-auto tagProducer(T &df){
-  return df.Define("isTag","tagCand==1 && trg_match==1 && gen_match==1");
+auto tagProducer(T &df, bool &isMC){
+
+  auto out = (isMC==true) ? df.Define("isTag","tagCand==1 && gen_match==1") : df.Define("isTag","tagCand==1 && trg_match==1");
+  return out
 }
 
 template <typename T>
@@ -112,7 +114,8 @@ auto pairProducer(T &df) {
       const auto itag = comb[0][i];
       const auto iprobe = comb[1][i];
 
-      tot.SetPtEtaPhiM(0.,0.,0.,0.);
+      tot.SetPtEtaPhiM( 0. , 0. , 0. , 0. );
+      probe.SetPtEtaPhiM( 0. , 0. , 0. , 0. );
 
       if (itag==iprobe) continue;
       if (isTag[itag]!=1) continue;
