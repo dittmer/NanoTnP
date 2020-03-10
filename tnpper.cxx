@@ -27,19 +27,21 @@ int main(int argc, char **argv) {
     std::cout << ">>> Process output: " << output << std::endl;
     std::cout << ">>> Integrated luminosity: " << lumi << std::endl;
 
-    // HLT
+    // configuration
     if (input.find("2016") != std::string::npos) {
-      myhlt.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
-      myhlt.bit="hltEle27WPTightTrackIsoFilter";
+      cfg.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
+      cfg.bit="hltEle27WPTightTrackIsoFilter";
     }
     else if (input.find("2017") != std::string::npos) {
-      myhlt.name = "HLT_Ele35_WPTight_Gsf";
-      myhlt.bit = "hltEle35noerWPTightGsfTrackIsoFilter";
+      cfg.name = "HLT_Ele35_WPTight_Gsf";
+      cfg.bit = "hltEle35noerWPTightGsfTrackIsoFilter";
     }
     else if (input.find("2017") != std::string::npos) {
-      myhlt.name = "HLT_Ele32_WPTight_Gsf";
-      myhlt.bit = "hltEle32WPTightGsfTrackIsoFilter";
+      cfg.name = "HLT_Ele32_WPTight_Gsf";
+      cfg.bit = "hltEle32WPTightGsfTrackIsoFilter";
     }
+
+    cfg.
 
     TStopwatch time;
     time.Start();
@@ -59,17 +61,22 @@ int main(int argc, char **argv) {
     auto df2 = goodElectrons(df1);
     auto df3 = goodJets(df2);
     auto df4 = cleanFromJet(df3);
-    // skim plus object cleaning
 
-    auto df5 = tagEle(df4);
-    auto df6 = genTagEle(df5,isMC);
-    auto df7 = tnpPairingEleIDs(df6);
+    // tag and probe producer
+    auto df5 = tagCandProducer(df4);
+    auto df6 = (isMC==false) ? tagMatchProducer(df5,"trigger") : df5.Define("trg_match","-1*(run==1)"); // data
+    auto df7 = (isMC==true) ? tagMatchProducer(df6,"gen") : df6.Define("gen_match","-1*(run>0)"); // mc
+    auto df8 = tagProducer(df7);
+    auto df9 = probeProducer(df8);
+
+    // tag-probe pair producer (return pair Idx)
+    auto df10 = pairProducer(df9);
 
     // should be applied last step
-    auto df8 = DeclareVariables(df7);
-    auto df9 = AddEventWeight(df8 , lumi , isMC );
+    auto df11 = DeclareVariables(df10);
+    auto df10 = AddEventWeight(df11 , lumi , isMC );
 
-    auto dfFinal = df9;
+    auto dfFinal = df10;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("Events", output, finalVariables);
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");

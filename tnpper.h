@@ -70,44 +70,31 @@ namespace Helper {
     }
 }
 
-struct HLT_t {
+
+struct config_t {
+
+  // basic
+  bool isMC=false;
+  bool passHLT=false;
+  // jet cleaning
+  float jetclean_dR=0.3;
+  //trigger
   std::string name;
   std::string bit;
-} myhlt;
+  // tag passing flag
+  bool passfilter=false;
+  float passfilter_dR=0.2;
+  boll genMatch=false;
+  float genMatch_dR=0.3;
+  // tag passing flag
+  std::string tag_WP;
+  std::string tag_sel;
+  // probe passig flag
+  std::string probe_WP;
+  std::string probe_sel;
+  // tag and pair flag
+  bool resolveAmbiguity=false;
 
-/*
- * Declare all variables which will end up in the final reduced dataset
- */
-
-const std::vector<std::string> finalVariables = {
-// ntuple variables
-"tag_Ele_pt" ,
-"tag_Ele_eta" ,
-"tag_Ele_phi" ,
-"probe_Ele_pt",
-"probe_Ele_eta" ,
-"probe_Ele_phi" ,
-"weight",
-"pair_pt" ,
-"pair_eta" ,
-"pair_phi" ,
-"pair_mass" ,
-"passingVeto" ,
-"passingLoose" ,
-"passingMedium" ,
-"passingTight" ,
-"passingMVAtth",
-
-// sanity checks variables
-"goodElectrons" ,
-"goodJets" ,
-"cleanFromJet" ,
-"tagEle" ,
-"TagEle" ,
-"nElectron" ,
-"tag_Idx" ,
-"probe_Idx" ,
-"nTnP"
-};
+} cfg;
 
 #endif
