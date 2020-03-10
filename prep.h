@@ -1,6 +1,6 @@
-#ifndef SKIM_H
-#define SKIM_H
-#include "tnpper.h"
+#include "skim.h"
+#ifndef PREP_H
+#define PREP_H
 
 /*
  * EDFilter
@@ -10,6 +10,7 @@ template <typename T>
 auto Filterbaseline(T &df, std::string HLT) {
   HLT+=" == true";
   return df
+    .Define("isMC", "run==1")
     .Filter(HLT, " --> Passes trigger "+HLT)
     .Filter("nElectron>=2"," --> At least two electrons")
     ;
@@ -61,14 +62,16 @@ auto cleanFromJet(T &df) {
       // Find match pair and eliminate the electron
       RVec<int> CleanElectron(eta_1.size(),0);
       for (size_t i = 0 ; i < numComb ; i++) {
-        const auto i1 = comb[0][i]; // ele
-        const auto i2 = comb[1][i]; // jets
+        const auto i1 = comb[0][i];
+        const auto i2 = comb[1][i];
         if( goodElectron[i1] == 1 && goodJet[i2] == 1 ){
-          const auto deltar = sqrt(pow(eta_1[i1] - eta_2[i2], 2) + pow(Helper::DeltaPhi(phi_1[i1], phi_2[i2]), 2));
+          const auto deltar = sqrt(
+				   pow(eta_1[i1] - eta_2[i2], 2) +
+				   pow(Helper::DeltaPhi(phi_1[i1], phi_2[i2]), 2));
           if (deltar > 0.3) {
-	           CleanElectron[i1] = 1; // no match, clean electron
-	        }
-	       }
+	    CleanElectron[i1] = 1; // no match, good electron
+	  }
+	}
       }
 
       return CleanElectron;

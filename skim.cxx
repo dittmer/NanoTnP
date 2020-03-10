@@ -1,4 +1,8 @@
 #include "skim.h"
+#include "prep.h"
+#include "run.h"
+#include "finito.h"
+
 /*
  * Main function, skimming step of analysis
  * The function loops over the input samples,
