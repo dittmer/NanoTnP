@@ -98,10 +98,10 @@ auto tagProducer(T &df, const bool &isMC){
 }
 
 template <typename T>
-auto probeProducer(T &df, const char* testWP){
+auto probeProducer(T &df, const char* testWP=""){
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L39-L42
   std::string WP(testWP);
-  return df.Define("isProbe","goodElectrons==1 &&"+WP);
+  return df.Define("isProbe","goodElectrons==1");
 }
 
 /*************************************************** tnpPairingEleIDs ***************************************************/
@@ -121,38 +121,35 @@ auto pairProducer(T &df) {
     const auto paircomb = comb[0].size();
     std::vector<std::pair<int,int>> pair_Idx;
 
-    TLorentzVector tot, probe;
     for(size_t i = 0 ; i < paircomb ; i++){
       const auto itag = comb[0][i];
       const auto iprobe = comb[1][i];
 
-      tot.SetPtEtaPhiM( 0. , 0. , 0. , 0. );
-      probe.SetPtEtaPhiM( 0. , 0. , 0. , 0. );
-
       if (itag==iprobe) continue;
-      if (isTag[itag]!=1) continue;
-      if (isProbe[iprobe]!=1) continue;
-      tot.SetPtEtaPhiM( pt[itag] , eta[itag] , phi[itag] , m[itag] );
-      probe.SetPtEtaPhiM( pt[iprobe] , eta[iprobe] , phi[iprobe] , m[iprobe] );
+      if (isTag[itag]!=1) continue; // probe cannot be tag
+      if (isProbe[iprobe]!=1) continue; // tag can be probe
+      TLorentzVector tot = Helper::VectorMaker( pt[itag] , eta[itag] , phi[itag] , m[itag] );
+      TLorentzVector probe = Helper::VectorMaker( pt[iprobe] , eta[iprobe] , phi[iprobe] , m[iprobe] );
       tot+=probe;
       if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(itag,iprobe));
     }
     //
     auto nTnP = pair_Idx.size();
-    int irand = -1, tidx = -1, pidx = -1;
+    int ipair = -1, tidx = -1, pidx = -1; double randomness = -1.;
     //std::cout<<"pair_Idx size : "<<nTnP<<std::endl;
-    if (nTnP==1) return std::vector<int>({pair_Idx[0].first , pair_Idx[0].second , static_cast<int>(nTnP) , irand });
-    if (nTnP==0) return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , irand });
+    if (nTnP==1) return std::vector<int>({pair_Idx[0].first , pair_Idx[0].second , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
+    if (nTnP==0) return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
 
     TRandom3 rand = TRandom3();
     // throw random number on selecting which pair
-    irand = static_cast<int>(rand.Uniform(0,nTnP));
+    randomness = rand.Uniform(0,nTnP);
+    ipair = static_cast<int>(randomness);
     //std::cout<<"throwing random number : "<<irand<<std::endl;
-    tidx = pair_Idx[irand].first;
-    pidx = pair_Idx[irand].second;
+    tidx = pair_Idx[ipair].first;
+    pidx = pair_Idx[ipair].second;
     //std::cout<<"tidx : "<<tidx<<std::endl;
     //std::cout<<"pidx : "<<pidx<<std::endl;
-    return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , irand});
+    return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
 
 };
 
@@ -161,7 +158,8 @@ auto pairProducer(T &df) {
           .Define("tag_Idx", "tnpProducer[0]")
           .Define("probe_Idx","tnpProducer[1]")
           .Define("nTnP","tnpProducer[2]")
-          .Define("randPair","tnpProducer[3]")
+          .Define("ipair","tnpProducer[3]")
+          .Define("randomness","tnpProducer[4]")
           .Filter("(tag_Idx!=-1 && probe_Idx!=-1) && (tag_Idx!=probe_Idx)"," --> Filter invalid tnp pair")
           ;
 }

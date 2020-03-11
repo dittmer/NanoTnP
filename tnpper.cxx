@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
     auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger") : df5; // data: tag matched with trigger
     auto df7 = ( isMC ) ? tagMatchProducer(df6,"gen") : df6; // mc: tag match with gen
     auto df8 = tagProducer(df7,isMC);
-    auto df9 = probeProducer(df8,"Electron_mvaTTH > 0.7"); // <-- insert testflag // assume HWW working, test passing in pairProducer... zzzz
-
+    auto df9 = probeProducer(df8,""); // <-- insert testflag // assume HWW working, test passing in pairProducer... zzzz
+    // "Electron_mvaTTH > 0.7"
     // tag-probe pair producer (return pair Idx)
     auto df10 = pairProducer(df9);
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
     auto dfFinal = df12;
     auto report = dfFinal.Report();
-    dfFinal.Snapshot("Events", output, finalVariables);
+    dfFinal.Snapshot("fitter_tree", output, finalVariables); //dfFinal.GetDefinedColumnNames()
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
     time.Stop();
 

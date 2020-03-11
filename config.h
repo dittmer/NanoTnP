@@ -34,7 +34,9 @@ const std::vector<std::string> finalVariables = {
 "gen_match",
 "tag_Idx" ,
 "probe_Idx" ,
-"nTnP"
+"nTnP" ,
+"ipair",
+"randomness"
 };
 
 #endif
