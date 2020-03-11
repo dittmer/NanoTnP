@@ -68,7 +68,15 @@ namespace Helper {
       }
       return r;
     }
+
+template<typename T>
+TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
+  TLorentzVector out;
+  out.SetPtEtaPhiM(pt,eta,phi,m);
+  return out;
 }
+
+} // helper
 
 
 struct config_t {

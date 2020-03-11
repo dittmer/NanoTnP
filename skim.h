@@ -23,9 +23,10 @@ auto Filterbaseline(T &df, std::string HLT) {
  * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmGoodParticlesDef_cff.py#L75-L79
  */
 template <typename T>
-auto goodElectrons(T &df) {
+auto goodElectrons(T &df, const char* good) {
+  std::string in(good);
   return df
-    .Define("goodElectrons","abs(Electron_eta) < 2.5 && Electron_pt > 5")
+    .Define("goodElectrons", in )
     .Filter("Sum(goodElectrons==0)==0"," --> All good electrons")
     ;
 }
@@ -35,9 +36,10 @@ auto goodElectrons(T &df) {
  * Kinematically good jets
  */
 template <typename T>
-auto goodJets(T &df) {
+auto goodJets(T &df, const char* good) {
+  std::string in(good);
   return df
-    .Define("goodJets","Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4")
+    .Define("goodJets", in )
     ;
 }
 

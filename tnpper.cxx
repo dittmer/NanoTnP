@@ -55,9 +55,9 @@ int main(int argc, char **argv) {
     std::string dummy="HLT_Ele35_WPTight_Gsf";
 
     // skim plus object cleaning
-    auto df1 = Filterbaseline(df, dummy );
-    auto df2 = goodElectrons(df1);
-    auto df3 = goodJets(df2);
+    auto df1 = Filterbaseline( df , dummy );
+    auto df2 = goodElectrons( df1 , "abs(Electron_eta) < 2.5 && Electron_pt > 5" ); //definition of good electron
+    auto df3 = goodJets( df2 , "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4"); // definition of good jets
     auto df4 = cleanFromJet(df3);
 
     // tag and probe producer
@@ -65,10 +65,10 @@ int main(int argc, char **argv) {
     auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger") : df5; // data: tag matched with trigger
     auto df7 = ( isMC ) ? tagMatchProducer(df6,"gen") : df6; // mc: tag match with gen
     auto df8 = tagProducer(df7,isMC);
-    auto df9 = probeProducer(df8,"Electron_mvaTTH > 0.7"); // <-- insert testflag
 
     // tag-probe pair producer (return pair Idx)
-    auto df10 = pairProducer(df9);
+    auto df9 = pairProducer(df8);
+    auto df10 = probeWPProducer(df9);
 
     // should be applied last step
     auto df11 = DeclareVariables(df10);
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
     auto dfFinal = df12;
     auto report = dfFinal.Report();
-    dfFinal.Snapshot("Events", output, finalVariables);
+    dfFinal.Snapshot("fitter_tree", output, finalVariables);
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
     time.Stop();
 
