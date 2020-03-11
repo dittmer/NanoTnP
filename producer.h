@@ -97,13 +97,6 @@ auto tagProducer(T &df, const bool &isMC){
   return (isMC) ? df.Define("isTag","tagCand==1 && gen_match==1") : df.Define("isTag","tagCand==1 && trg_match==1");
 }
 
-template <typename T>
-auto probeProducer(T &df, const char* testWP=""){
-  //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L39-L42
-  std::string WP(testWP);
-  return df.Define("isProbe","goodElectrons==1");
-}
-
 /*************************************************** tnpPairingEleIDs ***************************************************/
 /*
  * EDProducer + EDAnalyzer
@@ -115,52 +108,78 @@ auto probeProducer(T &df, const char* testWP=""){
 template <typename T>
 auto pairProducer(T &df) {
   using namespace ROOT::VecOps;
-  auto tnpProducer = [](RVec<int>& isTag , RVec<int>& isProbe , RVec<float>& pt , RVec<float>& eta , RVec<float>& phi , RVec<float>& m ){
+  auto tnpProducer = [](RVec<int>& isTag , RVec<float>& pt , RVec<float>& eta , RVec<float>& phi , RVec<float>& m ){
 
-    auto comb = Combinations(isTag,isProbe);
+    auto comb = Combinations(isTag,isTag);
     const auto paircomb = comb[0].size();
     std::vector<std::pair<int,int>> pair_Idx;
 
     for(size_t i = 0 ; i < paircomb ; i++){
-      const auto itag = comb[0][i];
-      const auto iprobe = comb[1][i];
+      const auto i1 = comb[0][i];
+      const auto i2 = comb[1][i];
 
-      if (itag==iprobe) continue;
-      if (isTag[itag]!=1) continue; // probe cannot be tag
-      if (isProbe[iprobe]!=1) continue; // tag can be probe
-      TLorentzVector tot = Helper::VectorMaker( pt[itag] , eta[itag] , phi[itag] , m[itag] );
-      TLorentzVector probe = Helper::VectorMaker( pt[iprobe] , eta[iprobe] , phi[iprobe] , m[iprobe] );
+      if (i1==i2) continue;
+      if (isTag[i1]!=1) continue; // first need to be tag
+      TLorentzVector tot = Helper::VectorMaker( pt[i1] , eta[i1] , phi[i1] , m[i1] );
+      TLorentzVector probe = Helper::VectorMaker( pt[i2] , eta[i2] , phi[i2] , m[i2] );
       tot+=probe;
-      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(itag,iprobe));
+      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(i1,i2));
     }
     //
     auto nTnP = pair_Idx.size();
     int ipair = -1, tidx = -1, pidx = -1; double randomness = -1.;
-    //std::cout<<"pair_Idx size : "<<nTnP<<std::endl;
     if (nTnP==1) return std::vector<int>({pair_Idx[0].first , pair_Idx[0].second , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
     if (nTnP==0) return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
 
-    TRandom3 rand = TRandom3();
     // throw random number on selecting which pair
+    TRandom3 rand = TRandom3();
     randomness = rand.Uniform(0,nTnP);
     ipair = static_cast<int>(randomness);
-    //std::cout<<"throwing random number : "<<irand<<std::endl;
     tidx = pair_Idx[ipair].first;
     pidx = pair_Idx[ipair].second;
-    //std::cout<<"tidx : "<<tidx<<std::endl;
-    //std::cout<<"pidx : "<<pidx<<std::endl;
+
     return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , ipair , static_cast<int>(randomness) });
 
 };
 
   return df
-          .Define("tnpProducer", tnpProducer, {"isTag","isProbe","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
+          .Define("tnpProducer", tnpProducer, {"isTag","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
           .Define("tag_Idx", "tnpProducer[0]")
           .Define("probe_Idx","tnpProducer[1]")
           .Define("nTnP","tnpProducer[2]")
           .Define("ipair","tnpProducer[3]")
           .Define("randomness","tnpProducer[4]")
           .Filter("(tag_Idx!=-1 && probe_Idx!=-1) && (tag_Idx!=probe_Idx)"," --> Filter invalid tnp pair")
+          ;
+}
+
+/*
+ * Probe WP definition
+ *
+ */
+template <typename T>
+auto probeWPProducer(T &df){
+  using namespace ROOT::VecOps;
+  auto leptonidx = [](RVec<int>& leptonwp , RVec<int>& leptonidx , int& pidx) {
+    int lIdx=-1;
+    for (size_t i=0 ; i< leptonidx.size() ; i++){
+        //
+        if ( leptonidx[i]== pidx ){
+          lIdx=i;
+          break;
+        }
+    }
+    return leptonwp[lIdx];
+  };
+
+  return df
+          .Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
+          .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
+          .Define("passingVeto","Electron_cutBased[probe_Idx]==1")
+          .Define("passingLoose","Electron_cutBased[probe_Idx]==2")
+          .Define("passingMedium","Electron_cutBased[probe_Idx]==3")
+          .Define("passingTight","Electron_cutBased[probe_Idx]==4")
+          .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
           ;
 }
 
@@ -176,7 +195,7 @@ auto DeclareVariables(T &df) {
       return ROOT::Math::PtEtaPhiMVector(pt, eta, phi, mass);
     };
 
-  auto pair_kin = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
+  auto pair = [](ROOT::Math::PtEtaPhiMVector& p4_1, ROOT::Math::PtEtaPhiMVector& p4_2)
     {
       return std::vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
     };
@@ -196,12 +215,12 @@ auto DeclareVariables(T &df) {
 
     .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
     .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
+    .Define("pair" ,pair,{"tag_Ele","probe_Ele"})
 
-    .Define("pair_kin" ,pair_kin,{"tag_Ele","probe_Ele"})
-    .Define("pair_pt" ,"pair_kin[0]")
-    .Define("pair_eta" ,"pair_kin[1]")
-    .Define("pair_phi" ,"pair_kin[2]")
-    .Define("pair_mass" ,"pair_kin[3]")
+    .Define("pair_pt" ,"pair[0]")
+    .Define("pair_eta" ,"pair[1]")
+    .Define("pair_phi" ,"pair[2]")
+    .Define("pair_mass" ,"pair[3]")
     ;
 }
 
