@@ -139,10 +139,10 @@ auto pairProducer(T &df) {
     }
     //
     auto nTnP = pair_Idx.size();
-    int irand, tidx = -1, pidx = -1;
+    int irand = -1, tidx = -1, pidx = -1;
     //std::cout<<"pair_Idx size : "<<nTnP<<std::endl;
-    if (nTnP==1) return std::vector<int>({pair_Idx[0].first , pair_Idx[0].second , static_cast<int>(nTnP)});
-    if (nTnP==0) return std::vector<int>({tidx , pidx , static_cast<int>(nTnP)});
+    if (nTnP==1) return std::vector<int>({pair_Idx[0].first , pair_Idx[0].second , static_cast<int>(nTnP) , irand });
+    if (nTnP==0) return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , irand });
 
     TRandom3 rand = TRandom3();
     // throw random number on selecting which pair
@@ -152,7 +152,7 @@ auto pairProducer(T &df) {
     pidx = pair_Idx[irand].second;
     //std::cout<<"tidx : "<<tidx<<std::endl;
     //std::cout<<"pidx : "<<pidx<<std::endl;
-    return std::vector<int>({tidx , pidx , static_cast<int>(nTnP)});
+    return std::vector<int>({tidx , pidx , static_cast<int>(nTnP) , irand});
 
 };
 
@@ -161,6 +161,7 @@ auto pairProducer(T &df) {
           .Define("tag_Idx", "tnpProducer[0]")
           .Define("probe_Idx","tnpProducer[1]")
           .Define("nTnP","tnpProducer[2]")
+          .Define("randPair","tnpProducer[3]")
           .Filter("(tag_Idx!=-1 && probe_Idx!=-1) && (tag_Idx!=probe_Idx)"," --> Filter invalid tnp pair")
           ;
 }
