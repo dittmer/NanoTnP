@@ -11,6 +11,7 @@ const std::vector<std::string> finalVariables = {
 "goodJets" ,
 "cleanFromJet" ,
 "tagMatcher" ,
+"mctruth" ,
 "isTag" ,
 "nElectron" ,
 "tag_Idx" ,

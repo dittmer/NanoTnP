@@ -25,19 +25,19 @@
 namespace Helper {
 
   /*
-   * sort TnP electron candidates in pT descending order
+   * sort Gen matched candidates in ascending order
    */
-  struct pTSorter {
-    bool operator() (std::pair<int,float> i , std::pair<int,float> j) { return ( (i.second) > (j.second) ); }
+  struct dRSorter {
+    bool operator() (std::pair<std::pair<int,int>,float> i , std::pair<std::pair<int,int>,float> j) { return ( (i.second) < (j.second) ); }
   };
 
   template <typename T>
-    std::vector<int> IndexBypT(T v){
-    pTSorter comparator;
+    std::vector<int> IndexBydeltaR(T v){
+    dRSorter comparator;
     std::vector<int> indecies;
     std::sort (v.begin() , v.end() , comparator);
     for (auto it = v.begin() ; it != v.end() ; ++it){
-      indecies.push_back((*it).first);
+      indecies.push_back((*it).first.second);
     }
     return indecies;
   }

@@ -27,11 +27,12 @@ template<typename T>
   std::string flag(s);
   // trigger matching producer
   auto trgMatcher = [](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg , int& filter ) {
-
+    std::pair<RVec<int>,RVec<int>> out;
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
     const auto numComb = comb[0].size();
     RVec<int> matcher(eta_el.size(),1); // in case matching is not apply, all deemed pass
+    RVec<int> mctruth(eta_el.size(),-1); // dummy
 
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
@@ -44,51 +45,72 @@ template<typename T>
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
       if (deltar > 0.3) matcher[iele] = 0;
       }
-    return matcher;
+    out = std::make_pair(matcher,mctruth);
+    return out;
   };
 
   // gen-matching producer
   auto genMatcher = [](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
-                          RVec<float>& eta_gen , RVec<float>& phi_gen , RVec<int>& statusflag) {
-
-      // get combination
-      auto comb = Combinations(eta_el,eta_gen); // electron-gen object pair
-      const auto numComb = comb[0].size();
+                          RVec<float>& eta_gen , RVec<float>& phi_gen , RVec<int>& statusflag , RVec<int>& mother_gen , RVec<int>& status_gen ) {
+      std::pair<RVec<int>,RVec<int>> out;
       RVec<int> matcher(eta_el.size(),0); // in case matching is not apply, all deemed pass
+      RVec<int> truth = matcher;
 
-      for (size_t i = 0 ; i < numComb ; i++){
-        const auto iele = comb[0][i]; // ele
-        const auto igen = comb[1][i]; // genpart
+      std::vector<std::pair<std::pair<int,int>,float>> pair_maker;
 
-        //genpart selection
-        //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L83-L86
-        if (abs(gen_pdgId[igen]) != 11) continue;
-        if (pt_gen[igen] < 3) continue;
-        if (abs(eta_gen[igen]) > 2.7) continue;
-        // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
-        if ( !Helper::bitdecoder(statusflag[igen],0) ) continue; // isPrompt
-        if ( !Helper::bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
-        //genpart selection
+      for (size_t iele = 0 ; iele < eta_el.size() ; iele++){
+        for (size_t igen = 0 ; igen < eta_gen.size() ; igen++){
 
-        //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
-        const auto deltar = sqrt( pow(eta_el[iele] - eta_gen[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_gen[igen]), 2));
-        const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_gen[igen];
-        if (deltar > 0.2) continue; // Minimum deltaR for the match
-        if (dpt_rel > 50.) continue; // Minimum deltaPt/Pt for the match
-        // resolve ambiguity, pick lowest deltaR pair first , we dont need the gen information, so no need for now.
-        matcher[iele] = 1;
-      }
-      return matcher;
+          //genpart selection
+          //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L83-L86
+          if (abs(gen_pdgId[igen]) != 11) continue;
+          if (pt_gen[igen] < 3) continue;
+          if (abs(eta_gen[igen]) > 2.7) continue;
+          // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
+          if ( !Helper::bitdecoder(statusflag[igen],0) ) continue; // isPrompt
+          if ( !Helper::bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
+          //genpart selection
+
+          //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
+          const auto deltar = sqrt( pow(eta_el[iele] - eta_gen[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_gen[igen]), 2));
+          const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_gen[igen];
+          if (deltar > 0.2) continue; // Minimum deltaR for the match
+          if (dpt_rel > 50.) continue; // Minimum deltaPt/Pt for the match
+          matcher[iele] = 1;
+          std::pair idxpair = std::make_pair(iele,igen);
+          pair_maker.push_back(std::make_pair(idxpair,deltar));
+        } // end of igen loop
+        if (pair_maker.size()==0) continue;
+        // resolve ambiguity, pick lowest deltaR pair.
+        std::vector<int> match_genIdx = Helper::IndexBydeltaR(pair_maker); //
+        int momIdx= mother_gen[match_genIdx[0]];
+        // mom checking
+        while(momIdx!=-1){
+          if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 ){
+            truth[iele]=1; break;
+          }
+          momIdx= mother_gen[momIdx];
+        }
+      } // end of iele loop
+      out = std::make_pair(matcher,truth);
+      return out;
   };
 
   auto out = df;
   if (flag=="trigger"){
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
-    out = df.Define("tagMatcher",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi","bits"});
+    out = df.Define("tagmatcher",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi","bits"})
+            .Define("tagMatcher","tagmatcher.first")
+            .Define("mctruth","tagmatcher.second")
+            ;
   }
   else if (flag=="gen"){
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
-    out = df.Define("tagMatcher",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"});
+    out = df
+            .Define("tagmatcher",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags","GenPart_genPartIdxMother","GenPart_status"})
+            .Define("tagMatcher","tagmatcher.first")
+            .Define("mctruth","tagmatcher.second")
+            ;
   }
   return out;
 }

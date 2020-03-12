@@ -33,9 +33,9 @@ if datasets == 'latinov5_16':
 elif datasets == 'latinov5_17':
     lumi="41.53"
     # DY LO
-    #samplelists.append("%s/data/%s/DYJetsToLL_M-50-LO.txt" %(cwd,datasets) )
+    samplelists.append("%s/data/%s/DYJetsToLL_M-50-LO.txt" %(cwd,datasets) )
     # alt DY NLO
-    #samplelists.append("%s/data/%s/DYJetsToLL_M-50_ext1.txt" %(cwd,datasets) )
+    samplelists.append("%s/data/%s/DYJetsToLL_M-50_ext1.txt" %(cwd,datasets) )
     # single electrons
     samplelists.append("%s/data/%s/SingleElectron_Run2017.txt" %(cwd,datasets) )
 
