@@ -22,16 +22,16 @@
  */
 
 template<typename T>
-  auto tagMatchProducer(T &df, const char* s, std::string filter="") {
+  auto tagMatchProducer(T &df, const char* s) {
   using namespace ROOT::VecOps;
   std::string flag(s);
   // trigger matching producer
-  auto trg_matchCandi = [](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg) {
+  auto trgMatcher = [](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg , int& filter ) {
 
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
     const auto numComb = comb[0].size();
-    RVec<int> trg_matchCandidate(eta_el.size(),1); // in case matching is not apply, all deemed pass
+    RVec<int> matcher(eta_el.size(),1); // in case matching is not apply, all deemed pass
 
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
@@ -40,21 +40,21 @@ template<typename T>
       //trigger object selection
       if (abs(id[itrg]) != 11) continue;
       //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
-      if ( !bitdecoder(filterbits[itrg],1) ) continue;
+      if ( !Helper::bitdecoder(filterbits[itrg], filter) ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
-      if (deltar > 0.3) trg_matchCandidate[iele] = 0;
+      if (deltar > 0.3) matcher[iele] = 0;
       }
-    return trg_matchCandidate;
+    return matcher;
   };
 
   // gen-matching producer
-  auto gen_matchCandi = [](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
+  auto genMatcher = [](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
                           RVec<float>& eta_gen , RVec<float>& phi_gen , RVec<int>& statusflag) {
 
       // get combination
       auto comb = Combinations(eta_el,eta_gen); // electron-gen object pair
       const auto numComb = comb[0].size();
-      RVec<int> gen_matchCandidate(eta_el.size(),0); // in case matching is not apply, all deemed pass
+      RVec<int> matcher(eta_el.size(),0); // in case matching is not apply, all deemed pass
 
       for (size_t i = 0 ; i < numComb ; i++){
         const auto iele = comb[0][i]; // ele
@@ -66,8 +66,8 @@ template<typename T>
         if (pt_gen[igen] < 3) continue;
         if (abs(eta_gen[igen]) > 2.7) continue;
         // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
-        if ( !bitdecoder(statusflag[igen],0) ) continue; // isPrompt
-        if ( !bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
+        if ( !Helper::bitdecoder(statusflag[igen],0) ) continue; // isPrompt
+        if ( !Helper::bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
         //genpart selection
 
         //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
@@ -76,27 +76,27 @@ template<typename T>
         if (deltar > 0.2) continue; // Minimum deltaR for the match
         if (dpt_rel > 50.) continue; // Minimum deltaPt/Pt for the match
         // resolve ambiguity, pick lowest deltaR pair first , we dont need the gen information, so no need for now.
-        gen_matchCandidate[iele] = 1;
+        matcher[iele] = 1;
       }
-      return gen_matchCandidate;
-
+      return matcher;
   };
 
   auto out = df;
-  std::cout<<" >> Matcher deployed : "<<flag<<" matching << "<<std::endl;
   if (flag=="trigger"){
-    out = df.Define("trg_match",trg_matchCandi,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi"});
+    std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
+    out = df.Define("tagMatcher",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi","bits"});
   }
   else if (flag=="gen"){
-    out = df.Define("gen_match",gen_matchCandi,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"});
+    std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
+    out = df.Define("tagMatcher",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags"});
   }
   return out;
 }
 
 template <typename T>
-auto tagProducer(T &df, const bool &isMC){
+auto tagProducer(T &df){
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L30-L37
-  return (isMC) ? df.Define("isTag","tagCand==1 && gen_match==1") : df.Define("isTag","tagCand==1 && trg_match==1");
+  return df.Define("isTag","tagCand==1 && tagMatcher==1");
 }
 
 /*************************************************** tnpPairingEleIDs ***************************************************/
@@ -234,7 +234,7 @@ template <typename T>
 auto AddEventWeight(T &df, const std::string& lumi, const bool isMC) {
 
   std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; //PromptGenLepMatch2l
-  std::cout<<">>> weights interpreted : "<<weights<<std::endl;
+  std::cout<<" >>> weights interpreted : "<<weights<<" <<< "<<std::endl;
   return df.Define( "weight", weights );
 }
 

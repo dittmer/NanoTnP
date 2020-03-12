@@ -32,17 +32,17 @@ int main(int argc, char **argv) {
     if (input.find("_16") != std::string::npos) {
       myhlt.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
       // hltEle27WPTightTrackIsoFilter
-      myhlt.bit=1; // bit's position
+      myhlt.bit="1"; // bit's position
     }
     else if (input.find("_17") != std::string::npos) {
       myhlt.name = "HLT_Ele35_WPTight_Gsf";
       // hltEle35noerWPTightGsfTrackIsoFilter ??
-      myhlt.bit=1; // bit's position
+      myhlt.bit="1"; // bit's position
     }
     else if (input.find("_18") != std::string::npos) {
       myhlt.name = "HLT_Ele32_WPTight_Gsf";
       // hltEle32WPTightGsfTrackIsoFilter
-      myhlt.bit =1; // bit's position
+      myhlt.bit="1"; // bit's position
     }
 
     TStopwatch time;
@@ -58,15 +58,15 @@ int main(int argc, char **argv) {
     ROOT::RDataFrame df("Events", infiles);
 
     // skim plus object cleaning
-    auto df1 = Filterbaseline( df , myhlt.name );                                                       // mild skim
+    auto df1 = Filterbaseline( df , myhlt);                                                             // mild skim
     auto df2 = goodElectrons( df1 , "abs(Electron_eta) < 2.5 && Electron_pt > 5" );                     // definition of good electron
     auto df3 = goodJets( df2 , "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4");   // definition of good jets
     auto df4 = cleanFromJet(df3);                                                                       // cleaning good electron with good jets
 
     // tag and probe producer
     auto df5 = tagCandProducer(df4);                                                                    // standard tag cuts definition
-    auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger", myhlt.bit) : tagMatchProducer(df5,"gen");    // data: tag matched with trigger object ; mc: tag match with gen level
-    auto df8 = tagProducer(df6,isMC);                                                                   // tag candidates
+    auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger") : tagMatchProducer(df5,"gen");               // data: tag matched with trigger object ; mc: tag match with gen level
+    auto df8 = tagProducer(df6);                                                                        // tag candidates
 
     // tag-probe pair producer (return pair Idx)
     auto df9 = pairProducer(df8);                                                                       // tnp pair candidate

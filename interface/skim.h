@@ -7,10 +7,12 @@
  * goodElectron
  */
 template <typename T>
-auto Filterbaseline(T &df, std::string HLT) {
-  HLT+=" == true";
+auto Filterbaseline(T &df, config_t &HLT) {
+  std::cout<<" >>> HLT : "<<HLT.name<<" <<< "<<std::endl;
+  std::string hlt(HLT.name +=" == true");
   return df
-    .Filter(HLT, " --> Passes trigger "+HLT)
+    .Filter(hlt, " --> Passes trigger "+hlt)
+    .Define("bits",HLT.bit)
     .Filter("nElectron>=2"," --> At least two electrons")
     ;
 }

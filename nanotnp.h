@@ -81,7 +81,7 @@ TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
 struct config_t {
   //trigger
   std::string name;
-  int bit;
+  std::string bit;
   // tag and pair flag
   bool resolveAmbiguity=false;
 
