@@ -175,6 +175,8 @@ auto probeWPProducer(T &df){
   };
 
   return df
+          // WP 2016
+          // WP 2017
           .Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
           .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
           .Define("passingVeto","Electron_cutBased[probe_Idx]==1")
@@ -182,6 +184,7 @@ auto probeWPProducer(T &df){
           .Define("passingMedium","Electron_cutBased[probe_Idx]==3")
           .Define("passingTight","Electron_cutBased[probe_Idx]==4")
           .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
+          // WP 2018
           ;
 }
 
