@@ -16,13 +16,13 @@
 }
 
 /*
- * EDFilter + EDProducer
- * genEle + genTagEle + genProbeEle
- * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L83-L86
+ * Matching producer
+ * trg-matching: https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L30-L37
+ * gen-matching: https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L78-L98
  */
 
 template<typename T>
-  auto tagMatchProducer(T &df, const char* s) {
+  auto tagMatchProducer(T &df, const char* s, std::string filter="") {
   using namespace ROOT::VecOps;
   std::string flag(s);
   // trigger matching producer
@@ -39,7 +39,8 @@ template<typename T>
 
       //trigger object selection
       if (abs(id[itrg]) != 11) continue;
-      if ( (filterbits[itrg] & 1) != 1 ) continue;
+      //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
+      if ( !bitdecoder(filterbits[itrg],1) ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
       if (deltar > 0.3) trg_matchCandidate[iele] = 0;
       }
@@ -64,8 +65,9 @@ template<typename T>
         if (abs(gen_pdgId[igen]) != 11) continue;
         if (pt_gen[igen] < 3) continue;
         if (abs(eta_gen[igen]) > 2.7) continue;
-        //isPromptFinalState = isPrompt + isLastCopy
-        if ( ( statusflag[igen] & 0 ) != 0) continue;
+        // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
+        if ( !bitdecoder(statusflag[igen],0) ) continue; // isPrompt
+        if ( !bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
         //genpart selection
 
         //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98

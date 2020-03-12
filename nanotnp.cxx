@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     const std::string input = argv[1];
     const std::string output = argv[2];
     const std::string lumi = argv[3];
-    const bool isMC = (input.find("Electron") != std::string::npos) ? false : true;
+    const bool isMC = (input.find("Run") != std::string::npos) ? false : true;
     std::cout<<"isMC : "<<isMC<<std::endl;
 
     std::cout << ">>> Process input: " << input << std::endl;
@@ -31,15 +31,18 @@ int main(int argc, char **argv) {
     config_t myhlt;
     if (input.find("_16") != std::string::npos) {
       myhlt.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
-      myhlt.bit="hltEle27WPTightTrackIsoFilter";
+      // hltEle27WPTightTrackIsoFilter
+      myhlt.bit=1; // bit's position
     }
     else if (input.find("_17") != std::string::npos) {
       myhlt.name = "HLT_Ele35_WPTight_Gsf";
-      myhlt.bit = "hltEle35noerWPTightGsfTrackIsoFilter";
+      // hltEle35noerWPTightGsfTrackIsoFilter ??
+      myhlt.bit=1; // bit's position
     }
     else if (input.find("_18") != std::string::npos) {
       myhlt.name = "HLT_Ele32_WPTight_Gsf";
-      myhlt.bit = "hltEle32WPTightGsfTrackIsoFilter";
+      // hltEle32WPTightGsfTrackIsoFilter
+      myhlt.bit =1; // bit's position
     }
 
     TStopwatch time;
@@ -62,7 +65,7 @@ int main(int argc, char **argv) {
 
     // tag and probe producer
     auto df5 = tagCandProducer(df4);                                                                    // standard tag cuts definition
-    auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger") : tagMatchProducer(df5,"gen");               // data: tag matched with trigger object ; mc: tag match with gen level
+    auto df6 = ( !isMC ) ? tagMatchProducer(df5,"trigger", myhlt.bit) : tagMatchProducer(df5,"gen");    // data: tag matched with trigger object ; mc: tag match with gen level
     auto df8 = tagProducer(df6,isMC);                                                                   // tag candidates
 
     // tag-probe pair producer (return pair Idx)

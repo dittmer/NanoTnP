@@ -46,10 +46,10 @@ namespace Helper {
    * bit decoder
    */
   template <typename T>
-    int bitdecoder( T decimal , T kbit){
+    bool bitdecoder( T decimal , T kbit){
       // shift bit from the left to right and inspect with AND operator
-      int on=0;
-      if ( decimal & ( 1 << kbit ) ) on=1;
+      bool on=false;
+      if ( (decimal & ( 1 << kbit )) == kbit ) on=true;
       return on;
     }
 
@@ -81,7 +81,7 @@ TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
 struct config_t {
   //trigger
   std::string name;
-  std::string bit;
+  int bit;
   // tag and pair flag
   bool resolveAmbiguity=false;
 
