@@ -2,14 +2,16 @@
 ########## General settings
 #############################################################
 import os
-# flag to be Tested
-#cutpass80 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.988153,0.967910,0.841729)
-#cutpass90 = '(( abs(probe_sc_eta) < 0.8 && probe_Ele_nonTrigMVA > %f ) ||  ( abs(probe_sc_eta) > 0.8 && abs(probe_sc_eta) < 1.479&& probe_Ele_nonTrigMVA > %f ) || ( abs(probe_sc_eta) > 1.479 && probe_Ele_nonTrigMVA > %f ) )' % (0.972153,0.922126,0.610764)
 
 # flag to be Tested
 flag = {
-#    'passingCutBasedIDFall17V2' : '(passingCutBasedIDFall17V2 == 1)',
-    'passingmvaTTH'             : '(passingMVAtth == 1)',
+    #'passingMvaFall17V1Iso_WP90_SS' : '(passingMvaFall17V1Iso_WP90_SS == 1)',
+    'passingMvaFall17V1Iso_WP90' : '(passingMvaFall17V1Iso_WP90 == 1)',
+    #'passingVeto' : '(passingVeto == 1)' ,
+    #'passingLoose': '(passingLoose == 1)',
+    #'passingMedium': '(passingMedium == 1)',
+    #'passingTight': '(passingTight == 1)',
+    #'passingMvaTTH': '(passingMvaTTH == 1)',
 }
 
 #baseOutDir = 'results/runB/%s/' % (flag.keys()[0])
@@ -19,15 +21,15 @@ baseOutDir = '%s/results/Legacy2016/tnpEleID/runAll' %os.getcwd()
 ########## samples definition  [can be nD bining]
 #############################################################
 #tnpTreeDir = 'GsfElectronToEleID'
-tnpTreeDir = 'Events'
+tnpTreeDir = 'fitter_tree'
 weightName = 'weight'
 
 ### MANDATORY nEvts in data = -1 // mcTruth will require mc Matching
 ## some sample based cuts... general cuts defined here after
-cutAltSel = 'tag_Ele_pt > 30'
+cutAltSel = 'tag_Ele_pt > 35'
 #&& tag_Ele_nonTrigMVA > 0.90'
-#cutData   = 'run >= 273726'
-cutData    = None
+cutData   = 'run >= 273726'
+#cutData    = None
 
 #* samplesDef: these are the main info
 #  - data: data ntuple
@@ -37,12 +39,13 @@ cutData    = None
 
 samplesDef = {
     'data'     : { 'name' : 'SingleElectron' , 'mcTruth' : False, 'nEvts': -1, 'cut' : cutData,
-                   'path' : '../skim/2016/SingleElectron_Skim.root' },
-    'mcNom'    : { 'name' : 'DYJetsToLL_M-50-LONom' , 'mcTruth' : False , 'nEvts': -1, 'cut' : None,
-                   'path' : '../skim/2016/DYJetsToLL_M-50-LO_ext2_Skim.root' },
-    'mcAlt'    : None,
-    'tagSel'   : { 'name' : 'DYJetsToLL_M-50-LOAltSel' , 'mcTruth' : False , 'nEvts' : -1, 'cut' : cutAltSel,
-                   'path' : '../skim/2016/DYJetsToLL_M-50-LO_ext2_Skim.root' },
+                   'path' : '%s/results/latinov5_17/SingleElectron_Run2017.root' %os.getcwd() },
+    'mcNom'    : { 'name' : 'DYJetsToLL_M-50-LONom' , 'mcTruth' : True , 'nEvts': -1, 'cut' : None,
+                   'path' : '%s/results/latinov5_17/DYJetsToLL_M-50-LO.root' %os.getcwd() },
+    'mcAlt'   : { 'name' : 'DYJetsToLL_M-50-LOAltSel' , 'mcTruth' : True , 'nEvts' : -1, 'cut' : None,
+                  'path' : '%s/results/latinov5_17/DYJetsToLL_M-50_ext1.root' %os.getcwd() },
+    'tagSel' : { 'name' : 'DYJetsToLL_M-50-LOtagSel' , 'mcTruth' : True , 'nEvts': -1, 'cut' : cutAltSel,
+                 'path' : '%s/results/latinov5_17/DYJetsToLL_M-50-LO.root' %os.getcwd() },
 }
 
 ### lumi in /fb
@@ -52,15 +55,15 @@ lumi = 35.867
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-   { 'var' : 'probe_Ele_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.442, -1.0, 0.0, 1.0, 1.442, 1.566, 2.0, 2.5] },
-   { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [10,20.0,30,40,50,200] },
+    { 'var' : 'probe_Ele_eta' , 'type': 'float', 'bins': [ -2.5 , -2.0 , -1.566 , -1.442 , -0.8 , 0.0 , 0.8 , 1.442 , 1.566 , 2.0 , 2.5 ] },
+    { 'var' : 'probe_Ele_pt' , 'type': 'float', 'bins': [ 10 , 20 , 35 , 50 , 90 , 150 , 500 ] },
 ]
 
 #############################################################
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 30 && abs(tag_Ele_eta) < 2.1'
+cutBase   = 'tag_Ele_pt > 30 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 
