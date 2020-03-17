@@ -46,6 +46,6 @@ Default definition
   A `results` folder will appear containing the output.
  
  ## To-do
- - [ ] mcTruth for tag only... needed probe is mcTruth requirement ?
+ - [x] mcTruth for tag only... needed probe is mcTruth requirement ?
  - [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`.
  - [ ] implement `PromptGenLepton2l`.
