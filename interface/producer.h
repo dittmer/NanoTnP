@@ -197,17 +197,21 @@ auto probeWPProducer(T &df){
   };
 
   return df
-          // WP 2016
-          // WP 2017
-          .Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
-          .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
-          .Define("passingVeto","Electron_cutBased[probe_Idx]==1")
-          .Define("passingLoose","Electron_cutBased[probe_Idx]==2")
-          .Define("passingMedium","Electron_cutBased[probe_Idx]==3")
-          .Define("passingTight","Electron_cutBased[probe_Idx]==4")
-          .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
-          // WP 2018
-          ;
+    //PromptGenLepMatch2l = Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]
+    //.Define("Probe_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","probe_Idx"})
+    //.Define("Tag_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","tag_Idx"})
+    //.Define("PromptGenLepMatch2l","Tag_promptgenmatched*Probe_promptgenmatched")
+    // WP 2016
+    // WP 2017
+    .Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
+    .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
+    .Define("passingVeto","Electron_cutBased[probe_Idx]==1")
+    .Define("passingLoose","Electron_cutBased[probe_Idx]==2")
+    .Define("passingMedium","Electron_cutBased[probe_Idx]==3")
+    .Define("passingTight","Electron_cutBased[probe_Idx]==4")
+    .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
+    // WP 2018
+    ;
 }
 
 /*
@@ -257,8 +261,10 @@ auto DeclareVariables(T &df) {
 
 template <typename T>
 auto AddEventWeight(T &df, const std::string& lumi, const bool isMC) {
-
-  std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; //PromptGenLepMatch2l
+  // GenLepMatch2l
+  std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; 
+  //PromptGenLepMatch2l
+  //std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*PromptGenLepMatch2l*METFilter_MC";
   std::cout<<" >>> weights interpreted : "<<weights<<" <<< "<<std::endl;
   return df.Define( "weight", weights );
 }
