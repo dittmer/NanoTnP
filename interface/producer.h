@@ -32,7 +32,7 @@ template<typename T>
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
     const auto numComb = comb[0].size();
     RVec<int> matcher(eta_el.size(),1); // in case matching is not apply, all deemed pass
-    RVec<int> mctruth(eta_el.size(),-1); // dummy
+    RVec<int> mctruth(eta_el.size(),0); // dummy
 
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
@@ -84,7 +84,7 @@ template<typename T>
         // resolve ambiguity, pick lowest deltaR pair.
         std::vector<int> match_genIdx = Helper::IndexBydeltaR(pair_maker); //
         int momIdx= mother_gen[match_genIdx[0]];
-        // mom checking
+        // mom checking for now, on tag only
         while(momIdx!=-1){
           if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 ){
             truth[iele]=1; break;
@@ -101,7 +101,7 @@ template<typename T>
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
     out = df.Define("tagmatcher",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi","bits"})
             .Define("tagMatcher","tagmatcher.first")
-            .Define("mctruth","tagmatcher.second")
+            .Define("ismctruth","tagmatcher.second")
             ;
   }
   else if (flag=="gen"){
@@ -109,7 +109,7 @@ template<typename T>
     out = df
             .Define("tagmatcher",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags","GenPart_genPartIdxMother","GenPart_status"})
             .Define("tagMatcher","tagmatcher.first")
-            .Define("mctruth","tagmatcher.second")
+            .Define("ismctruth","tagmatcher.second")
             ;
   }
   return out;
@@ -121,7 +121,6 @@ auto tagProducer(T &df){
   return df.Define("isTag","tagCand==1 && tagMatcher==1");
 }
 
-/*************************************************** tnpPairingEleIDs ***************************************************/
 /*
  * EDProducer + EDAnalyzer
  * tnpPairingEleIDs
@@ -167,14 +166,14 @@ auto pairProducer(T &df) {
 };
 
   return df
-          .Define("tnpProducer", tnpProducer, {"isTag","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
-          .Define("tag_Idx", "tnpProducer[0]")
-          .Define("probe_Idx","tnpProducer[1]")
-          .Define("nTnP","tnpProducer[2]")
-          .Define("ipair","tnpProducer[3]")
-          .Define("randomness","tnpProducer[4]")
-          .Filter("(tag_Idx!=-1 && probe_Idx!=-1) && (tag_Idx!=probe_Idx)"," --> Filter invalid tnp pair")
-          ;
+    .Define("tnpProducer", tnpProducer, {"isTag","Electron_pt","Electron_eta","Electron_phi","Electron_mass"})
+    .Define("tag_Idx", "tnpProducer[0]")
+    .Define("probe_Idx","tnpProducer[1]")
+    .Define("nTnP","tnpProducer[2]")
+    .Define("ipair","tnpProducer[3]")
+    .Define("randomness","tnpProducer[4]")
+    .Filter("(tag_Idx!=-1 && probe_Idx!=-1) && (tag_Idx!=probe_Idx)"," --> Filter invalid tnp pair")
+    ;
 }
 
 /*
@@ -243,6 +242,8 @@ auto DeclareVariables(T &df) {
     .Define("probe_Ele_phi","Electron_phi[probe_Idx]")
     .Define("probe_Ele_mass","Electron_mass[probe_Idx]")
     .Define("probe_Ele_q","Electron_charge[probe_Idx]")
+
+    .Define("mctruth","ismctruth[probe_Idx]*ismctruth[tag_Idx]")
 
     .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
     .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
