@@ -47,4 +47,5 @@ Default definition
  
  ## To-do
  - [ ] mcTruth for tag and probe.
- - [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`
+ - [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`.
+ - [ ] implement `PromptGenLepton2l`.
