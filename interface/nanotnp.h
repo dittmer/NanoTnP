@@ -88,11 +88,13 @@ namespace Helper {
     std::string line;
 
     while (getline(json, line)) {
+      
       const unsigned qCount = std::count(line.begin(), line.end(), '"');
       if (qCount < 2 or qCount % 2 != 0) continue; // skip this line, weird that we don't have even quote count
       
       unsigned q1 = line.find('"');
       while (q1 < line.length()) {
+
 	unsigned q2 = line.find('"', q1 + 1);
 	
 	unsigned bo1 = line.find('[', q1 + 1);
@@ -127,7 +129,8 @@ namespace Helper {
    * json selector
    */
   template <typename T>
-    bool isRunLumiInJSON(const std::map<T, std::vector<std::pair<T, T> > > m_json, const T nRun, const T nLumi) {
+    bool isRunLumiInJSON(const std::map<T, std::vector<std::pair<T, T> > > m_json, T nRun, T nLumi) {
+    
     if (m_json.empty())
       return true;
     
@@ -139,10 +142,9 @@ namespace Helper {
 	}
       }
     }
-    
     return false;
   }
-
+  
   struct config_t {
     // basic
     bool passHLT=false;

@@ -8,13 +8,6 @@
  */
 template <typename T>
 auto Filterbaseline(T &df, Helper::config_t &cfg) {
-  using namespace ROOT::VecOps;
-  auto isPassJSON = [](std::map<int, std::vector<std::pair<int, int> > >& m_json , unsigned& run , unsigned& luminosityBlock)
-    {
-      int RUN = static_cast<int>(run);
-      int LUM = static_cast<int>(luminosityBlock);
-      return Helper::isRunLumiInJSON( m_json , RUN, LUM );
-    };
   
   std::cout<<" >>> HLT : "<<cfg.name<<" <<< "<<std::endl;
   std::cout<<" >>> Json : "<<cfg.jsonFile<<" <<< "<<std::endl;
@@ -25,11 +18,18 @@ auto Filterbaseline(T &df, Helper::config_t &cfg) {
       ;
   }
   else{
+    
     std::string hlt(cfg.name +=" == true");
-    std::map<int, std::vector<std::pair<int, int> > > jsonin = Helper::parseJSONAsMap(cfg.jsonFile);
+    static std::map<int, std::vector<std::pair<int, int> > > m_json = Helper::parseJSONAsMap(cfg.jsonFile);
+    auto isPassJSON = [&m_json](unsigned& run , unsigned& luminosityBlock)
+      {
+	int RUN = static_cast<int>(run);
+	int LUM = static_cast<int>(luminosityBlock);
+	return Helper::isRunLumiInJSON( m_json , RUN, LUM );
+      };
+    
     return df
-      .Define("json", "jsonin" )
-      .Define("passJSON",isPassJSON, { "json" , "run" , "luminosityBlock" } )
+      .Define("passJSON",isPassJSON, { "run" , "luminosityBlock" } )
       .Filter("passJSON == true"," --> Filtered by Golden Json")
       .Filter(hlt, " --> Passes trigger "+hlt)
       .Define("bits",cfg.bit)
