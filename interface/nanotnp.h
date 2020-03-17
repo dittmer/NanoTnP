@@ -78,7 +78,7 @@ namespace Helper {
   }
 
   /*
-   * Json reader
+   * Json reader (author: the overlord Afiq @DESY)
    */
   template <typename T>
     std::map<int, std::vector<std::pair<int, int> > > parseJSONAsMap(const T jsonFile) {
@@ -126,7 +126,7 @@ namespace Helper {
   }
  
   /*
-   * json selector
+   * json selector (author: the overlord Afiq @DESY)
    */
   template <typename T>
     bool isRunLumiInJSON(const std::map<T, std::vector<std::pair<T, T> > > m_json, T nRun, T nLumi) {
