@@ -8,13 +8,21 @@
  */
 template <typename T>
 auto Filterbaseline(T &df, config_t &HLT) {
+  
   std::cout<<" >>> HLT : "<<HLT.name<<" <<< "<<std::endl;
-  std::string hlt(HLT.name +=" == true");
-  return df
-    .Filter(hlt, " --> Passes trigger "+hlt)
-    .Define("bits",HLT.bit)
-    .Filter("nElectron>=2"," --> At least two electrons")
-    ;
+  if (HLT.name.find("NULL") != std::string::npos){
+    return df
+      .Filter("nElectron>=2"," --> At least two electrons")
+      ;
+  }
+  else{
+    std::string hlt(HLT.name +=" == true");
+    return df
+      .Filter(hlt, " --> Passes trigger "+hlt)
+      .Define("bits",HLT.bit)
+      .Filter("nElectron>=2"," --> At least two electrons")
+      ;
+  }
 }
 
 /*************************************************** tag_sequence ***************************************************/
