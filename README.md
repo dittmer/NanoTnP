@@ -49,4 +49,4 @@ Default definition
  - [x] mcTruth for tag only... needed probe is mcTruth requirement ?
  - [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`.
  - [ ] implement `PromptGenLepton2l`.
- - [ ] period based selection with json on data.
+ - [x] json selection on data for now.
