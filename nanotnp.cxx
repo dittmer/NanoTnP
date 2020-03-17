@@ -28,27 +28,28 @@ int main(int argc, char **argv) {
     std::cout << ">>> Integrated luminosity: " << lumi << std::endl;
 
     // configuration
-    config_t myhlt;
+    Helper::config_t mycfg;
     if (input.find("_16") != std::string::npos) {
-      myhlt.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
-      // hltEle27WPTightTrackIsoFilter
-      myhlt.bit="1"; // bit's position
+      mycfg.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
+      mycfg.bit="1"; // hltEle27WPTightTrackIsoFilter
+      mycfg.jsonFile="";
     }
     else if (input.find("_17") != std::string::npos) {
-      myhlt.name = "HLT_Ele35_WPTight_Gsf";
-      // hltEle35noerWPTightGsfTrackIsoFilter ??
-      myhlt.bit="1"; // bit's position
+      mycfg.name = "HLT_Ele35_WPTight_Gsf";
+      mycfg.bit="1"; // hltEle35noerWPTightGsfTrackIsoFilter ??
+      mycfg.jsonFile= "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt";
     }
     else if (input.find("_18") != std::string::npos) {
-      myhlt.name = "HLT_Ele32_WPTight_Gsf";
-      // hltEle32WPTightGsfTrackIsoFilter
-      myhlt.bit="1"; // bit's position
+      mycfg.name = "HLT_Ele32_WPTight_Gsf";
+      mycfg.bit="1"; // hltEle32WPTightGsfTrackIsoFilter 
+      mycfg.jsonFile= "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt";
     }
 
     // No hlt selection on mc
     if (isMC){
-      myhlt.name = "NULL";
-      myhlt.bit = "NULL";
+      mycfg.name = "NULL";
+      mycfg.bit = "NULL";
+      mycfg.jsonFile = "NULL";
     }
 
     TStopwatch time;
@@ -64,7 +65,7 @@ int main(int argc, char **argv) {
     ROOT::RDataFrame df("Events", infiles);
 
     // skim plus object cleaning
-    auto df1 = Filterbaseline( df , myhlt );                                                            // mild skim, no hlt for mc
+    auto df1 = Filterbaseline( df , mycfg );                                                            // mild skim, no hlt for mc
     auto df2 = goodElectrons( df1 , "abs(Electron_eta) < 2.5 && Electron_pt > 5" );                     // definition of good electron
     auto df3 = goodJets( df2 , "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4" );  // definition of good jets
     auto df4 = cleanFromJet( df3 );                                                                     // cleaning good electron with good jets

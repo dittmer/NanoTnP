@@ -7,19 +7,32 @@
  * goodElectron
  */
 template <typename T>
-auto Filterbaseline(T &df, config_t &HLT) {
+auto Filterbaseline(T &df, Helper::config_t &cfg) {
+  using namespace ROOT::VecOps;
+  auto isPassJSON = [](std::map<int, std::vector<std::pair<int, int> > >& m_json , unsigned& run , unsigned& luminosityBlock)
+    {
+      int RUN = static_cast<int>(run);
+      int LUM = static_cast<int>(luminosityBlock);
+      return Helper::isRunLumiInJSON( m_json , RUN, LUM );
+    };
   
-  std::cout<<" >>> HLT : "<<HLT.name<<" <<< "<<std::endl;
-  if (HLT.name.find("NULL") != std::string::npos){
+  std::cout<<" >>> HLT : "<<cfg.name<<" <<< "<<std::endl;
+  std::cout<<" >>> Json : "<<cfg.jsonFile<<" <<< "<<std::endl;
+  
+  if (cfg.name.find("NULL") != std::string::npos){
     return df
       .Filter("nElectron>=2"," --> At least two electrons")
       ;
   }
   else{
-    std::string hlt(HLT.name +=" == true");
+    std::string hlt(cfg.name +=" == true");
+    std::map<int, std::vector<std::pair<int, int> > > jsonin = Helper::parseJSONAsMap(cfg.jsonFile);
     return df
+      .Define("json", "jsonin" )
+      .Define("passJSON",isPassJSON, { "json" , "run" , "luminosityBlock" } )
+      .Filter("passJSON == true"," --> Filtered by Golden Json")
       .Filter(hlt, " --> Passes trigger "+hlt)
-      .Define("bits",HLT.bit)
+      .Define("bits",cfg.bit)
       .Filter("nElectron>=2"," --> At least two electrons")
       ;
   }

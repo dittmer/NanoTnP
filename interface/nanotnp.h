@@ -8,12 +8,13 @@
 #include "TStopwatch.h"
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <stdlib.h>
 #include <string>
 #include <vector>
-#include <iostream>
 #include <cmath>
+#include <map>
 
 #include "utility" // std::pair
 #include <algorithm> // for std::find
@@ -41,18 +42,18 @@ namespace Helper {
     }
     return indecies;
   }
-
+  
   /*
    * bit decoder
    */
   template <typename T>
     int bitdecoder( T decimal , T kbit){
-      // shift bit from the left to right and inspect with AND operator
-      int on=0;
-      if ( decimal & ( 1 << kbit ) ) on=1;
-      return on;
-    }
-
+    // shift bit from the left to right and inspect with AND operator
+    int on=0;
+    if ( decimal & ( 1 << kbit ) ) on=1;
+    return on;
+  }
+  
   /*
    * Compute the difference in the azimuth coordinate taking the boundary conditions at 2*pi into account.
    */
@@ -69,26 +70,94 @@ namespace Helper {
       return r;
     }
 
-template<typename T>
-TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
-  TLorentzVector out;
-  out.SetPtEtaPhiM(pt,eta,phi,m);
-  return out;
-}
+  template<typename T>
+    TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
+    TLorentzVector out;
+    out.SetPtEtaPhiM(pt,eta,phi,m);
+    return out;
+  }
 
-} // helper
+  /*
+   * Json reader
+   */
+  template <typename T>
+    std::map<int, std::vector<std::pair<int, int> > > parseJSONAsMap(const T jsonFile) {
+    std::map<int, std::vector<std::pair<int, int> > > m_json;
+    
+    std::ifstream json(jsonFile);
+    std::string line;
 
-struct config_t {
-  // basic
-  bool passHLT=false;
-  // jet cleaning
-  float jetclean_dR=0.3;
-  //trigger
-  std::string name;
-  std::string bit;
-  // tag and pair flag
-  bool resolveAmbiguity=false;
+    while (getline(json, line)) {
+      const unsigned qCount = std::count(line.begin(), line.end(), '"');
+      if (qCount < 2 or qCount % 2 != 0) continue; // skip this line, weird that we don't have even quote count
+      
+      unsigned q1 = line.find('"');
+      while (q1 < line.length()) {
+	unsigned q2 = line.find('"', q1 + 1);
+	
+	unsigned bo1 = line.find('[', q1 + 1);
+	if (line.find('[', bo1 + 1) == bo1 + 1)
+	  ++bo1;
+  
+	unsigned bc1 = line.find(']', bo1 + 1);
+	if (bo1 > q1 and bo1 > q2) {
+	  const int nRun = std::stoi( line.substr(q1 + 1, q2 - q1 - 1) );
+	  std::vector<std::pair<int, int> > vp_lumi;
+	  while (true) {
+	    if (bc1 > bo1) {
+	      const std::string sLumi = line.substr(bo1 + 1, bc1 - bo1 - 1);
+	      const unsigned comma = sLumi.find(',');
+	      
+	      vp_lumi.push_back( std::make_pair(std::stoi(sLumi.substr(0, comma)),
+						std::stoi(sLumi.substr(comma + 1, sLumi.length() - comma))) );
+	    }
+	    if (line.find(']', bc1 + 1) == bc1 + 1) break; 
+	    bc1 = line.find(']', bc1 + 1);
+	    bo1 = line.find('[', bo1 + 1);
+	  } 
+	  m_json.insert( std::make_pair(nRun, vp_lumi) );
+	}	
+	q1 = line.find('"', q2 + 1);
+      }
+    }    
+    return m_json;
+  }
+ 
+  /*
+   * json selector
+   */
+  template <typename T>
+    bool isRunLumiInJSON(const std::map<T, std::vector<std::pair<T, T> > > m_json, const T nRun, const T nLumi) {
+    if (m_json.empty())
+      return true;
+    
+    for (auto &p_json : m_json) {
+      if (nRun == p_json.first) {
+	for (auto &p_lumi : p_json.second) {
+	  if (nLumi >= p_lumi.first and nLumi <= p_lumi.second)
+	    return true;
+	}
+      }
+    }
+    
+    return false;
+  }
 
-} cfg;
+  struct config_t {
+    // basic
+    bool passHLT=false;
+    // jet cleaning
+    float jetclean_dR=0.3;
+    //trigger
+    std::string name;
+    std::string bit;
+    // tag and pair flag
+    bool resolveAmbiguity=false;
+    // cert
+    std::string jsonFile;
+    //std::map<int, std::vector<std::pair<int, int> > > jsonFile;
+  };
+  
+} //helper
 
 #endif
