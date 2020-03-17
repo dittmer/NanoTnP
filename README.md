@@ -31,7 +31,7 @@ Default definition
  ROOT > 6.18 ; python3.7 ; on lxplus7
  
  ```
- source /cvmfs/sft-nightlies.cern.ch/lcg/views/dev3python3/latest/x86_64-centos7-gcc7-opt/setup.sh
+ source /cvmfs/sft.cern.ch/lcg/views/LCG_95/x86_64-centos7-gcc8-opt/setup.sh
  git clone git@github.com:SiewYan/NanoTnP.git
  cd NanoTnp
  # for latinov5 2017
@@ -46,6 +46,7 @@ Default definition
   A `results` folder will appear containing the output.
  
  ## To-do
- - [ ] mcTruth for tag and probe.
+ - [x] mcTruth for tag only... needed probe is mcTruth requirement ?
  - [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`.
  - [ ] implement `PromptGenLepton2l`.
+ - [ ] period based selection with json on data.
