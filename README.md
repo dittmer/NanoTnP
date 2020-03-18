@@ -41,7 +41,7 @@ Default definition
  ```
   - default at 10 cores for parallelism
   - 2017's approximately takes 18 mins (data, mc, altmc)
-  - 2018's approximately takes 12 mins (data, mc, altmc)
+  - 2018's approximately takes 31 mins (data, mc, altmc)
   
   A `results` folder will appear containing the output.
  
