@@ -12,7 +12,7 @@
  template<typename T>
  auto tagCandProducer(T &df) {
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmElectronIDModules_cff.py#L144-L150
-  return df.Define("tagCand","Electron_cutBased>3 && Electron_pt>=30 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)"); // tag cuts
+  return df.Define("tagCand","Electron_pt>32 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)"); // tag cuts
 }
 
 /*
@@ -202,13 +202,12 @@ auto probeWPProducer(T &df){
     //.Define("PromptGenLepMatch2l","Tag_promptgenmatched*Probe_promptgenmatched")
     // WP 2016
     // WP 2017
-    .Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
+    //.Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
     .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
-    .Define("passingVeto","Electron_cutBased[probe_Idx]==1")
-    .Define("passingLoose","Electron_cutBased[probe_Idx]==2")
-    .Define("passingMedium","Electron_cutBased[probe_Idx]==3")
-    .Define("passingTight","Electron_cutBased[probe_Idx]==4")
+    .Define("passingLoose",leptonidx,{"Lepton_isLoose","Lepton_electronIdx","probe_Idx"})
+    .Define("passingHWW_WP","passingMvaFall17V1Iso_WP90*passingLoose")
     .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
+    .Define("passing_New_HWW_WP","passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH")
     // WP 2018
     ;
 }

@@ -41,12 +41,10 @@ const std::vector<std::string> finalVariables = {
   "pair_mass" ,
   
   // WP
-  "passingVeto" ,
-  "passingLoose" ,
-  "passingMedium" ,
-  "passingTight" ,
-  "passingMvaFall17V1Iso_WP90_SS",
+  //"passingMvaFall17V1Iso_WP90_SS",
   "passingMvaFall17V1Iso_WP90",
+  "passingHWW_WP" , 
+  "passing_New_HWW_WP" ,
   "passingMvaTTH",
   
 };

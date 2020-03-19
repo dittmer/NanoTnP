@@ -6,7 +6,7 @@ import os
 # flag to be Tested
 flag = {
     #'passingMvaFall17V1Iso_WP90_SS' : '(passingMvaFall17V1Iso_WP90_SS == 1)',
-    'passingMvaFall17V1Iso_WP90' : '(passingMvaFall17V1Iso_WP90 == 1)',
+    'passingHWW_WP' : '(passingHWW_WP == 1)',
     #'passingVeto' : '(passingVeto == 1)' ,
     #'passingLoose': '(passingLoose == 1)',
     #'passingMedium': '(passingMedium == 1)',
@@ -15,7 +15,7 @@ flag = {
 }
 
 #baseOutDir = 'results/runB/%s/' % (flag.keys()[0])
-baseOutDir = '%s/results/Legacy2016/tnpEleID/runAll' %os.getcwd()
+baseOutDir = '%s/results/Legacy2018/tnpEleID/runAll' %os.getcwd()
 
 #############################################################
 ########## samples definition  [can be nD bining]
@@ -28,8 +28,8 @@ weightName = 'weight'
 ## some sample based cuts... general cuts defined here after
 cutAltSel = 'tag_Ele_pt > 37'
 #&& tag_Ele_nonTrigMVA > 0.90'
-cutData   = 'run >= 273726'
-#cutData    = None
+#cutData   = 'run >= 273726'
+cutData    = None
 
 #* samplesDef: these are the main info
 #  - data: data ntuple
@@ -38,18 +38,18 @@ cutData   = 'run >= 273726'
 #  - tagSel: usually same as nominal MC + different base cuts: check the tag selection syst
 
 samplesDef = {
-    'data'     : { 'name' : 'SingleElectron' , 'mcTruth' : False, 'nEvts': -1, 'cut' : cutData,
-                   'path' : '%s/results/latinov5_17/SingleElectron_Run2017.root' %os.getcwd() },
+    'data'     : { 'name' : 'EGamma' , 'mcTruth' : False, 'nEvts': -1, 'cut' : cutData,
+                   'path' : '%s/results/latinov5_18/EGamma_Run2018.root' %os.getcwd() },
     'mcNom'    : { 'name' : 'DYJetsToLL_M-50-LONom' , 'mcTruth' : True , 'nEvts': -1, 'cut' : None,
-                   'path' : '%s/results/latinov5_17/DYJetsToLL_M-50-LO.root' %os.getcwd() },
+                   'path' : '%s/results/latinov5_18/DYJetsToLL_M-50-LO.root' %os.getcwd() },
     'mcAlt'   : { 'name' : 'DYJetsToLL_M-50-LOAltSel' , 'mcTruth' : True , 'nEvts' : -1, 'cut' : None,
-                  'path' : '%s/results/latinov5_17/DYJetsToLL_M-50_ext1.root' %os.getcwd() },
+                  'path' : '%s/results/latinov5_18/DYJetsToLL_M-50_ext.root' %os.getcwd() },
     'tagSel' : { 'name' : 'DYJetsToLL_M-50-LOtagSel' , 'mcTruth' : True , 'nEvts': -1, 'cut' : cutAltSel,
-                 'path' : '%s/results/latinov5_17/DYJetsToLL_M-50-LO.root' %os.getcwd() },
+                 'path' : '%s/results/latinov5_18/DYJetsToLL_M-50-LO.root' %os.getcwd() },
 }
 
 ### lumi in /fb
-lumi = 35.867
+lumi = 59.74
 
 #############################################################
 ########## bining definition  [can be nD bining]
@@ -63,7 +63,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0'
+cutBase   = 'tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 
