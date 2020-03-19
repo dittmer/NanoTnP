@@ -20,53 +20,47 @@ int main(int argc, char **argv) {
     const std::string input = argv[1];
     const std::string output = argv[2];
     const std::string lumi = argv[3];
-    const bool isMC = (input.find("Run") != std::string::npos) ? false : true;
-    std::cout<<"isMC : "<<isMC<<std::endl;
 
+    // JSON file initialization
+    const bool isMC = (input.find("Run") != std::string::npos) ? false : true;
+    std::map<int, std::vector<std::pair<int, int> > > m_json;
+    Helper::config_t mycfg;
+
+    std::cout << ">>> Process is mc: " << isMC << std::endl;
     std::cout << ">>> Process input: " << input << std::endl;
     std::cout << ">>> Process output: " << output << std::endl;
     std::cout << ">>> Integrated luminosity: " << lumi << std::endl;
 
-    // configuration
-    Helper::config_t mycfg;
-    if (input.find("_16") != std::string::npos) {
-      mycfg.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
-      mycfg.bit="1"; // hltEle27WPTightTrackIsoFilter
-      mycfg.jsonFile="";
-    }
-    else if (input.find("_17") != std::string::npos) {
-      mycfg.name = "HLT_Ele35_WPTight_Gsf";
-      mycfg.bit="1"; // hltEle35noerWPTightGsfTrackIsoFilter ??
-      mycfg.jsonFile= "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt";
-    }
-    else if (input.find("_18") != std::string::npos) {
-      mycfg.name = "HLT_Ele32_WPTight_Gsf";
-      mycfg.bit="1"; // hltEle32WPTightGsfTrackIsoFilter 
-      mycfg.jsonFile= "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt";
-    }
 
-    // No hlt selection on mc
-    if (isMC){
-      mycfg.name = "NULL";
-      mycfg.bit = "NULL";
-      mycfg.jsonFile = "NULL";
-    }
+    // customising configuration
+    if (!isMC) mycfg.name = (input.find("_17") != std::string::npos) ? "HLT_Ele35_WPTight_Gsf" : "HLT_Ele32_WPTight_Gsf";
+    if (!isMC) mycfg.bit="1"; // 2017:  hltEle35noerWPTightGsfTrackIsoFilter ; 2018: hltEle32WPTightGsfTrackIsoFilter
+    if (!isMC) mycfg.jsonFile= (input.find("_17") != std::string::npos) ? 
+		 "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt" :
+		 "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" ;
+    m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
 
+    //if (input.find("_16") != std::string::npos) {
+    //  if (!isMC) mycfg.name = "HLT_Ele27_eta2p1_WPTight_Gsf";
+    //  mycfg.bit="1"; // hltEle27WPTightTrackIsoFilter
+    //  mycfg.jsonFile="./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
+    // }
+
+    // Initialize time
     TStopwatch time;
     time.Start();
 
+    // filelist
     std::vector<std::string> infiles;
     std::ifstream file(input);
     std::string str;
-    while (std::getline(file, str)) {
-      infiles.push_back(str);
-    }
-
+    while (std::getline(file, str)) { infiles.push_back(str); }
+    
     ROOT::RDataFrame df("Events", infiles);
-
+    
     // skim plus object cleaning
-    auto df1 = Filterbaseline( df , mycfg );                                                            // mild skim, no hlt for mc
-    auto df2 = goodElectrons( df1 , "abs(Electron_eta) < 2.5 && Electron_pt > 5" );                     // definition of good electron
+    auto df1 = Filterbaseline( df , mycfg , m_json );                                                   // mild skim, HLT and JSON filter for DATA
+    auto df2 = goodElectrons( df1 , "abs(Electron_eta) < 2.5 && Electron_pt > 10" );                    // definition of good electron
     auto df3 = goodJets( df2 , "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4" );  // definition of good jets
     auto df4 = cleanFromJet( df3 );                                                                     // cleaning good electron with good jets
 

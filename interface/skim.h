@@ -6,8 +6,15 @@
  * EDFilter
  * goodElectron
  */
-template <typename T>
-auto Filterbaseline(T &df, Helper::config_t &cfg) {
+template <typename T,typename U>
+auto Filterbaseline(T &df, Helper::config_t &cfg , std::map< U, std::vector< std::pair<U, U> > > &m_json) {
+
+  auto isPassJSON = [&m_json](unsigned& run , unsigned& luminosityBlock)
+    {
+      int RUN = static_cast<int>(run);
+      int LUM = static_cast<int>(luminosityBlock);
+      return Helper::isRunLumiInJSON( m_json , RUN, LUM );
+    };
   
   std::cout<<" >>> HLT : "<<cfg.name<<" <<< "<<std::endl;
   std::cout<<" >>> Json : "<<cfg.jsonFile<<" <<< "<<std::endl;
@@ -18,16 +25,7 @@ auto Filterbaseline(T &df, Helper::config_t &cfg) {
       ;
   }
   else{
-    
     std::string hlt(cfg.name +=" == true");
-    static std::map<int, std::vector<std::pair<int, int> > > m_json = Helper::parseJSONAsMap(cfg.jsonFile);
-    auto isPassJSON = [&m_json](unsigned& run , unsigned& luminosityBlock)
-      {
-	int RUN = static_cast<int>(run);
-	int LUM = static_cast<int>(luminosityBlock);
-	return Helper::isRunLumiInJSON( m_json , RUN, LUM );
-      };
-    
     return df
       .Define("passJSON",isPassJSON, { "run" , "luminosityBlock" } )
       .Filter("passJSON == true"," --> Filtered by Golden Json")

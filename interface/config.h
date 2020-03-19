@@ -12,13 +12,13 @@ const std::vector<std::string> finalVariables = {
   "event" ,
 
   // sanity checks variables
-  "goodElectrons" ,
-  "goodJets" ,
-  "cleanFromJet" ,
-  "tagMatcher" ,
-  "mctruth" ,
-  "isTag" ,
-  "nElectron" ,
+  //"goodElectrons" ,
+  //"goodJets" ,
+  //"cleanFromJet" ,
+  //"tagMatcher" ,
+  "mcTrue" ,
+  //"isTag" ,
+  //"nElectron" ,
   "tag_Idx" ,
   "probe_Idx" ,
   "nTnP" ,
@@ -30,6 +30,7 @@ const std::vector<std::string> finalVariables = {
   "tag_Ele_eta" ,
   "tag_Ele_phi" ,
   "tag_Ele_q" ,
+  "tag_Ele_trigMVA" ,
   "probe_Ele_pt" ,
   "probe_Ele_eta" ,
   "probe_Ele_phi" ,
@@ -41,12 +42,14 @@ const std::vector<std::string> finalVariables = {
   "pair_mass" ,
   
   // WP
-  //"passingMvaFall17V1Iso_WP90_SS",
   "passingMvaFall17V1Iso_WP90",
   "passingHWW_WP" , 
   "passing_New_HWW_WP" ,
   "passingMvaTTH",
-  
+
+  // met
+  "event_met_pfmet" ,
+  "event_met_pfphi" ,
 };
 
 #endif

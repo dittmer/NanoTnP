@@ -147,12 +147,13 @@ namespace Helper {
   
   struct config_t {
     // basic
+    bool isMC=false;
     bool passHLT=false;
     // jet cleaning
     float jetclean_dR=0.3;
     //trigger
-    std::string name;
-    std::string bit;
+    std::string name = "NULL";
+    std::string bit = "NULL";
     // tag and pair flag
     bool resolveAmbiguity=false;
     // cert

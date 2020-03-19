@@ -12,7 +12,7 @@
  template<typename T>
  auto tagCandProducer(T &df) {
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmElectronIDModules_cff.py#L144-L150
-  return df.Define("tagCand","Electron_pt>32 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)"); // tag cuts
+  return df.Define("tagCand","Electron_pt>32 && Electron_cutBased==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)"); // tag cuts
 }
 
 /*
@@ -183,7 +183,7 @@ auto pairProducer(T &df) {
 template <typename T>
 auto probeWPProducer(T &df){
   using namespace ROOT::VecOps;
-  auto leptonidx = [](RVec<int>& leptonwp , RVec<int>& leptonidx , int& pidx) {
+  auto leptonidx = [](RVec<int>& leptonidx , int& pidx) {
     int lIdx=-1;
     for (size_t i=0 ; i< leptonidx.size() ; i++){
         //
@@ -192,7 +192,7 @@ auto probeWPProducer(T &df){
           break;
         }
     }
-    return leptonwp[lIdx];
+    return lIdx;
   };
 
   return df
@@ -200,15 +200,10 @@ auto probeWPProducer(T &df){
     //.Define("Probe_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","probe_Idx"})
     //.Define("Tag_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","tag_Idx"})
     //.Define("PromptGenLepMatch2l","Tag_promptgenmatched*Probe_promptgenmatched")
-    // WP 2016
-    // WP 2017
-    //.Define("passingMvaFall17V1Iso_WP90_SS",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90_SS","Lepton_electronIdx","probe_Idx"})
-    .Define("passingMvaFall17V1Iso_WP90",leptonidx,{"Lepton_isTightElectron_mvaFall17V1Iso_WP90","Lepton_electronIdx","probe_Idx"})
-    .Define("passingLoose",leptonidx,{"Lepton_isLoose","Lepton_electronIdx","probe_Idx"})
-    .Define("passingHWW_WP","passingMvaFall17V1Iso_WP90*passingLoose")
-    .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
-    .Define("passing_New_HWW_WP","passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH")
-    // WP 2018
+    // specific WP from Lepton collection
+    .Define("LeptonIdx",leptonidx,{"Lepton_electronIdx","probe_Idx"})
+    .Define("passingLoose","Lepton_isLoose[LeptonIdx]")
+    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[LeptonIdx]")
     ;
 }
 
@@ -242,7 +237,7 @@ auto DeclareVariables(T &df) {
     .Define("probe_Ele_mass","Electron_mass[probe_Idx]")
     .Define("probe_Ele_q","Electron_charge[probe_Idx]")
 
-    .Define("mctruth","ismctruth[probe_Idx]*ismctruth[tag_Idx]")
+    .Define("mcTrue","ismctruth[probe_Idx]*ismctruth[tag_Idx]")
 
     .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
     .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
@@ -252,6 +247,14 @@ auto DeclareVariables(T &df) {
     .Define("pair_eta" ,"pair[1]")
     .Define("pair_phi" ,"pair[2]")
     .Define("pair_mass" ,"pair[3]")
+    
+    // WP for fitter
+    .Define("passingHWW_WP","passingMvaFall17V1Iso_WP90*passingLoose")
+    .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
+    .Define("passing_New_HWW_WP","passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH")
+    .Define("tag_Ele_trigMVA","Electron_mvaFall17V1Iso[tag_Idx]")
+    .Define("event_met_pfmet","MET_pt")
+    .Define("event_met_pfphi","MET_phi")
     ;
 }
 
