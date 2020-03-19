@@ -9,10 +9,10 @@
  * 1.) fulfill tightcutbased
  * 2.) match to last filter
  */
- template<typename T>
- auto tagCandProducer(T &df) {
+template<typename T>
+auto tagCandProducer(T &df, config_t &cfg) {
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmElectronIDModules_cff.py#L144-L150
-  return df.Define("tagCand","Electron_pt>32 && Electron_cutBased==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)"); // tag cuts
+  return df.Define( "tagCand" , cfg.TagCandidate ); // tag cuts
 }
 
 /*
@@ -22,11 +22,11 @@
  */
 
 template<typename T>
-  auto tagMatchProducer(T &df, const char* s) {
+auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
   using namespace ROOT::VecOps;
   std::string flag(s);
   // trigger matching producer
-  auto trgMatcher = [](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg , int& filter ) {
+  auto trgMatcher = [&cfg](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg) {
     std::pair<RVec<int>,RVec<int>> out;
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
@@ -41,16 +41,16 @@ template<typename T>
       //trigger object selection
       if (abs(id[itrg]) != 11) continue;
       //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
-      if ( !Helper::bitdecoder(filterbits[itrg], filter) ) continue;
+      if ( !Helper::bitdecoder(filterbits[itrg], cfg.bit) ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
-      if (deltar > 0.3) matcher[iele] = 0;
+      if (deltar > cfg.trig_dR) matcher[iele] = 0;
       }
     out = std::make_pair(matcher,mctruth);
     return out;
   };
 
   // gen-matching producer
-  auto genMatcher = [](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
+  auto genMatcher = [&cfg](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
                           RVec<float>& eta_gen , RVec<float>& phi_gen , RVec<int>& statusflag , RVec<int>& mother_gen , RVec<int>& status_gen ) {
       std::pair<RVec<int>,RVec<int>> out;
       RVec<int> matcher(eta_el.size(),0); // in case matching is not apply, all deemed pass
@@ -74,8 +74,8 @@ template<typename T>
           //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
           const auto deltar = sqrt( pow(eta_el[iele] - eta_gen[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_gen[igen]), 2));
           const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_gen[igen];
-          if (deltar > 0.2) continue; // Minimum deltaR for the match
-          if (dpt_rel > 50.) continue; // Minimum deltaPt/Pt for the match
+          if (deltar > cfg.gen_dR) continue; // Minimum deltaR for the match
+          if (dpt_rel > cfg.gen_relPt) continue; // Minimum deltaPt/Pt for the match
           matcher[iele] = 1;
           std::pair idxpair = std::make_pair(iele,igen);
           pair_maker.push_back(std::make_pair(idxpair,deltar));
@@ -99,17 +99,17 @@ template<typename T>
   auto out = df;
   if (flag=="trigger"){
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
-    out = df.Define("tagmatcher",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi","bits"})
-            .Define("tagMatcher","tagmatcher.first")
-            .Define("ismctruth","tagmatcher.second")
+    out = df.Define("tagMatchProducer",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi"})
+            .Define("tagMatcher","tagMatchProducer.first")
+            .Define("ismctruth","tagMatchProducer.second")
             ;
   }
   else if (flag=="gen"){
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
     out = df
-            .Define("tagmatcher",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags","GenPart_genPartIdxMother","GenPart_status"})
-            .Define("tagMatcher","tagmatcher.first")
-            .Define("ismctruth","tagmatcher.second")
+            .Define("tagMatchProducer",genMatcher,{"Electron_pt","Electron_eta","Electron_phi","GenPart_pdgId","GenPart_pt","GenPart_eta","GenPart_phi","GenPart_statusFlags","GenPart_genPartIdxMother","GenPart_status"})
+            .Define("tagMatcher","tagMatchProducer.first")
+            .Define("ismctruth","tagMatchProducer.second")
             ;
   }
   return out;
@@ -118,7 +118,7 @@ template<typename T>
 template <typename T>
 auto tagProducer(T &df){
   //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L30-L37
-  return df.Define("isTag","tagCand==1 && tagMatcher==1");
+  return df.Define("isTag","tagCand==1 && tagMatcher==1"); //
 }
 
 /*
@@ -263,11 +263,10 @@ auto DeclareVariables(T &df) {
  */
 
 template <typename T>
-auto AddEventWeight(T &df, const std::string& lumi, const bool isMC) {
+auto AddEventWeight(T &df, config_t &cfg) {
   // GenLepMatch2l
-  std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; 
+  std::string weights = (!cfg.isMC) ? "METFilter_DATA" : cfg.lumi+"*XSWeight*puWeight*GenLepMatch2l*METFilter_MC"; 
   //PromptGenLepMatch2l
-  //std::string weights = (isMC==false) ? "METFilter_DATA" : lumi+"*XSWeight*puWeight*PromptGenLepMatch2l*METFilter_MC";
   std::cout<<" >>> weights interpreted : "<<weights<<" <<< "<<std::endl;
   return df.Define( "weight", weights );
 }

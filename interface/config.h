@@ -2,6 +2,44 @@
 #define CONFIG_H
 
 /*
+ * configuration for ntuple
+ */
+struct config_t {
+  // basic                                                                                                                                                                                                
+  bool isMC=false;
+  std::string lumi;
+  std::string jsonFile;
+
+  // trigger
+  std::string name = "NULL";
+  int bit;
+
+  // goodElectron definition
+  std::string goodElectron = "abs(Electron_eta) < 2.5 && Electron_pt > 10"; 
+
+  // goodJet definition
+  std::string goodJet = "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4";  
+
+  // jet cleaning mathcing                                                                                                                                                                            
+  float jetclean_dR=0.3;
+
+  // tag candidate definition
+  std::string TagCandidate = "Electron_pt>32 && Electron_cutBased==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
+
+  // trigger object matching
+  float trig_dR = 0.3;
+
+  // gen-matching
+  float gen_dR = 0.2;
+  float gen_relPt = 50;
+
+  // tag and pair flag                                                                                                                                                                               
+  bool resolveAmbiguity=false;
+};
+
+
+
+/*
  * Declare all variables which will end up in the final reduced dataset
  */
 

@@ -6,8 +6,8 @@
  * EDFilter
  * goodElectron
  */
-template <typename T,typename U>
-auto Filterbaseline(T &df, Helper::config_t &cfg , std::map< U, std::vector< std::pair<U, U> > > &m_json) {
+template <typename T , typename U>
+auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U, U> > > &m_json) {
 
   auto isPassJSON = [&m_json](unsigned& run , unsigned& luminosityBlock)
     {
@@ -30,7 +30,6 @@ auto Filterbaseline(T &df, Helper::config_t &cfg , std::map< U, std::vector< std
       .Define("passJSON",isPassJSON, { "run" , "luminosityBlock" } )
       .Filter("passJSON == true"," --> Filtered by Golden Json")
       .Filter(hlt, " --> Passes trigger "+hlt)
-      .Define("bits",cfg.bit)
       .Filter("nElectron>=2"," --> At least two electrons")
       ;
   }
@@ -44,10 +43,9 @@ auto Filterbaseline(T &df, Helper::config_t &cfg , std::map< U, std::vector< std
  * https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmGoodParticlesDef_cff.py#L75-L79
  */
 template <typename T>
-auto goodElectrons(T &df, const char* good) {
-  std::string in(good);
+auto goodElectrons(T &df, config_t &cfg) {
   return df
-    .Define("goodElectrons", in )
+    .Define("goodElectrons", cfg.goodElectron )
     .Filter("Sum(goodElectrons==0)==0"," --> All good electrons")
     ;
 }
@@ -57,10 +55,9 @@ auto goodElectrons(T &df, const char* good) {
  * Kinematically good jets
  */
 template <typename T>
-auto goodJets(T &df, const char* good) {
-  std::string in(good);
+auto goodJets(T &df, config_t cfg) {
   return df
-    .Define("goodJets", in )
+    .Define("goodJets", cfg.goodJet )
     ;
 }
 
@@ -70,9 +67,9 @@ auto goodJets(T &df, const char* good) {
  * Bool Vector
  */
 template <typename T>
-auto cleanFromJet(T &df) {
+auto cleanFromJet(T &df , config_t &cfg) {
   using namespace ROOT::VecOps;
-  auto cleanFromJet = [](RVec<int>& goodElectron, RVec<float>& eta_1, RVec<float>& phi_1,
+  auto cleanFromJet = [&cfg](RVec<int>& goodElectron, RVec<float>& eta_1, RVec<float>& phi_1,
 			 RVec<int>& goodJet, RVec<float>& eta_2, RVec<float>& phi_2)
     {
 
@@ -87,7 +84,7 @@ auto cleanFromJet(T &df) {
         if ( goodElectron[iele] != 1 ) continue;
         if ( goodJet[ijet] !=1 ) continue;
         const auto deltar = sqrt(pow(eta_1[iele] - eta_2[ijet], 2) + pow(Helper::DeltaPhi(phi_1[iele], phi_2[ijet]), 2));
-        if (deltar > 0.3) CleanElectron[iele] = 1; // no match, clean electron
+        if (deltar > cfg.jetclean_dR) CleanElectron[iele] = 1; // no match, clean electron
       }
       return CleanElectron;
     };

@@ -144,7 +144,8 @@ namespace Helper {
     }
     return false;
   }
-  
+
+  /**  
   struct config_t {
     // basic
     bool isMC=false;
@@ -160,7 +161,7 @@ namespace Helper {
     std::string jsonFile;
     //std::map<int, std::vector<std::pair<int, int> > > jsonFile;
   };
-  
+  **/
 } //helper
 
 #endif
