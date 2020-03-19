@@ -40,8 +40,8 @@ Default definition
  python nanotnp.py -y latinov5_18 
  ```
   - default at 10 cores for parallelism
-  - 2017's approximately takes 18 mins (data, mc, altmc)
-  - 2018's approximately takes 31 mins (data, mc, altmc)
+  - 2017's approximately takes ~ 13 mins (data, mc, altmc)
+  - 2018's approximately takes ~ 19 mins (data, mc, altmc)
   
   A `results` folder will appear containing the output.
  
