@@ -8,9 +8,9 @@ The tag is a well identified and isolated electron which pass an electron trigge
 ## Brief technical aspect
 The package constructed in plug-in-play modular nature, in EDM's language, a series of EDMProducer/EDMFilter parameterized with PSet before EDAnalyzer, string in cms sequence. Thanks to RDataframe, module is implemented as collective transformation fucntions (lambda function implemented to compute particle-based quantity) which lazily executed upon action. Benefits are, speed and better cpu utilization.
 
- - Samples used for TnP defined in `NanoTnP\data\latinov5_17`, `NanoTnP\data\latinov5_18`
+ - Samples used for TnP defined in `NanoTnP/data/latinov5_17`, `NanoTnP/data/latinov5_18`
  - Execution script:  `NanoTnP/nanotnp.py`
- - Output definition: `NanoTnP/interface/config.h`
+ - Output and object definition definition: `NanoTnP/interface/config.h`
  - Skim definition:   `NanoTnP/interface/skim.h`
  - Producer definition: `NanoTnP/interface/producer.h`
  - Sequence definition: `NanoTnP/nanotnp.cxx`
