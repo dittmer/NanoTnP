@@ -5,48 +5,50 @@ import os, sys, time
 cwd = os.getcwd()
 usage = "usage: %prog [options]"
 parser = OptionParser(usage)
-parser.add_option("-y","--year", action="store", type="string", dest="year", default="latinov5_17")
+parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="latinov5_17")
+parser.add_option("-l","--location", action="store", type="string", dest="location", default="eos")
 parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
 
 (options, args) = parser.parse_args()
 
-datasets = options.year
+datasets = options.dataset
+locations = options.location
+dirs = "%s/data/filelists/%s/%s/" % (cwd,locations,datasets)
 output = options.output + "%s" %(datasets)
+samplelists=[]
+lumi=""
 
 tcompile = time.time()
 os.system("make")
 print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() - tcompile) , (time.time() - tcompile)/60. ) )
 
-samplelists=[]
-lumi=""
-
 # predefined samples
 if datasets == 'latinov5_16':
     lumi = "35.867"
     # DY LO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50-LO.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
     # alt DY NLO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50_ext1.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
     # single electrons
-    samplelists.append("%s/data/%s/SingleElectron_Run2017.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "SingleElectron_Run2017.txt" )
 
 elif datasets == 'latinov5_17':
     lumi="41.53"
     # DY LO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50-LO.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
     # alt DY NLO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50_ext1.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
     # single electrons
-    samplelists.append("%s/data/%s/SingleElectron_Run2017.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "SingleElectron_Run2017.txt" )
 
 elif datasets == 'latinov5_18':
     lumi = "59.74"
     # DY LO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50-LO.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
     # alt DY NLO
-    samplelists.append("%s/data/%s/DYJetsToLL_M-50_ext.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "DYJetsToLL_M-50_ext.txt" )
     # single electrons
-    samplelists.append("%s/data/%s/EGamma_Run2018.txt" %(cwd,datasets) )
+    samplelists.append( dirs + "EGamma_Run2018.txt" )
 
 else:
     print(' >>> ERROR: Dude... really? Pick one datasets here <<<')
