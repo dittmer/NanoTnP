@@ -6,17 +6,17 @@ def createBins( bining, cut ):
     nbin = 0
 
     nbin = 1
-    index = range(len(bining))
-    for ix in range(len(index)):
+    index = list(range(len(bining)))
+    for ix in list(range(len(index))):
         index[ix] = -1
     listOfIndex = []    
     listOfIndex.append( index )
 
     ### first map nD bins in a single list
-    for iv in range(len(bining)):
+    for iv in list(range(len(bining))):
         var = bining[iv]['var']
-        if not bining[iv].has_key('type') or not bining[iv].has_key('bins'):
-            print 'bining is not complete for var %s' % var
+        if 'type' not in bining[iv] or 'bins' not in bining[iv]:
+            print('bining is not complete for var %s' % var)
             return listOfIndex
         nb1D = 1
         if   bining[iv]['type'] == 'float' :
@@ -26,12 +26,12 @@ def createBins( bining, cut ):
         nbin = nbin * nb1D
 
         listOfIndexInit = copy.deepcopy(listOfIndex)
-        for ib_v in range(nb1D):
+        for ib_v in list(range(nb1D)):
             if ib_v == 0 :
-                for ib in range(len(listOfIndex)):
+                for ib in list(range(len(listOfIndex))):
                     listOfIndex[ib][iv] = ib_v            
             else: 
-                for ib in range(len(listOfIndexInit)):
+                for ib in list(range(len(listOfIndexInit))):
                     listOfIndexInit[ib][iv] = ib_v
                            
                 listOfIndex.extend(copy.deepcopy(listOfIndexInit))
@@ -52,7 +52,7 @@ def createBins( bining, cut ):
         if not cut is None:
             binCut = cut
 
-        for iv in range(len(ix)):
+        for iv in list(range(len(ix))):
             var     = bining[iv]['var']
             bins1D  = bining[iv]['bins']
             varType = bining[iv]['type']
@@ -84,7 +84,7 @@ def createBins( bining, cut ):
         ibin = ibin + 1
  
     listOfVars = []
-    for iv in  range(len(bining)):
+    for iv in  list(range(len(bining))):
         listOfVars.append(bining[iv]['var'])
         
     binDefinition = {
