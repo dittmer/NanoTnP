@@ -43,6 +43,9 @@ def main(sample, process):
     output="./results/"
     if 'latinov5_17' in sample:
         output+='latinov5_17/'
+    elif 'latinov5_18' in sample:
+        output+='latinov5_18/'
+
     # Create output file
     if not os.path.isdir(output):
         os.system('mkdir -p %s' % output)
@@ -61,7 +64,7 @@ def main(sample, process):
     for variable in variables: hists[variable] = bookHistogram(df, variable, ranges[variable])
 
     # Write histograms to output file
-    for variable in variables: writeHistogram(hists[variable], "{}".format(variable))
+    for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable))
 
     tfile.Close()
 

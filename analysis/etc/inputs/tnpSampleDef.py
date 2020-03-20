@@ -1,8 +1,8 @@
 from libPython.tnpClassUtils import tnpSample
 import os
 cwd = os.getcwd()
-latinov5_17 = '%s/../results/latinov5_17/' % cwd
-latinov5_18 = '%s/../results/latinov5_18/' % cwd
+latinov5_17 = '%s/../ntuple/results/latinov5_17/' % cwd
+latinov5_18 = '%s/../ntuple/results/latinov5_18/' % cwd
 
 nanov4_17 = {
     'DYJetsToLL_M-50-LO' : tnpSample('DYJetsToLL_M-50-LO',
