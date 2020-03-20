@@ -28,10 +28,10 @@ Default definition
  
  
  ## Setup
- ROOT > 6.18 ; python3.7 ; on lxplus7
+ ROOT > 6.18 ; python3.6.5 ; on lxplus7
  
  ```
- source /cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/setup.sh
+ source /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3/x86_64-centos7-gcc7-opt/setup.sh
  git clone git@github.com:SiewYan/NanoTnP.git
  cd NanoTnp
  # for latinov5 2017
