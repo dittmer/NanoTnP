@@ -264,9 +264,8 @@ auto DeclareVariables(T &df) {
 
 template <typename T>
 auto AddEventWeight(T &df, config_t &cfg) {
-  // GenLepMatch2l
-  std::string weights = (!cfg.isMC) ? "METFilter_DATA" : cfg.lumi+"*XSWeight*SFweight2l*PrefireWeight*GenLepMatch2l*METFilter_MC"; 
-  //PromptGenLepMatch2l
+  // GenLepMatch2l ? PromptGenLepMatch2l
+  std::string weights = (!cfg.isMC) ? "METFilter_DATA" : cfg.lumi+"*XSWeight*SFweight2l*GenLepMatch2l*METFilter_MC";  // PrefireWeight
   std::cout<<" >>> weights interpreted : "<<weights<<" <<< "<<std::endl;
   return df.Define( "weight", weights );
 }
