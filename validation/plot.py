@@ -90,8 +90,8 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
 
     # stack
     bkg = THStack('bkg', ";"+xlabel+";"+hist['BkgSum'].GetYaxis().GetTitle())
-    for proc in [ 'DY' ]:
-        bkg.Add(hist[proc]) # ADD ALL BKG
+    # ADD ALL BKG
+    for proc in [ 'DY' ]: bkg.Add(hist[proc])
 
     #Legend
     n=len(hist)
@@ -101,7 +101,7 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
     leg.SetFillColor(0)
     leg.SetTextSize(0.03)
     leg.AddEntry(hist['DATA'], 'Data', "pl")
-    leg.AddEntry(hist['DY'], 'DY', "f")
+    leg.AddEntry(hist['DY'], samplename, "f")
     c1 = TCanvas("c1", list(hist.values())[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad

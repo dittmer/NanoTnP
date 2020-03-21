@@ -21,13 +21,9 @@ ranges = {
     }
 
 # Book a histogram for a specific variable
-def bookHistogram(df, variable, range_, dimension="1d"):
-    if dimension=="2d":
-        return df.Histo2D(ROOT.ROOT.RDF.TH2DModel(variable, variable, range_[0], np.asarray(range_[1],'d'), range_[0], np.asarray(range_[1],'d')),\
-                          "absele_eta1" , "absele_eta2" , "weight" )
-    else:
-        return df.Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]),\
-                          variable, "weight")
+def bookHistogram(df, variable, range_, ismc):
+    return df.Define("weights", "weight*mcTrue" if ismc else "weight")\
+             .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 
 # Write a histogram with a given name to the output ROOT file
@@ -61,7 +57,7 @@ def main(sample, process):
     df = ROOT.ROOT.RDataFrame("fitter_tree", sample)
     
     # Book histogram
-    for variable in variables: hists[variable] = bookHistogram(df, variable, ranges[variable])
+    for variable in variables: hists[variable] = bookHistogram(df, variable, ranges[variable], False if 'Run' in process else True )
 
     # Write histograms to output file
     for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable))
