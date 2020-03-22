@@ -20,18 +20,18 @@ done
 hadd -f ./results/latinov5_17/histogram.root ./results/latinov5_17/*.root
 
 ##nominal plotting
-python plot.py ./results/latinov5_17/histogram.root ./results/latinov5_17/plots/DYJetsToLL_M-50-LO/ DYJetsToLL_M-50-LO 41.53
+python plot.py ./results/latinov5_17/histogram.root ./results/latinov5_17/plots/DYJetsToLL_M-50-LO/ DYJetsToLL_M-50-LO
 ##altMC plotting
-python plot.py ./results/latinov5_17/histogram.root ./results/latinov5_17/plots/DYJetsToLL_M-50_ext1/ DYJetsToLL_M-50_ext1 41.53
+python plot.py ./results/latinov5_17/histogram.root ./results/latinov5_17/plots/DYJetsToLL_M-50_ext1/ DYJetsToLL_M-50_ext1
 
 # 2018
-for jproc in ${nano18}
-do
-    python histograms.py ../ntuple/results/latinov5_18/${jproc}.root ${jproc}
-done
-hadd -f ./results/latinov5_18/histogram.root ./results/latinov5_18/*.root
+#for jproc in ${nano18}
+#do
+#    python histograms.py ../ntuple/results/latinov5_18/${jproc}.root ${jproc}
+#done
+#hadd -f ./results/latinov5_18/histogram.root ./results/latinov5_18/*.root
 
 ##nominal plotting
-python plot.py ./results/latinov5_18/histogram.root ./results/latinov5_18/DYJetsToLL_M-50-LO DYJetsToLL_M-50-LO 59.74
+#python plot.py ./results/latinov5_18/histogram.root ./results/latinov5_18/DYJetsToLL_M-50-LO DYJetsToLL_M-50-LO
 ##altMC plotting
-python plot.py ./results/latinov5_18/histogram.root ./results/latinov5_18/DYJetsToLL_M-50_ext DYJetsToLL_M-50_ext 59.74
+#python plot.py ./results/latinov5_18/histogram.root ./results/latinov5_18/DYJetsToLL_M-50_ext DYJetsToLL_M-50_ext

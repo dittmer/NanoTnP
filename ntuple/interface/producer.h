@@ -31,19 +31,20 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
     const auto numComb = comb[0].size();
-    RVec<int> matcher(eta_el.size(),1); // in case matching is not apply, all deemed pass
-    RVec<int> mctruth(eta_el.size(),0); // dummy
+    RVec<int> matcher(eta_el.size(),0);  // trigger matcher
+    RVec<int> mctruth(eta_el.size(),-1); // dummy
 
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
       const auto itrg = comb[1][j]; //trigobj
 
       //trigger object selection
-      if (abs(id[itrg]) != 11) continue;
+      if ( abs(id[itrg]) != 11                            ) continue;
       //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
       if ( !Helper::bitdecoder(filterbits[itrg], cfg.bit) ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
-      if (deltar > cfg.trig_dR) matcher[iele] = 0;
+      if ( deltar > cfg.trig_dR                           ) continue; // Minimum deltaR for matching
+      matcher[iele] = 1;
       }
     out = std::make_pair(matcher,mctruth);
     return out;
@@ -53,8 +54,8 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
   auto genMatcher = [&cfg](RVec<float>& pt_el, RVec<float>& eta_el , RVec<float>& phi_el , RVec<int>& gen_pdgId , RVec<float>& pt_gen ,
                           RVec<float>& eta_gen , RVec<float>& phi_gen , RVec<int>& statusflag , RVec<int>& mother_gen , RVec<int>& status_gen ) {
       std::pair<RVec<int>,RVec<int>> out;
-      RVec<int> matcher(eta_el.size(),0); // in case matching is not apply, all deemed pass
-      RVec<int> truth = matcher;
+      RVec<int> matcher(eta_el.size(),0); // gen matcher --> PromptGenLepMatch
+      RVec<int> mctruth(eta_el.size(),0); // mctruth --> PromptGenLepMatch + match to Z boson
 
       std::vector<std::pair<std::pair<int,int>,float>> pair_maker;
 
@@ -63,36 +64,40 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
 
           //genpart selection
           //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L83-L86
-          if (abs(gen_pdgId[igen]) != 11) continue;
-          if (pt_gen[igen] < 3) continue;
-          if (abs(eta_gen[igen]) > 2.7) continue;
+          if ( abs(gen_pdgId[igen]) != 11              ) continue;
+          if ( pt_gen[igen] < 3                        ) continue;
+          if ( abs(eta_gen[igen]) > 2.7                ) continue;
           // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
-          if ( !Helper::bitdecoder(statusflag[igen],0) ) continue; // isPrompt
-          if ( !Helper::bitdecoder(statusflag[igen],13) ) continue; // isLastCopy
+	  if ( status_gen[igen]!=1                     ) continue;
           //genpart selection
 
           //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
           const auto deltar = sqrt( pow(eta_el[iele] - eta_gen[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_gen[igen]), 2));
           const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_gen[igen];
-          if (deltar > cfg.gen_dR) continue; // Minimum deltaR for the match
-          if (dpt_rel > cfg.gen_relPt) continue; // Minimum deltaPt/Pt for the match
-          matcher[iele] = 1;
+          if ( deltar > cfg.gen_dR                     ) continue; // Minimum deltaR for matching
+          if ( dpt_rel > cfg.gen_relPt                 ) continue; // Minimum deltaPt/Pt for matching
+	  // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/modules/GenLeptonMatchProducer.py#L32-L38
+	  if ( Helper::bitdecoder(statusflag[igen],0) ||
+	       Helper::bitdecoder(statusflag[igen],5) ) // isPrompt or isDirectPromptTauDecay
+	    matcher[iele] = 1; // Reco electron is matched --> PromptGenLepMatch
           std::pair idxpair = std::make_pair(iele,igen);
-          pair_maker.push_back(std::make_pair(idxpair,deltar));
+          pair_maker.push_back(std::make_pair(idxpair,deltar)); // in case more then one gen electron matched to Reco electron
         } // end of igen loop
-        if (pair_maker.size()==0) continue;
-        // resolve ambiguity, pick lowest deltaR pair.
-        std::vector<int> match_genIdx = Helper::IndexBydeltaR(pair_maker); //
-        int momIdx= mother_gen[match_genIdx[0]];
-        // mom checking for now, on tag only
+	
+        if (pair_maker.size()==0) continue; // reco electron is not matched
+        std::vector<int> match_genIdx = Helper::IndexBydeltaR(pair_maker); // pick lowest deltaR pair if a reco electron match to more then one gen electron
+        int momIdx= mother_gen[match_genIdx[0]]; // query mom of gen electron
+	
+        // checking on matched electron mom
         while(momIdx!=-1){
-          if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 ){
-            truth[iele]=1; break;
+	  //  Z boson origin, stable mediator, prompt and lastcopy
+          if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 && Helper::bitdecoder(statusflag[momIdx],0) && Helper::bitdecoder(statusflag[momIdx],13) ){
+            mctruth[iele]=1; break;
           }
           momIdx= mother_gen[momIdx];
-        }
+        } // end of while loop
       } // end of iele loop
-      out = std::make_pair(matcher,truth);
+      out = std::make_pair(matcher,mctruth);
       return out;
   };
 
@@ -146,7 +151,7 @@ auto pairProducer(T &df) {
       TLorentzVector tot = Helper::VectorMaker( pt[i1] , eta[i1] , phi[i1] , m[i1] );
       TLorentzVector probe = Helper::VectorMaker( pt[i2] , eta[i2] , phi[i2] , m[i2] );
       tot+=probe;
-      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(i1,i2));
+      if ( tot.M() > 60 && tot.M() < 120 ) pair_Idx.push_back(std::make_pair(i1,i2));
     }
     //
     auto nTnP = pair_Idx.size();
@@ -177,7 +182,8 @@ auto pairProducer(T &df) {
 }
 
 /*
- * Probe WP definition
+ * 
+ * Recover Lepton_Idx from selected Electron_Idx
  *
  */
 template <typename T>
@@ -196,14 +202,13 @@ auto probeWPProducer(T &df){
   };
 
   return df
-    //PromptGenLepMatch2l = Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]
-    //.Define("Probe_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","probe_Idx"})
-    //.Define("Tag_promptgenmatched",leptonidx,{"Lepton_promptgenmatched","Lepton_electronIdx","tag_Idx"})
-    //.Define("PromptGenLepMatch2l","Tag_promptgenmatched*Probe_promptgenmatched")
     // specific WP from Lepton collection
-    .Define("LeptonIdx",leptonidx,{"Lepton_electronIdx","probe_Idx"})
-    .Define("passingLoose","Lepton_isLoose[LeptonIdx]")
-    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[LeptonIdx]")
+    .Define("probe_Lep_Idx",leptonidx,{"Lepton_electronIdx","probe_Idx"})
+    .Define("tag_Lep_Idx",leptonidx,{"Lepton_electronIdx","tag_Idx"})
+    
+    // probe WP definition
+    .Define("passingLoose","Lepton_isLoose[probe_Lep_Idx]")
+    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]")
     ;
 }
 
@@ -212,7 +217,7 @@ auto probeWPProducer(T &df){
  */
 
 template <typename T>
-auto DeclareVariables(T &df) {
+auto DeclareVariables(T &df , config_t &cfg) {
 
   auto add_p4 = [](float pt, float eta, float phi, float mass)
     {
@@ -224,37 +229,50 @@ auto DeclareVariables(T &df) {
       return std::vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
     };
 
+  // MC specific variable
+  std::string tagReco   = (cfg.isMC) ? "Lepton_RecoSF[tag_Lep_Idx]" : "-1";
+  std::string probeReco = (cfg.isMC) ? "Lepton_RecoSF[probe_Lep_Idx]" : "-1";
+
   return df
-    .Define("tag_Ele_pt" ,"Electron_pt[tag_Idx]")
-    .Define("tag_Ele_eta","Electron_eta[tag_Idx]")
-    .Define("tag_Ele_phi","Electron_phi[tag_Idx]")
-    .Define("tag_Ele_mass","Electron_mass[tag_Idx]")
-    .Define("tag_Ele_q","Electron_charge[tag_Idx]")
+    //mc specific variable
+    .Define( "tag_RecoSF"              , tagReco                                                           )
+    .Define( "probe_RecoSF"            , probeReco                                                         )
 
-    .Define("probe_Ele_pt" ,"Electron_pt[probe_Idx]")
-    .Define("probe_Ele_eta","Electron_eta[probe_Idx]")
-    .Define("probe_Ele_phi","Electron_phi[probe_Idx]")
-    .Define("probe_Ele_mass","Electron_mass[probe_Idx]")
-    .Define("probe_Ele_q","Electron_charge[probe_Idx]")
+    // tag kinematcis
+    .Define( "tag_Ele_pt"              , "Electron_pt[tag_Idx]"                                            )
+    .Define( "tag_Ele_eta"             , "Electron_eta[tag_Idx]"                                           )
+    .Define( "tag_Ele_phi"             , "Electron_phi[tag_Idx]"                                           )
+    .Define( "tag_Ele_mass"            , "Electron_mass[tag_Idx]"                                          )
+    .Define( "tag_Ele_q"               , "Electron_charge[tag_Idx]"                                        )
 
-    .Define("mcTrue","ismctruth[probe_Idx]*ismctruth[tag_Idx]")
+    // probe kinematics
+    .Define( "probe_Ele_pt"            , "Electron_pt[probe_Idx]"                                          )
+    .Define( "probe_Ele_eta"           , "Electron_eta[probe_Idx]"                                         )
+    .Define( "probe_Ele_phi"           , "Electron_phi[probe_Idx]"                                         )
+    .Define( "probe_Ele_mass"          , "Electron_mass[probe_Idx]"                                        )
+    .Define( "probe_Ele_q"             , "Electron_charge[probe_Idx]"                                      )
 
-    .Define("tag_Ele",add_p4,{"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"})
-    .Define("probe_Ele",add_p4,{"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"})
-    .Define("pair" ,pair,{"tag_Ele","probe_Ele"})
+    // mc match flag
+    .Define( "tag_PromptGenLepMatch"   , "tagMatcher[tag_Idx]"                                             ) // dummy value for data
+    .Define( "probe_PromptGenLepMatch" , "tagMatcher[probe_Idx]"                                           ) //dummy value for data
+    .Define( "mcTrue"                  , "ismctruth[probe_Idx]*ismctruth[tag_Idx]"                         ) //dummy value for data
 
-    .Define("pair_pt" ,"pair[0]")
-    .Define("pair_eta" ,"pair[1]")
-    .Define("pair_phi" ,"pair[2]")
-    .Define("pair_mass" ,"pair[3]")
+    .Define( "tag_Ele"   , add_p4      , {"tag_Ele_pt","tag_Ele_eta","tag_Ele_phi","tag_Ele_mass"}         )
+    .Define( "probe_Ele" , add_p4      , {"probe_Ele_pt","probe_Ele_eta","probe_Ele_phi","probe_Ele_mass"} )
+    .Define( "pair"      , pair        , {"tag_Ele","probe_Ele"}                                           )
+
+    .Define( "pair_pt"                 , "pair[0]"                                                         )
+    .Define( "pair_eta"                , "pair[1]"                                                         )
+    .Define( "pair_phi"                , "pair[2]"                                                         )
+    .Define( "pair_mass"               , "pair[3]"                                                         )
     
     // WP for fitter
-    .Define("passingHWW_WP","passingMvaFall17V1Iso_WP90*passingLoose")
-    .Define("passingMvaTTH","Electron_mvaTTH[probe_Idx]>0.7")
-    .Define("passing_New_HWW_WP","passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH")
-    .Define("tag_Ele_trigMVA","Electron_mvaFall17V1Iso[tag_Idx]")
-    .Define("event_met_pfmet","MET_pt")
-    .Define("event_met_pfphi","MET_phi")
+    .Define( "passingHWW_WP"           , "passingMvaFall17V1Iso_WP90*passingLoose"                         )
+    .Define( "passingMvaTTH"           , "Electron_mvaTTH[probe_Idx]>0.7"                                  )
+    .Define( "passing_New_HWW_WP"      , "passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH"           )
+    .Define( "tag_Ele_trigMVA"         , "Electron_mvaFall17V1Iso[tag_Idx]"                                )
+    .Define( "event_met_pfmet"         , "MET_pt"                                                          )
+    .Define( "event_met_pfphi"         , "MET_phi"                                                         )
     ;
 }
 
@@ -265,7 +283,7 @@ auto DeclareVariables(T &df) {
 template <typename T>
 auto AddEventWeight(T &df, config_t &cfg) {
   // GenLepMatch2l ? PromptGenLepMatch2l
-  std::string weights = (!cfg.isMC) ? "METFilter_DATA" : cfg.lumi+"*XSWeight*SFweight2l*GenLepMatch2l*METFilter_MC";  // PrefireWeight
+  std::string weights = (!cfg.isMC) ? "METFilter_DATA" : cfg.lumi + "*" + cfg.mcweight + "*tag_PromptGenLepMatch*probe_PromptGenLepMatch*tag_RecoSF*probe_RecoSF" ;
   std::cout<<" >>> weights interpreted : "<<weights<<" <<< "<<std::endl;
   return df.Define( "weight", weights );
 }

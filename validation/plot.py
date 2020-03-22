@@ -14,10 +14,12 @@ ROOT.gStyle.SetOptStat(0)
 
 # Declare human readable label for each variable
 labels = {
-    "tag_Ele_pt"  : "Tagged Electron p_{T} / GeV",
-    "probe_Ele_pt"  : "Probed Electron p_{T} / GeV",
-    "tag_Ele_eta"  : "Tagged Electron #eta",
+    "tag_Ele_pt"     : "Tagged Electron p_{T} [GeV/c^2]",
+    "probe_Ele_pt"   : "Probed Electron p_{T} [GeV/c^2]",
+    "tag_Ele_eta"    : "Tagged Electron #eta",
     "probe_Ele_eta"  : "Probed Electron #eta",
+    "pair_pt"        : "pair p_{T} [GeV/c^2]",
+    "pair_eta"       : "pair #eta",
     "pair_mass"      : "Mass (ll) [GeV/c]",
     }
 
@@ -138,7 +140,7 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
         c1.cd(2)
         err = hist['BkgSum'].Clone("BkgErr;")
         err.SetTitle("")
-        err.GetYaxis().SetTitle("Data / Bkg")
+        err.GetYaxis().SetTitle("Data / MC")
         err.GetXaxis().SetTitle(xlabel)
         for i in range(1, err.GetNbinsX()+1):
             err.SetBinContent(i, 1)
@@ -150,6 +152,7 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
         errLine.SetFillStyle(0)
         errLine.SetLineColor(1)
         err.Draw("E2")
+
         errLine.Draw("SAME, HIST")
 
         if 'DATA' in hist:
@@ -182,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("path", type=str, help="Full path to ROOT file with all histograms")
     parser.add_argument("output", type=str, help="Output directory for plots")
     parser.add_argument("sample", type=str, help="Monte Carlo sample for comparison with data")
-    parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
+    #parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
     args = parser.parse_args()
     
-    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , args.scale , 4 , True if 'pt' in variable else False )
+    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , "41.53" if '_17' in args.path else "59.74" , 4 , True if 'pt' in variable else False )

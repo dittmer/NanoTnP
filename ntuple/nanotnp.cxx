@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     auto df10 = probeWPProducer( df9 );                                                                                       // definition of WP in interest on probe
 
     // should be applied last step
-    auto df11 = DeclareVariables( df10 );                                                                                     // declare variables
+    auto df11 = DeclareVariables( df10 , mycfg );                                                                             // declare variables
     auto df12 = AddEventWeight( df11 , mycfg );                                                                               // add event weights
 
     auto dfFinal = df12;

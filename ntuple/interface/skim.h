@@ -28,8 +28,8 @@ auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U
     std::string hlt(cfg.name +=" == true");
     return df
       .Define("passJSON",isPassJSON, { "run" , "luminosityBlock" } )
-      .Filter("passJSON == true"," --> Filtered by Golden Json")
-      .Filter(hlt, " --> Passes trigger "+hlt)
+      .Filter("passJSON == 1"," --> Filtered by Golden Json")
+      .Filter(hlt," --> passing trigger "+hlt)
       .Filter("nElectron>=2"," --> At least two electrons")
       ;
   }
