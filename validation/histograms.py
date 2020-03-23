@@ -13,13 +13,13 @@ ROOT.ROOT.EnableImplicitMT(6)
 # specifying the histogram layout as value. The tuple sets the number of bins,
 # the lower edge and the upper edge of the histogram.
 ranges = {
-    "tag_Ele_pt"     : ( 50 , 0 , 500 ),
-    "probe_Ele_pt"   : ( 50 , 0 , 500 ),
-    "tag_Ele_eta"    : (20, -2.5 , 2.5),
-    "probe_Ele_eta"  : (20, -2.5 , 2.5),
-    "pair_pt"        : (50, 0, 500),
-    "pair_eta"       : (20, -2.5, 2.5),
-    "pair_mass"      : (60, 60, 120),
+    "tag_Ele_pt"     : ( 50 , 0.   , 500 ),
+    "probe_Ele_pt"   : ( 50 , 0.   , 500 ),
+    "tag_Ele_eta"    : ( 20 , -2.5 , 2.5 ),
+    "probe_Ele_eta"  : ( 20 , -2.5 , 2.5 ),
+    "pair_pt"        : ( 50 , 0.   , 500 ),
+    "pair_eta"       : ( 20 , -2.5 , 2.5 ),
+    "pair_mass"      : ( 80 , 50   , 130 ),
     }
 
 # Book a histogram for a specific variable
@@ -28,7 +28,9 @@ def bookHistogram(df, variable, range_, ismc):
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     match="mcTrue"
     return df.Define("weights", "weight*"+ match if ismc else "weight")\
-             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW_WP","Nominal cut")\
+             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
+             .Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
+             .Filter("passingHWW_WP==0","passing probe flag")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 

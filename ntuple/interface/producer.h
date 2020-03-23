@@ -151,7 +151,7 @@ auto pairProducer(T &df) {
       TLorentzVector tot = Helper::VectorMaker( pt[i1] , eta[i1] , phi[i1] , m[i1] );
       TLorentzVector probe = Helper::VectorMaker( pt[i2] , eta[i2] , phi[i2] , m[i2] );
       tot+=probe;
-      if ( tot.M() > 60 && tot.M() < 120 ) pair_Idx.push_back(std::make_pair(i1,i2));
+      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(i1,i2));
     }
     //
     auto nTnP = pair_Idx.size();
