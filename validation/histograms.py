@@ -33,7 +33,8 @@ def bookHistogram(df, variable, range_, ismc):
 pass
 
 # Write a histogram with a given name to the output ROOT file
-def writeHistogram(h, name):
+def writeHistogram(h, name, range_):
+    h.GetYaxis().SetTitle("Events / %s GeV" % ( float( (range_[2]-range_[1]) / range_[0] ) ) )
     h.SetName(name)
     h.Write()
 pass
@@ -66,7 +67,7 @@ def main(sample, process):
     for variable in variables: hists[variable] = bookHistogram(df, variable, ranges[variable], False if 'Run' in process else True )
 
     # Write histograms to output file
-    for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable))
+    for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable), ranges[variable])
 
     tfile.Close()
 

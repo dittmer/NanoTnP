@@ -167,10 +167,11 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
                 drawRatio(hist['DATA'], hist['BkgSum'])
                 drawKolmogorov(hist['DATA'], hist['BkgSum'])
         else: res = None
-    c1.cd(1)
+    c1.cd(1);
     drawCMS("%s" %scale, "Object Study")
-
+    
     c1.Update()
+    c1.cd(2); c1.Update()
 
     if not os.path.isdir(output):
         os.system('mkdir -p %s' % output )
@@ -188,4 +189,4 @@ if __name__ == "__main__":
     #parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
     args = parser.parse_args()
     
-    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , "41.53" if '_17' in args.path else "59.74" , 4 , True if 'pt' in variable else False )
+    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , "41.53" if '_17' in args.path else "59.74" , 4 , False if 'eta' in variable else True )
