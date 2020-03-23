@@ -24,8 +24,11 @@ ranges = {
 
 # Book a histogram for a specific variable
 def bookHistogram(df, variable, range_, ismc):
-    return df.Define("weights", "weight*tag_PromptGenLepMatch*probe_PromptGenLepMatch" if ismc else "weight")\ #mcTrue
-             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
+
+    #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
+    match="mcTrue"
+    return df.Define("weights", "weight*"+ match if ismc else "weight")\
+             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW_WP","Nominal cut")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 

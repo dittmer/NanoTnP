@@ -40,6 +40,9 @@ int main(int argc, char **argv) {
 		 "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" ;
     m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
 
+    // prefireweight for 17
+    if (input.find("_17") != std::string::npos) mycfg.mcweight = mycfg.mcweight+"*PrefireWeight";
+
     // Initialize time
     TStopwatch time;
     time.Start();
