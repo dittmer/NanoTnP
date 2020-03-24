@@ -19,7 +19,8 @@ ranges = {
     "probe_Ele_eta"  : ( 20 , -2.5 , 2.5 ),
     "pair_pt"        : ( 50 , 0.   , 500 ),
     "pair_eta"       : ( 20 , -2.5 , 2.5 ),
-    "pair_mass"      : ( 80 , 50   , 130 ),
+    "pair_mass"      : ( 60 , 60   , 120 ),
+
     }
 
 # Book a histogram for a specific variable
@@ -29,7 +30,7 @@ def bookHistogram(df, variable, range_, ismc):
     match="mcTrue"
     return df.Define("weights", "weight*"+ match if ismc else "weight")\
              .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
-             .Filter("passingHWW_WP==0","passing probe flag")\
+             .Filter("passingHWW_WP==0","passing flag")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 

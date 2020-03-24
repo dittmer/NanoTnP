@@ -124,7 +124,6 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
     hist['BkgSum'].Draw("SAME, E2") # sum of bkg
     hist['DATA'].Draw("SAME, PE") # data
 
-    #bkg.GetYaxis().SetTitleOffset(bkg.GetYaxis().GetTitleOffset()*0.05) #1.075
     bkg.GetYaxis().SetTitleOffset(0.95)
     bkg.SetMaximum((6.0 if logy else 1.5)*max(bkg.GetMaximum(), hist['DATA'].GetBinContent(hist['DATA'].GetMaximumBin())+hist['DATA'].GetBinError(hist['DATA'].GetMaximumBin())))
     bkg.SetMinimum(max(min(hist['BkgSum'].GetBinContent(hist['BkgSum'].GetMinimumBin()), hist['DATA'].GetMinimum()), 5.e-1)  if logy else 0.)
