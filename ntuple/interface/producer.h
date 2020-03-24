@@ -73,7 +73,7 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
 
           //https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesSetup_cff.py#L88-L98
           const auto deltar = sqrt( pow(eta_el[iele] - eta_gen[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_gen[igen]), 2));
-          const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_gen[igen];
+          const auto dpt_rel = fabs(pt_el[iele] - pt_gen[igen]) / pt_el[iele];
           if ( deltar > cfg.gen_dR                     ) continue; // Minimum deltaR for matching
           if ( dpt_rel > cfg.gen_relPt                 ) continue; // Minimum deltaPt/Pt for matching
 	  // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/modules/GenLeptonMatchProducer.py#L32-L38
@@ -91,7 +91,9 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
         // checking on matched electron mom
         while(momIdx!=-1){
 	  //  Z boson origin, stable mediator, prompt and lastcopy
-          if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 && Helper::bitdecoder(statusflag[momIdx],0) && Helper::bitdecoder(statusflag[momIdx],13) ){
+          if ( status_gen[momIdx]==62 \                           // stable Z boson
+	       && abs(gen_pdgId[momIdx])==23 \                    // is a Z boson
+	       ){ 
             mctruth[iele]=1; break;
           }
           momIdx= mother_gen[momIdx];
@@ -151,7 +153,7 @@ auto pairProducer(T &df) {
       TLorentzVector tot = Helper::VectorMaker( pt[i1] , eta[i1] , phi[i1] , m[i1] );
       TLorentzVector probe = Helper::VectorMaker( pt[i2] , eta[i2] , phi[i2] , m[i2] );
       tot+=probe;
-      if ( tot.M() > 60 && tot.M() < 120 ) pair_Idx.push_back(std::make_pair(i1,i2));
+      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(i1,i2));
     }
     //
     auto nTnP = pair_Idx.size();

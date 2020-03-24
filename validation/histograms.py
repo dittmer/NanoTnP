@@ -20,11 +20,12 @@ ranges = {
     "pair_pt"        : ( 50 , 0.   , 500 ),
     "pair_eta"       : ( 20 , -2.5 , 2.5 ),
     "pair_mass"      : ( 60 , 60   , 120 ),
+
     }
 
 # Book a histogram for a specific variable
 def bookHistogram(df, variable, range_, ismc):
-
+    ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     match="mcTrue"
     return df.Define("weights", "weight*"+ match if ismc else "weight")\

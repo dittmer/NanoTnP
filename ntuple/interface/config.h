@@ -31,8 +31,10 @@ struct config_t {
   float trig_dR = 0.3;
 
   // gen-matching
-  float gen_dR = 0.3;
+  float gen_dR = 0.2;
   float gen_relPt = 50;
+  bool resolveAmbiguities    = false; //Forbid two RECO objects to match to the same GEN objec
+  bool resolveByMatchQuality = true;  //False = just match input in order; True = pick lowest deltaR pair first
 };
 
 
