@@ -13,13 +13,13 @@ ROOT.ROOT.EnableImplicitMT(6)
 # specifying the histogram layout as value. The tuple sets the number of bins,
 # the lower edge and the upper edge of the histogram.
 ranges = {
-    "tag_Ele_pt"     : ( 50 , 0 , 500 ),
-    "probe_Ele_pt"   : ( 50 , 0 , 500 ),
-    "tag_Ele_eta"    : (20, -2.5 , 2.5),
-    "probe_Ele_eta"  : (20, -2.5 , 2.5),
-    "pair_pt"        : (50, 0, 500),
-    "pair_eta"       : (20, -2.5, 2.5),
-    "pair_mass"      : (60, 60, 120),
+    "tag_Ele_pt"     : ( 50 , 0.   , 500 ),
+    "probe_Ele_pt"   : ( 50 , 0.   , 500 ),
+    "tag_Ele_eta"    : ( 20 , -2.5 , 2.5 ),
+    "probe_Ele_eta"  : ( 20 , -2.5 , 2.5 ),
+    "pair_pt"        : ( 50 , 0.   , 500 ),
+    "pair_eta"       : ( 20 , -2.5 , 2.5 ),
+    "pair_mass"      : ( 60 , 60   , 120 ),
     }
 
 # Book a histogram for a specific variable
@@ -28,12 +28,14 @@ def bookHistogram(df, variable, range_, ismc):
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     match="mcTrue"
     return df.Define("weights", "weight*"+ match if ismc else "weight")\
-             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW_WP","Nominal cut")\
+             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
+             .Filter("passingHWW_WP==0","passing flag")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 
 # Write a histogram with a given name to the output ROOT file
-def writeHistogram(h, name):
+def writeHistogram(h, name, range_):
+    h.GetYaxis().SetTitle("Events / %s GeV" % ( float( (range_[2]-range_[1]) / range_[0] ) ) )
     h.SetName(name)
     h.Write()
 pass
@@ -66,7 +68,7 @@ def main(sample, process):
     for variable in variables: hists[variable] = bookHistogram(df, variable, ranges[variable], False if 'Run' in process else True )
 
     # Write histograms to output file
-    for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable))
+    for variable in variables: writeHistogram(hists[variable], "{}_{}".format(process,variable), ranges[variable])
 
     tfile.Close()
 
