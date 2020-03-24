@@ -159,6 +159,9 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
 
         if 'DATA' in hist:
             res = hist['DATA'].Clone("Residues")
+            res.SetTitle("")
+            res.GetYaxis().SetTitle("Data / MC")
+            res.GetXaxis().SetTitle(xlabel)
             for i in range(0, res.GetNbinsX()+1):
                 if hist['BkgSum'].GetBinContent(i) > 0:
                     res.SetBinContent(i, res.GetBinContent(i)/hist['BkgSum'].GetBinContent(i))
@@ -169,6 +172,7 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
                 drawRatio(hist['DATA'], hist['BkgSum'])
                 drawKolmogorov(hist['DATA'], hist['BkgSum'])
         else: res = None
+            
     gPad.Modified()
     gPad.Update()
     c1.cd(1)

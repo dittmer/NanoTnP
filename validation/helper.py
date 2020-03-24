@@ -79,8 +79,9 @@ def drawKolmogorov(data, bkg):
     latex.SetTextColor(1)
     latex.SetTextFont(62)
     latex.SetTextSize(0.08)
-    #latex.DrawLatex(0.55, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg)))
-    latex.DrawLatex(0.45, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg)))
+    #latex.DrawLatex(0.45, 0.85, "#chi^{2}/ndf = %.2f,   K-S = %.3f" % (data.Chi2Test(bkg, "CHI2/NDF"), data.KolmogorovTest(bkg)))
+    latex.DrawLatex(0.45, 0.85, "#chi^{2}/ndf = %.2f" % ( data.Chi2Test(bkg, "CHI2/NDF") ) )
+    
 pass
 
 def drawRelativeYield(data,bkg):
