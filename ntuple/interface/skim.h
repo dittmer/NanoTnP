@@ -35,7 +35,6 @@ auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U
   }
 }
 
-/*************************************************** tag_sequence ***************************************************/
 
 /*
  * EDFilter

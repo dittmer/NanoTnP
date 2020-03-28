@@ -28,9 +28,14 @@ def bookHistogram(df, variable, range_, ismc):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     match="mcTrue"
+    probe="probe_Ele_eta > 0 && probe_Ele_eta < 0.8 && probe_Ele_pt > 50 && probe_Ele_pt < 100"
+    #probe="1==1"
+    flag="passingHWW_WP==1"
+    #flag="1==1"
     return df.Define("weights", "weight*"+ match if ismc else "weight")\
-             .Filter("tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
-             .Filter("passingHWW_WP==0","passing flag")\
+             .Filter("tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
+             .Filter(flag,"passing flag")\
+             .Filter(probe,"probe low eta high pt cut")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
 pass
 

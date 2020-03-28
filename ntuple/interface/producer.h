@@ -90,10 +90,8 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
 	
         // checking on matched electron mom
         while(momIdx!=-1){
-	  //  Z boson origin, stable mediator, prompt and lastcopy
-          if ( status_gen[momIdx]==62 \                           // stable Z boson
-	       && abs(gen_pdgId[momIdx])==23 \                    // is a Z boson
-	       ){ 
+	  //  Z boson origin, and its prompt
+          if ( status_gen[momIdx]==62 && abs(gen_pdgId[momIdx])==23 && Helper::bitdecoder(statusflag[momIdx],0) ){ 
             mctruth[iele]=1; break;
           }
           momIdx= mother_gen[momIdx];
