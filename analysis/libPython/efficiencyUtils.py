@@ -142,7 +142,8 @@ class efficiencyList:
 
     
     def addEfficiency( self, eff ):
-        if not self.effList.has_key(eff.ptBin):
+        #if not self.effList.has_key(eff.ptBin):
+        if eff.ptBin not in self.effList:
             self.effList[eff.ptBin] = {}
         self.effList[eff.ptBin][eff.etaBin] = eff
 
@@ -155,11 +156,12 @@ class efficiencyList:
                     
                     effPlus  = self.effList[ptBin][etaBinPlus]
                     effMinus = None
-                    if self.effList[ptBin].has_key(etaBinMinus):
+                    #if self.effList[ptBin].has_key(etaBinMinus):
+                    if etaBinMinus in self.effList[ptBin]:
                         effMinus =  self.effList[ptBin][etaBinMinus] 
 
                     if effMinus is None:
-                        print " ---- efficiencyList: I did not find -eta bin!!!"
+                        print(" ---- efficiencyList: I did not find -eta bin!!!")
                         
                     else:                        
                         averageData = (effPlus.effData + effMinus.effData)/2.
@@ -182,12 +184,13 @@ class efficiencyList:
                     
                     effPlus  = self.effList[ptBin][etaBinPlus]
                     effMinus = None
-                    if self.effList[ptBin].has_key(etaBinMinus):
+                    #if self.effList[ptBin].has_key(etaBinMinus):
+                    if etaBinMinus in self.effList[ptBin]:
                         effMinus =  self.effList[ptBin][etaBinMinus] 
 
                     if effMinus is None:
                         self.effList[ptBin][etaBinMinus] = effPlus
-                        print " ---- efficiencyList: I did not find -eta bin!!!"
+                        print(" ---- efficiencyList: I did not find -eta bin!!!")
                     else:
                         #### fix statistical errors if needed
                         if    effPlus.errEffData <= 0.00001 and effMinus.errEffData > 0.00001: 
@@ -214,12 +217,12 @@ class efficiencyList:
                                 self.effList[ptBin][etaBinMinus].altEff[isyst] = averageSyst
                             else:
                                 averageSyst = (effPlus.altEff[isyst] +  effMinus.altEff[isyst]) / 2
-                                print "issue, I am averaging but the efficiencies are quite different in 2 etaBins"
-                                print " --- syst: ", isyst
-                                print str(self.effList[ptBin][etaBinPlus ])
-                                print str(self.effList[ptBin][etaBinMinus])
-                                print "   eff[+] = ",  self.effList[ptBin][etaBinPlus ].altEff[isyst]
-                                print "   eff[-] = ",  self.effList[ptBin][etaBinMinus].altEff[isyst]                                
+                                print("issue, I am averaging but the efficiencies are quite different in 2 etaBins")
+                                print(" --- syst: ", isyst)
+                                print(str(self.effList[ptBin][etaBinPlus ]))
+                                print(str(self.effList[ptBin][etaBinMinus]))
+                                print("   eff[+] = ",  self.effList[ptBin][etaBinPlus ].altEff[isyst])
+                                print("   eff[-] = ",  self.effList[ptBin][etaBinMinus].altEff[isyst])                               
                                 self.effList[ptBin][etaBinPlus ].altEff[isyst] = averageSyst
                                 self.effList[ptBin][etaBinMinus].altEff[isyst] = averageSyst
 
@@ -278,13 +281,14 @@ class efficiencyList:
                     
                         effPlus  = self.effList[ptBin][etaBinPlus]
                         effMinus = None
-                        if self.effList[ptBin].has_key(etaBinMinus):
+                        #if self.effList[ptBin].has_key(etaBinMinus):
+                        if etaBinMinus in self.effList[ptBin]:
                             effMinus =  self.effList[ptBin][etaBinMinus] 
 
                         averageMC = None
                         if effMinus is None:
                             averageMC = effPlus.effMC
-                            print " ---- efficiencyList: I did not find -eta bin!!!"
+                            print(" ---- efficiencyList: I did not find -eta bin!!!")
                         else:                        
                             averageMC   = (effPlus.effMC   + effMinus.effMC  )/2.
                         ### so this is h2D bin is inside the bining used by e/gamma POG
@@ -329,7 +333,8 @@ class efficiencyList:
                     
                     effPlus  = self.effList[ptBin][etaBinPlus]
                     effMinus = None
-                    if self.effList[ptBin].has_key(etaBinMinus):
+                    #if self.effList[ptBin].has_key(etaBinMinus):
+                    if etaBinMinus in self.effList[ptBin]:
                         effMinus =  self.effList[ptBin][etaBinMinus] 
 
                     effAverage = effPlus
@@ -337,7 +342,8 @@ class efficiencyList:
                         effAverage = effPlus + effMinus
 
                         
-                    if not listOfGraphs.has_key(etaBin):                        
+                    #if not listOfGraphs.has_key(etaBin):
+                    if etaBin not in listOfGraphs:
                         ### init average efficiency 
                         listOfGraphs[etaBin] = []
 
@@ -398,7 +404,8 @@ class efficiencyList:
         
         for ptBin in self.effList.keys():
             for etaBin in self.effList[ptBin].keys():
-                if not listOfGraphs.has_key(ptBin):                        
+                #if not listOfGraphs.has_key(ptBin):
+                if ptBin not in listOfGraphs:
                     ### init average efficiency 
                     listOfGraphs[ptBin] = []
                 effAverage = self.effList[ptBin][etaBin]

@@ -3,11 +3,12 @@
 import sys,os
 from math import sqrt
 import ROOT as rt
-import CMS_lumi, tdrstyle
+import libPython.CMS_lumi as CMS_lumi
+import libPython.tdrstyle as tdrstyle
 
-from efficiencyUtils import efficiency
-from efficiencyUtils import efficiencyList
-import efficiencyUtils as effUtil
+from libPython.efficiencyUtils import efficiency
+from libPython.efficiencyUtils import efficiencyList
+import libPython.efficiencyUtils as effUtil
 
 tdrstyle.setTDRStyle()
 
@@ -277,12 +278,12 @@ def diagnosticErrorPlot( effgr, ierror, nameout ):
 
 
 def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
-    print " Opening file: %s (plot lumi: %3.1f)" % ( filein, lumi )
+    print(" Opening file: %s (plot lumi: %3.1f)" % ( filein, lumi ))
     CMS_lumi.lumi_13TeV = "%+3.1f fb^{-1}" % lumi 
 
     nameOutBase = filein 
     if not os.path.exists( filein ) :
-        print 'file %s does not exist' % filein
+        print('file %s does not exist' % filein)
         sys.exit(1)
 
 
@@ -310,7 +311,7 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
     effGraph.symmetrizeSystVsEta()
     effGraph.combineSyst()
 
-    print " ------------------------------- "
+    print(" ------------------------------- ")
 
     customEtaBining = []
     customEtaBining.append( (0.000,0.800))
@@ -402,7 +403,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.txtFile is None:
-        print ' - Needs EGM txt file as input'
+        print(' - Needs EGM txt file as input')
         sys.exit(1)
     
 

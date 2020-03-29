@@ -19,9 +19,9 @@ tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
     'data'   : tnpSamples.nanov4_17['data_Run2017'].clone(),
-    'mcNom'  : tnpSamples.nanov4_17['DYJetsToLL_M-50-LO'].clone(),
+    'mcNom'  : tnpSamples.nanov4_17['DYJetsToLL_M-50-LO_ext1'].clone(),
     'mcAlt'  : tnpSamples.nanov4_17['DYJetsToLL_M-50_ext1'].clone(),
-    'tagSel' : tnpSamples.nanov4_17['DYJetsToLL_M-50-LO'].clone(),
+    'tagSel' : tnpSamples.nanov4_17['DYJetsToLL_M-50-LO_ext1'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
@@ -38,7 +38,7 @@ if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
-    samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO')
+    samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO_ext1')
     samplesDef['tagSel'].set_cut('tag_Ele_pt > 37') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 

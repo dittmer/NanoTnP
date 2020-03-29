@@ -5,8 +5,8 @@ latinov5_17 = '%s/../ntuple/results/latinov5_17/' % cwd
 latinov5_18 = '%s/../ntuple/results/latinov5_18/' % cwd
 
 nanov4_17 = {
-    'DYJetsToLL_M-50-LO' : tnpSample('DYJetsToLL_M-50-LO',
-                                     latinov5_17 + 'DYJetsToLL_M-50-LO.root',
+    'DYJetsToLL_M-50-LO_ext1' : tnpSample('DYJetsToLL_M-50-LO_ext1',
+                                     latinov5_17 + 'DYJetsToLL_M-50-LO_ext1.root',
                                      isMC = True, nEvts =  -1 ),
     
     'DYJetsToLL_M-50_ext1' : tnpSample('DYJetsToLL_M-50_ext1',
