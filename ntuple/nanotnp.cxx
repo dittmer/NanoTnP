@@ -33,11 +33,23 @@ int main(int argc, char **argv) {
     std::cout << ">>> Integrated luminosity: " << mycfg.lumi << std::endl;
 
     // customising configuration
-    if ( !mycfg.isMC ) mycfg.name = (input.find("_17") != std::string::npos) ? "HLT_Ele35_WPTight_Gsf" : "HLT_Ele32_WPTight_Gsf";
-    if ( !mycfg.isMC ) mycfg.bit = 1; // 2017:  hltEle35noerWPTightGsfTrackIsoFilter ; 2018: hltEle32WPTightGsfTrackIsoFilter
-    if ( !mycfg.isMC ) mycfg.jsonFile= (input.find("_17") != std::string::npos) ? 
-		 "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt" :
-		 "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt" ;
+    if ( !mycfg.isMC ){
+      if (input.find("_16") != std::string::npos){
+	mycfg.name     = "HLT_Ele35_WPTight_Gsf";
+	mycfg.bit      = 1;
+	mycfg.jsonFile = "./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
+      }
+      else if (input.find("_17") != std::string::npos){
+	mycfg.name     = "HLT_Ele35_WPTight_Gsf";
+        mycfg.bit      = 1;
+        mycfg.jsonFile = "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt";
+      }
+      else if (input.find("_18") != std::string::npos){
+	mycfg.name     = "HLT_Ele32_WPTight_Gsf";
+	mycfg.bit      = 1;
+        mycfg.jsonFile = "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt";
+      }
+    }
     m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
 
     // prefireweight for 17

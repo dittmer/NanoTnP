@@ -7,7 +7,7 @@
 struct config_t {
   // basic                                                                                                                                                                                                
   bool isMC=false;
-  std::string mcweight="XSWeight*puWeight*TriggerEffWeight_2l*EMTFbug_veto*METFilter_MC"; //nominal
+  std::string mcweight="XSWeight*puWeight*METFilter_MC"; //nominal
   std::string lumi;
   std::string jsonFile;
 
