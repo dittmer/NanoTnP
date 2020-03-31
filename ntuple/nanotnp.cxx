@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
 
     // prefireweight for 17
-    if (input.find("_17") != std::string::npos) mycfg.mcweight = mycfg.mcweight+"*PrefireWeight";
+    //if (input.find("_17") != std::string::npos) mycfg.mcweight = mycfg.mcweight+"*PrefireWeight";
 
     // Initialize time
     TStopwatch time;

@@ -151,7 +151,7 @@ auto pairProducer(T &df) {
       TLorentzVector tot = Helper::VectorMaker( pt[i1] , eta[i1] , phi[i1] , m[i1] );
       TLorentzVector probe = Helper::VectorMaker( pt[i2] , eta[i2] , phi[i2] , m[i2] );
       tot+=probe;
-      if ( tot.M() > 50 && tot.M() < 130 ) pair_Idx.push_back(std::make_pair(i1,i2));
+      if ( tot.M() > 60 && tot.M() < 120 ) pair_Idx.push_back(std::make_pair(i1,i2));
     }
     //
     auto nTnP = pair_Idx.size();
@@ -208,11 +208,17 @@ auto probeWPProducer(T &df){
     // Working point component definition
     .Define("passingLoose","Lepton_isLoose[probe_Lep_Idx]")
     .Define("passingMedium","Electron_cutBased_Fall17_V1[probe_Idx]==3")
+    .Define("passingMediumTight","Electron_cutBased_Fall17_V1[probe_Idx]>=3")
     .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]") // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L710-L731
-    .Define("el_sc_abseta","abs(Electron_eta[probe_Idx])")
-    .Define("el_mHits","Electron_lostHits[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L370
+    .Define("passingMVA94Xwp90iso","Electron_mvaFall17V1Iso_WP90[probe_Idx]==1")
+    .Define("el_sc_abseta","abs(Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx])")
+    .Define("el_sc_eta","Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx]")
     .Define("el_sieie","Electron_sieie[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L330
     .Define("el_1overEminus1overP","Electron_eInvMinusPInv[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L331
+    .Define("el_dz","Electron_dz[probe_Idx]")
+    .Define("el_dxy","Electron_dxy[probe_Idx]")
+    .Define("el_reliso03","Electron_pfRelIso03_all[probe_Idx]")
+    .Define("el_mHits","Electron_lostHits[probe_Idx]")
     ;
 }
 
@@ -248,6 +254,7 @@ auto DeclareVariables(T &df , config_t &cfg) {
     .Define( "tag_Ele_phi"             , "Electron_phi[tag_Idx]"                                           )
     .Define( "tag_Ele_mass"            , "Electron_mass[tag_Idx]"                                          )
     .Define( "tag_Ele_q"               , "Electron_charge[tag_Idx]"                                        )
+    .Define( "tag_sc_eta"              , "Electron_deltaEtaSC[tag_Idx] + Electron_eta[tag_Idx]"            )
 
     // probe kinematics
     .Define( "probe_Ele_pt"            , "Electron_pt[probe_Idx]"                                          )
@@ -276,8 +283,8 @@ auto DeclareVariables(T &df , config_t &cfg) {
     // https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesContent_cff.py#L186
     // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L411
     .Define( "tag_Ele_trigMVA"         , "Electron_mvaFall17V1Iso[tag_Idx]"                                )
-    .Define( "event_met_pfmet"         , "MET_pt"                                                          )
-    .Define( "event_met_pfphi"         , "MET_phi"                                                         )
+    .Define( "event_met_pfmet"         , "PuppiMET_pt"                                                     )
+    .Define( "event_met_pfphi"         , "PuppiMET_phi"                                                    )
     ;
 }
 

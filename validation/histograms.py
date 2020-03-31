@@ -32,11 +32,11 @@ def bookHistogram(df, variable, range_, ismc):
     #probe="1==1"
     flag="passingHWW_WP==1"
     #flag="1==1"
-    return df.Define("weights", "weight*"+ match if ismc else "weight")\
+    return df.Define("plotweights", "plotweight*"+ match if ismc else "plotweight")\
              .Filter("tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
              .Filter(flag,"passing flag")\
              .Filter(probe,"probe low eta high pt cut")\
-             .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights")
+             .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "plotweights")
 pass
 
 # Write a histogram with a given name to the output ROOT file

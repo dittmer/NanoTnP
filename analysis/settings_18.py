@@ -3,9 +3,19 @@ import os
 ########## General settings
 #############################################################
 # flag to be Tested
+###
+
+cutMissingInnerHits = 'el_mHits==0 '
+cutLoose = '(( abs(el_sc_abseta) > 1.497 && (el_sieie < 0.03 ) && (el_1overEminus1overP < 0.014)) ||( abs(el_sc_abseta) < 1.497))'
+cutDz = '(( abs(el_sc_abseta) > 1.497 && abs(el_dz) < 0.2 )||( abs(el_sc_abseta) < 1.497 && abs(el_dz) < 0.1 ))'
+cutDxy = '(( abs(el_sc_abseta) > 1.497 && abs(el_dxy) < 0.1 )||( abs(el_sc_abseta) < 1.497 && abs(el_dxy) < 0.05 ))'
+cutIso = '(el_reliso03 < 0.06)'
+
+# flag to be Tested
 flags = {
-    'passingHWW_WP' : '(passingHWW_WP == 1)',
-    }
+    'passingMedium'                     : '(passingMedium == 1)',
+    'passingMVA94Xwp90isoHWWiso0p06'    : '({0}) && ({1}) && ({2}) && ({3}) && (passingMedium == 1) && ( passingMVA94Xwp90iso == 1 )'.format(cutDxy,cutDz,cutLoose,cutIso),
+}
 
 baseOutDir = 'results/Legacy2018/tnpEleID/runAll'
 
@@ -81,6 +91,7 @@ additionalCuts = {
 #############################################################
 ########## fitting params to tune fit by hand if necessary
 #############################################################
+# x[ initial value , min , max ]
 tnpParNomFit = [
     "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
     "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",

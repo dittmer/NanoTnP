@@ -26,11 +26,11 @@ print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() 
 if datasets == 'latinov5_16':
     lumi = "35.867"
     # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext2.txt" )
     # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
+    samplelists.append( dirs + "DYJetsToLL_M-50_ext2.root" )
     # single electrons
-    samplelists.append( dirs + "SingleElectron_Run2017.txt" )
+    samplelists.append( dirs + "SingleElectron_Run2016.txt" )
 
 elif datasets == 'latinov5_17':
     lumi="41.53"

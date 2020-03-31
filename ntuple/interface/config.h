@@ -25,7 +25,7 @@ struct config_t {
   float jetclean_dR=0.3;
 
   // tag candidate definition
-  std::string TagCandidate = "Electron_pt>32 && Electron_cutBased==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
+  std::string TagCandidate = "Electron_pt>32 && Electron_cutBased_Fall17_V1==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
 
   // trigger object matching
   float trig_dR = 0.3;
@@ -76,6 +76,7 @@ const std::vector<std::string> finalVariables = {
   "tag_Ele_phi" ,
   "tag_Ele_q" ,
   "tag_Ele_trigMVA" ,
+  "tag_sc_eta" ,
   "probe_Ele_pt" ,
   "probe_Ele_eta" ,
   "probe_Ele_phi" ,
@@ -89,12 +90,18 @@ const std::vector<std::string> finalVariables = {
   
   // WP component
   "passingMedium" ,
+  "passingMediumTight" ,
+  "passingMVA94Xwp90iso" ,
   "passingMvaFall17V1Iso_WP90" ,
-  "el_sc_abseta" ,
-  "el_mHits" ,
-  "el_sieie" ,
-  "el_1overEminus1overP" ,
   "passingMvaTTH" ,
+  "el_sc_abseta" ,
+  "el_sieie" ,  
+  "el_1overEminus1overP" ,
+  "el_dz" ,
+  "el_dxy" ,
+  "el_reliso03" ,
+  "el_sc_eta" ,
+  "el_mHits" ,
 
   // met
   "event_met_pfmet" ,
