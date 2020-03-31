@@ -81,16 +81,20 @@ const std::vector<std::string> finalVariables = {
   "probe_Ele_phi" ,
   "probe_Ele_q" ,
   "weight",
+  "plotweight",
   "pair_pt" ,
   "pair_eta" ,
   "pair_phi" ,
   "pair_mass" ,
   
-  // WP
-  "passingMvaFall17V1Iso_WP90",
-  "passingHWW_WP" , 
-  "passing_New_HWW_WP" ,
-  "passingMvaTTH",
+  // WP component
+  "passingMedium" ,
+  "passingMvaFall17V1Iso_WP90" ,
+  "el_sc_abseta" ,
+  "el_mHits" ,
+  "el_sieie" ,
+  "el_1overEminus1overP" ,
+  "passingMvaTTH" ,
 
   // met
   "event_met_pfmet" ,

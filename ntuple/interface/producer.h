@@ -182,13 +182,13 @@ auto pairProducer(T &df) {
 }
 
 /*
+ * Working point definition
  * 
- * Recover Lepton_Idx from selected Electron_Idx
- *
  */
 template <typename T>
 auto probeWPProducer(T &df){
   using namespace ROOT::VecOps;
+  // Recover Lepton_Idx from selected Electron_Idx
   auto leptonidx = [](RVec<int>& leptonidx , int& pidx) {
     int lIdx=-1;
     for (size_t i=0 ; i< leptonidx.size() ; i++){
@@ -202,13 +202,17 @@ auto probeWPProducer(T &df){
   };
 
   return df
-    // specific WP from Lepton collection
+    // retrieve Lepton_idx from probe_Idx and tag_Idx via Lepton_electronIdx 
     .Define("probe_Lep_Idx",leptonidx,{"Lepton_electronIdx","probe_Idx"})
     .Define("tag_Lep_Idx",leptonidx,{"Lepton_electronIdx","tag_Idx"})
-    
-    // probe WP definition
+    // Working point component definition
     .Define("passingLoose","Lepton_isLoose[probe_Lep_Idx]")
-    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]")
+    .Define("passingMedium","Electron_cutBased_Fall17_V1[probe_Idx]==3")
+    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]") // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L710-L731
+    .Define("el_sc_abseta","abs(Electron_eta[probe_Idx])")
+    .Define("el_mHits","Electron_lostHits[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L370
+    .Define("el_sieie","Electron_sieie[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L330
+    .Define("el_1overEminus1overP","Electron_eInvMinusPInv[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L331
     ;
 }
 
@@ -267,9 +271,10 @@ auto DeclareVariables(T &df , config_t &cfg) {
     .Define( "pair_mass"               , "pair[3]"                                                         )
     
     // WP for fitter
-    .Define( "passingHWW_WP"           , "passingMvaFall17V1Iso_WP90*passingLoose"                         )
     .Define( "passingMvaTTH"           , "Electron_mvaTTH[probe_Idx]>0.7"                                  )
-    .Define( "passing_New_HWW_WP"      , "passingMvaFall17V1Iso_WP90*passingLoose*passingMvaTTH"           )
+    // Ele_trigMVA
+    // https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesContent_cff.py#L186
+    // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L411
     .Define( "tag_Ele_trigMVA"         , "Electron_mvaFall17V1Iso[tag_Idx]"                                )
     .Define( "event_met_pfmet"         , "MET_pt"                                                          )
     .Define( "event_met_pfphi"         , "MET_phi"                                                         )
