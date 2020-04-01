@@ -219,6 +219,8 @@ auto probeWPProducer(T &df){
     .Define("el_dxy","Electron_dxy[probe_Idx]")
     .Define("el_reliso03","Electron_pfRelIso03_all[probe_Idx]")
     .Define("el_mHits","Electron_lostHits[probe_Idx]")
+    .Define("el_convVeto","Electron_convVeto[probe_Idx]")
+    .Define("el_deltaEtaSC","Electron_deltaEtaSC[probe_Idx]")
     ;
 }
 

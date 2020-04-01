@@ -22,6 +22,7 @@ auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U
   if (cfg.name.find("NULL") != std::string::npos){
     return df
       .Filter("nElectron>=2"," --> At least two electrons")
+      .Filter("nLepton>=2"," --> At least two leptons")
       ;
   }
   else{

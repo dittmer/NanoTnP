@@ -16,7 +16,7 @@ struct config_t {
   int bit;
 
   // goodElectron definition
-  std::string goodElectron = "abs(Electron_eta) < 2.5 && Electron_pt > 10 && Electron_cutBased>=2";
+  std::string goodElectron = "abs(Electron_eta) < 2.5 && Electron_pt > 10 && Electron_cutBased>=2"; //take away Electron_cutBased>=2
 
   // goodJet definition
   std::string goodJet = "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4";  
@@ -25,7 +25,7 @@ struct config_t {
   float jetclean_dR=0.3;
 
   // tag candidate definition
-  std::string TagCandidate = "Electron_pt>32 && Electron_cutBased_Fall17_V1==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
+  std::string TagCandidate = "Electron_pt>35 && Electron_cutBased_Fall17_V1==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
 
   // trigger object matching
   float trig_dR = 0.3;
@@ -102,6 +102,8 @@ const std::vector<std::string> finalVariables = {
   "el_reliso03" ,
   "el_sc_eta" ,
   "el_mHits" ,
+  "el_convVeto" ,
+  "el_deltaEtaSC" ,
 
   // met
   "event_met_pfmet" ,
