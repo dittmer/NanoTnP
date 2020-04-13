@@ -8,6 +8,7 @@ struct config_t {
   // basic                                                                                                                                                                                                
   bool isMC=false;
   std::string mcweight="XSWeight*puWeight*METFilter_MC"; //nominal
+  std::string year;
   std::string lumi;
   std::string jsonFile;
 
@@ -37,9 +38,9 @@ struct config_t {
   bool resolveByMatchQuality = true;  //False = just match input in order; True = pick lowest deltaR pair first
 
   // probe denominator flag
-  std::string denom="";
+  std::string denom;
   // probe nominator flag
-  std::string num="";
+  std::string num;
 };
 
 

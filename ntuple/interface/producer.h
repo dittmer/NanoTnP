@@ -26,7 +26,7 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
   using namespace ROOT::VecOps;
   std::string flag(s);
   // trigger matching producer
-  auto trgMatcher = [&cfg](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float>& eta_trg , RVec<float>& phi_trg) {
+  auto trgMatcher = [&cfg](RVec<int>& id, RVec<int>& filterbits , RVec<float>& eta_el , RVec<float>& phi_el , RVec<float> pt_trg , RVec<float>& eta_trg , RVec<float>& phi_trg) {
     std::pair<RVec<int>,RVec<int>> out;
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
@@ -39,11 +39,14 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
       const auto itrg = comb[1][j]; //trigobj
 
       //trigger object selection
-      if ( abs(id[itrg]) != 11                            ) continue;
+      if ( abs(id[itrg]) != 11                                               ) continue;
       //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
-      if ( !Helper::bitdecoder(filterbits[itrg], cfg.bit) ) continue;
+      if ( !Helper::bitdecoder(filterbits[itrg], cfg.bit)                    ) continue;
+      if ( cfg.year=="2016" && pt_trg[itrg] < 27 && abs(eta_trg[itrg]) > 2.1 ) continue;
+      if ( cfg.year=="2017" && pt_trg[itrg] < 35                             ) continue;
+      if ( cfg.year=="2018" && pt_trg[itrg] < 32                             ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
-      if ( deltar > cfg.trig_dR                           ) continue; // Minimum deltaR for matching
+      if ( deltar > cfg.trig_dR                                              ) continue; // Minimum deltaR for matching
       matcher[iele] = 1;
       }
     out = std::make_pair(matcher,mctruth);
@@ -104,7 +107,7 @@ auto tagMatchProducer(T &df, config_t &cfg , const char* s) {
   auto out = df;
   if (flag=="trigger"){
     std::cout<<" >>> Matcher deployed : "<<flag<<" matching <<< "<<std::endl;
-    out = df.Define("tagMatchProducer",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_eta","TrigObj_phi"})
+    out = df.Define("tagMatchProducer",trgMatcher,{"TrigObj_id","TrigObj_filterBits","Electron_eta","Electron_phi","TrigObj_pt","TrigObj_eta","TrigObj_phi"})
             .Define("tagMatcher","tagMatchProducer.first")
             .Define("ismctruth","tagMatchProducer.second")
             ;
