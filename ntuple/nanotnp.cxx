@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     // customising configuration
     if ( !mycfg.isMC ){
       if (input.find("_16") != std::string::npos){
-	mycfg.name     = "HLT_Ele35_WPTight_Gsf";
+	mycfg.name     = "HLT_Ele27_eta2p1_WPTight_Gsf";
 	mycfg.bit      = 1;
 	mycfg.jsonFile = "./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
       }
