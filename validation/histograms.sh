@@ -1,5 +1,11 @@
 #!/bin/bash
 
+nano16="
+DYJetsToLL_M-50_ext2
+DYJetsToLL_M-50-LO_ext2
+SingleElectron_Run2016
+"
+
 nano17="
 DYJetsToLL_M-50-LO_ext1
 DYJetsToLL_M-50_ext1
@@ -11,6 +17,19 @@ DYJetsToLL_M-50-LO
 DYJetsToLL_M-50_ext
 EGamma_Run2018
 "
+
+# 2016
+for iproc in ${nano16}
+do
+    python histograms.py ../ntuple/results/latinov5_16/${iproc}.root ${iproc}
+done
+hadd -f ./results/latinov5_16/histogram.root ./results/latinov5_16/*.root
+
+##nominal plotting
+python plot.py ./results/latinov5_16/histogram.root ./results/latinov5_16/plots/DYJetsToLL_M-50-LO_ext2/ DYJetsToLL_M-50-LO_ext2
+##altMC plotting
+python plot.py ./results/latinov5_16/histogram.root ./results/latinov5_16/plots/DYJetsToLL_M-50_ext2/ DYJetsToLL_M-50_ext2
+
 
 # 2017
 for iproc in ${nano17}

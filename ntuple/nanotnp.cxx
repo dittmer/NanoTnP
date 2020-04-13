@@ -33,25 +33,29 @@ int main(int argc, char **argv) {
     std::cout << ">>> Integrated luminosity: " << mycfg.lumi << std::endl;
 
     // customising configuration
-    if ( !mycfg.isMC ){
-      if (input.find("_16") != std::string::npos){
-	mycfg.name     = "HLT_Ele27_eta2p1_WPTight_Gsf";
-	mycfg.bit      = 1;
-	mycfg.jsonFile = "./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
-      }
-      else if (input.find("_17") != std::string::npos){
-	mycfg.name     = "HLT_Ele35_WPTight_Gsf";
-        mycfg.bit      = 1;
-        mycfg.jsonFile = "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt";
-      }
-      else if (input.find("_18") != std::string::npos){
-	mycfg.name     = "HLT_Ele32_WPTight_Gsf";
-	mycfg.bit      = 1;
-        mycfg.jsonFile = "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt";
-      }
+    if (input.find("_16") != std::string::npos){
+      if (!mycfg.isMC) mycfg.name     = "HLT_Ele27_eta2p1_WPTight_Gsf";
+      if (!mycfg.isMC) mycfg.bit      = 1;
+      if (!mycfg.isMC) mycfg.jsonFile = "./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
+      mycfg.denom    = "Lepton_isTightElectron_mva_90p_Iso2016";
+      mycfg.num      = "Electron_mvaTTH"; //>0.7
     }
-    m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
-
+    else if (input.find("_17") != std::string::npos){
+      if (!mycfg.isMC) mycfg.name     = "HLT_Ele35_WPTight_Gsf";
+      if (!mycfg.isMC) mycfg.bit      = 1;
+      if (!mycfg.isMC) mycfg.jsonFile = "./data/Certs/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt";
+      mycfg.denom    = "Lepton_isTightElectron_mvaFall17V1Iso_WP90";
+      mycfg.num      = "Electron_mvaTTH"; //>0.7
+    }
+    else if (input.find("_18") != std::string::npos){
+      if (!mycfg.isMC) mycfg.name     = "HLT_Ele32_WPTight_Gsf";
+      if (!mycfg.isMC) mycfg.bit      = 1;
+      if (!mycfg.isMC) mycfg.jsonFile = "./data/Certs/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt";
+      mycfg.denom    = "Lepton_isTightElectron_mvaFall17V1Iso_WP90";
+      mycfg.num      = "Electron_mvaTTH"; //>0.7
+    }
+    if (!mycfg.isMC) m_json = Helper::parseJSONAsMap(mycfg.jsonFile);
+    
     // prefireweight for 17
     //if (input.find("_17") != std::string::npos) mycfg.mcweight = mycfg.mcweight+"*PrefireWeight";
 

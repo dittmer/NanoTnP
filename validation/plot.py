@@ -60,7 +60,14 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
     hist['BkgSum'] = hist['DY'].Clone("BkgSum")
     
     # Data
-    hist['DATA'] = getHistogram(tfile, "EGamma_Run2018" if '_18' in path else "SingleElectron_Run2017" , variable)
+    dataIn=""
+    if '_16' in path:
+        dataIn="SingleElectron_Run2016"
+    elif '_17' in path:
+        dataIn="SingleElectron_Run2017"
+    elif '_18' in path:
+        dataIn="EGamma_Run2018"
+    hist['DATA'] = getHistogram(tfile , dataIn , variable)
 
     ######################################################################3
     # Plotting style
@@ -195,4 +202,12 @@ if __name__ == "__main__":
     #parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
     args = parser.parse_args()
     
-    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , "41.53" if '_17' in args.path else "59.74" , 4 , False if 'eta' in variable else True )
+    lm=""
+    if '_16' in args.path:
+        lm="35.867"
+    elif '_17' in args.path:
+        lm="41.53"
+    elif '_18' in args.path:
+        lm="59.74"
+    
+    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , lm , 4 , False if 'eta' in variable else True )
