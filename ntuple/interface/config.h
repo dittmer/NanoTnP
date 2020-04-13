@@ -35,6 +35,11 @@ struct config_t {
   float gen_relPt = 50;
   bool resolveAmbiguities    = false; //Forbid two RECO objects to match to the same GEN objec
   bool resolveByMatchQuality = true;  //False = just match input in order; True = pick lowest deltaR pair first
+
+  // probe denominator flag
+  std::string denom="";
+  // probe nominator flag
+  std::string num="";
 };
 
 
@@ -89,21 +94,23 @@ const std::vector<std::string> finalVariables = {
   "pair_mass" ,
   
   // WP component
-  "passingMedium" ,
-  "passingMediumTight" ,
-  "passingMVA94Xwp90iso" ,
-  "passingMvaFall17V1Iso_WP90" ,
-  "passingMvaTTH" ,
-  "el_sc_abseta" ,
-  "el_sieie" ,  
-  "el_1overEminus1overP" ,
-  "el_dz" ,
-  "el_dxy" ,
-  "el_reliso03" ,
-  "el_sc_eta" ,
-  "el_mHits" ,
-  "passingConvVeto" ,
-  "el_deltaEtaSC" ,
+  "passingMvattH" ,
+  "passingHWW" ,
+  //"passingMedium" ,
+  //"passingMediumTight" ,
+  //"passingMVA94Xwp90iso" ,
+  //"passingMvaFall17V1Iso_WP90" ,
+  //"passingMvaTTH" ,
+  //"el_sc_abseta" ,
+  //"el_sieie" ,  
+  //"el_1overEminus1overP" ,
+  //"el_dz" ,
+  //"el_dxy" ,
+  //"el_reliso03" ,
+  //"el_sc_eta" ,
+  //"el_mHits" ,
+  //"passingConvVeto" ,
+  //"el_deltaEtaSC" ,
 
   // met
   "event_met_pfmet" ,

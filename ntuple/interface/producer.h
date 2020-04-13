@@ -208,19 +208,19 @@ auto probeWPProducer(T &df){
     // Working point component definition
     .Define("passingLoose","Lepton_isLoose[probe_Lep_Idx]")
     .Define("passingMedium","Electron_cutBased_Fall17_V1[probe_Idx]==3")
-    .Define("passingMediumTight","Electron_cutBased_Fall17_V1[probe_Idx]>=3")
-    .Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]") // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L710-L731
-    .Define("passingMVA94Xwp90iso","Electron_mvaFall17V1Iso_WP90[probe_Idx]==1")
-    .Define("el_sc_abseta","abs(Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx])")
-    .Define("el_sc_eta","Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx]")
-    .Define("el_sieie","Electron_sieie[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L330
-    .Define("el_1overEminus1overP","Electron_eInvMinusPInv[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L331
-    .Define("el_dz","Electron_dz[probe_Idx]")
-    .Define("el_dxy","Electron_dxy[probe_Idx]")
-    .Define("el_reliso03","Electron_pfRelIso03_all[probe_Idx]")
-    .Define("el_mHits","Electron_lostHits[probe_Idx]")
-    .Define("passingConvVeto","Electron_convVeto[probe_Idx]==1")
-    .Define("el_deltaEtaSC","Electron_deltaEtaSC[probe_Idx]")
+    //.Define("passingMediumTight","Electron_cutBased_Fall17_V1[probe_Idx]>=3")
+    //.Define("passingMvaFall17V1Iso_WP90","Lepton_isTightElectron_mvaFall17V1Iso_WP90[probe_Lep_Idx]") // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L710-L731
+    //.Define("passingMVA94Xwp90iso","Electron_mvaFall17V1Iso_WP90[probe_Idx]==1")
+    //.Define("el_sc_abseta","abs(Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx])")
+    //.Define("el_sc_eta","Electron_deltaEtaSC[probe_Idx] + Electron_eta[probe_Idx]")
+    //.Define("el_sieie","Electron_sieie[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L330
+    //.Define("el_1overEminus1overP","Electron_eInvMinusPInv[probe_Idx]") // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L331
+    //.Define("el_dz","Electron_dz[probe_Idx]")
+    //.Define("el_dxy","Electron_dxy[probe_Idx]")
+    //.Define("el_reliso03","Electron_pfRelIso03_all[probe_Idx]")
+    //.Define("el_mHits","Electron_lostHits[probe_Idx]")
+    //.Define("passingConvVeto","Electron_convVeto[probe_Idx]==1")
+    //.Define("el_deltaEtaSC","Electron_deltaEtaSC[probe_Idx]")
     ;
 }
 
@@ -244,6 +244,9 @@ auto DeclareVariables(T &df , config_t &cfg) {
   // MC specific variable
   std::string tagReco   = (cfg.isMC) ? "Lepton_RecoSF[tag_Lep_Idx]" : "-1";
   std::string probeReco = (cfg.isMC) ? "Lepton_RecoSF[probe_Lep_Idx]" : "-1";
+
+  cfg.denom.append("[probe_Lep_Idx]==1"); std::cout<<"Define probe denominator flag : "<< cfg.denom <<std::endl;
+  cfg.num.append("[probe_Idx]>0.7");   std::cout<<"Define probe numerator flag  : "<< cfg.num <<std::endl;
 
   return df
     //mc specific variable
@@ -280,7 +283,8 @@ auto DeclareVariables(T &df , config_t &cfg) {
     .Define( "pair_mass"               , "pair[3]"                                                         )
     
     // WP for fitter
-    .Define( "passingMvaTTH"           , "Electron_mvaTTH[probe_Idx]>0.7"                                  )
+    .Define( "passingMvattH"           , cfg.num                                                           )
+    .Define( "passingHWW"              , cfg.denom                                                         )
     // Ele_trigMVA
     // https://github.com/cms-analysis/EgammaAnalysis-TnPTreeProducer/blob/master/python/egmTreesContent_cff.py#L186
     // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L411
@@ -302,6 +306,7 @@ auto AddEventWeight(T &df, config_t &cfg) {
   std::cout<<" >>> plotweights interpreted : "<<weights1<<" <<< "<<std::endl;
   std::cout<<" >>> weights interpreted : "<<weights2<<" <<< "<<std::endl;
   return df
+    .Filter( "passingHWW==1", " --> Define Denominator" ) // define denominator
     .Define( "plotweight", weights1 )
     .Define( "weight", weights2 )
     ;
