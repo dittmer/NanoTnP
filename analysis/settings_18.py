@@ -3,18 +3,8 @@ import os
 ########## General settings
 #############################################################
 # flag to be Tested
-###
-
-cutMissingInnerHits = 'el_mHits==0 '
-cutLoose = '(( abs(probe_Ele_eta) > 1.497 && (el_sieie < 0.03 ) && (el_1overEminus1overP < 0.014)) ||( abs(probe_Ele_eta) < 1.497))'
-cutDz = '(( abs(probe_Ele_eta) > 1.497 && abs(el_dz) < 0.2 )||( abs(probe_Ele_eta) < 1.497 && abs(el_dz) < 0.1 ))'
-cutDxy = '(( abs(probe_Ele_eta) > 1.497 && abs(el_dxy) < 0.1 )||( abs(probe_Ele_eta) < 1.497 && abs(el_dxy) < 0.05 ))'
-cutIso = '(el_reliso03 < 0.06)'
-
-# flag to be Tested
 flags = {
-    'passingMedium'                     : '(passingMedium == 1)',
-    'passingMVA94Xwp90isoHWWiso0p06'    : '({0}) && ({1}) && ({2}) && ({3}) && (passingMediumTight == 1) && ( passingMVA94Xwp90iso == 1 )'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingMvattH'    : 'passingMvattH==1'
 }
 
 baseOutDir = 'results/Legacy2018/tnpEleID/runAll'
