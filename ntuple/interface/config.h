@@ -102,6 +102,8 @@ const std::vector<std::string> finalVariables = {
   "el_reliso03" ,
   "el_sc_eta" ,
   "el_mHits" ,
+  "passingConvVeto" ,
+  "el_deltaEtaSC" ,
 
   // met
   "event_met_pfmet" ,
