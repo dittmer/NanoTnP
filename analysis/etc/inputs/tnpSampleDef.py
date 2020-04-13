@@ -1,8 +1,21 @@
 from libPython.tnpClassUtils import tnpSample
 import os
 cwd = os.getcwd()
+latinov5_16 = '%s/../ntuple/results/latinov5_16/' % cwd
 latinov5_17 = '%s/../ntuple/results/latinov5_17/' % cwd
 latinov5_18 = '%s/../ntuple/results/latinov5_18/' % cwd
+
+nanov4_16 = {
+    'DYJetsToLL_M-50-LO_ext2' : tnpSample('DYJetsToLL_M-50-LO_ext2',
+                                     latinov5_16 + 'DYJetsToLL_M-50-LO_ext2.root',
+                                     isMC = True, nEvts =  -1 ),
+
+    'DYJetsToLL_M-50_ext2' : tnpSample('DYJetsToLL_M-50_ext1',
+                                       latinov5_16 + 'DYJetsToLL_M-50_ext2.root',
+                                       isMC = True, nEvts =  -1 ),
+
+    'data_Run2016' : tnpSample('SingleElectron' , latinov5_16 + 'SingleElectron_Run2016.root' , lumi = 35.867 ),
+}
 
 nanov4_17 = {
     'DYJetsToLL_M-50-LO_ext1' : tnpSample('DYJetsToLL_M-50-LO_ext1',
