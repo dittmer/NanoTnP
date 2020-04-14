@@ -4,7 +4,7 @@ import os
 #############################################################
 # flag to be Tested
 flags = {
-    'passingMvattH'    : 'passingMvattH==1'
+    'passingMvattH'    : 'passingHWW==1 && passingMvattH==1'
 }
 
 baseOutDir = 'results/Legacy2017/tnpEleID/runAll'

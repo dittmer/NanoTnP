@@ -4,7 +4,7 @@ import os
 #############################################################
 # flag to be Tested
 flags = {
-    'passingMvattH'    : 'passingMvattH==1'
+    'passingMvattH'    : 'passingHWW==1 && passingMvattH==1'
 }
 
 baseOutDir = 'results/Legacy2016/tnpEleID/runAll'
@@ -18,10 +18,10 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
-    'data'   : tnpSamples.nanov4_16['data_Run2016'].clone(),
-    'mcNom'  : tnpSamples.nanov4_16['DYJetsToLL_M-50-LO_ext2'].clone(),
-    'mcAlt'  : tnpSamples.nanov4_16['DYJetsToLL_M-50_ext2'].clone(),
-    'tagSel' : tnpSamples.nanov4_16['DYJetsToLL_M-50-LO_ext2'].clone(),
+    'data'   : tnpSamples.nanov5_16['data_Run2016'].clone(),
+    'mcNom'  : tnpSamples.nanov5_16['DYJetsToLL_M-50-LO_ext2'].clone(),
+    'mcAlt'  : tnpSamples.nanov5_16['DYJetsToLL_M-50'].clone(),
+    'tagSel' : tnpSamples.nanov5_16['DYJetsToLL_M-50-LO_ext2'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
@@ -59,7 +59,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW==1'
+cutBase   = 'tag_Ele_pt > 30 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW==1'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 

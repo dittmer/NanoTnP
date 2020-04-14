@@ -4,7 +4,7 @@ import os
 #############################################################
 # flag to be Tested
 flags = {
-    'passingMvattH'    : 'passingMvattH==1'
+    'passingMvattH'    : 'passingHWW==1 && passingMvattH==1'
 }
 
 baseOutDir = 'results/Legacy2018/tnpEleID/runAll'
@@ -20,7 +20,7 @@ tnpTreeDir = 'fitter_tree'
 samplesDef = {
     'data'   : tnpSamples.nanov5_18['data_Run2018'].clone(),
     'mcNom'  : tnpSamples.nanov5_18['DYJetsToLL_M-50-LO'].clone(),
-    'mcAlt'  : tnpSamples.nanov5_18['DYJetsToLL_M-50_ext'].clone(),
+    'mcAlt'  : tnpSamples.nanov5_18['DYJetsToLL_M-50_ext2'].clone(),
     'tagSel' : tnpSamples.nanov5_18['DYJetsToLL_M-50-LO'].clone(),
 }
 
