@@ -18,10 +18,10 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
-    'data'   : tnpSamples.nanov5_18['data_Run2018'].clone(),
-    'mcNom'  : tnpSamples.nanov5_18['DYJetsToLL_M-50-LO'].clone(),
-    'mcAlt'  : tnpSamples.nanov5_18['DYJetsToLL_M-50_ext2'].clone(),
-    'tagSel' : tnpSamples.nanov5_18['DYJetsToLL_M-50-LO'].clone(),
+    'data'   : tnpSamples.nanov6_18['data_Run2018'].clone(),
+    'mcNom'  : tnpSamples.nanov6_18['DYJetsToLL_M-50-LO'].clone(),
+    'mcAlt'  : tnpSamples.nanov6_18['DYJetsToLL_M-50_ext2'].clone(),
+    'tagSel' : tnpSamples.nanov6_18['DYJetsToLL_M-50-LO'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
