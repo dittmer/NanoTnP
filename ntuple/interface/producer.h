@@ -309,7 +309,7 @@ auto AddEventWeight(T &df, config_t &cfg) {
   std::cout<<" >>> plotweights interpreted : "<<weights1<<" <<< "<<std::endl;
   std::cout<<" >>> weights interpreted : "<<weights2<<" <<< "<<std::endl;
   return df
-    .Filter( "passingHWW==1", " --> Define Denominator" ) // define denominator
+    //.Filter( "passingHWW==1", " --> Define Denominator" ) // define denominator
     .Define( "plotweight", weights1 )
     .Define( "weight", weights2 )
     ;
