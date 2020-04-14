@@ -23,7 +23,7 @@ os.system("make")
 print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() - tcompile) , (time.time() - tcompile)/60. ) )
 
 # predefined samples
-if datasets == 'latinov5_16':
+if datasets == 'latinov6_16':
     lumi = "35.867"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext2.txt" )
@@ -32,7 +32,7 @@ if datasets == 'latinov5_16':
     # single electrons
     samplelists.append( dirs + "SingleElectron_Run2016.txt" )
 
-elif datasets == 'latinov5_17':
+elif datasets == 'latinov6_17':
     lumi="41.53"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )#"DYJetsToLL_M-50-LO.txt" )
@@ -41,7 +41,7 @@ elif datasets == 'latinov5_17':
     # single electrons
     samplelists.append( dirs + "SingleElectron_Run2017.txt" )
 
-elif datasets == 'latinov5_18':
+elif datasets == 'latinov6_18':
     lumi = "59.74"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )

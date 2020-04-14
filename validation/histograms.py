@@ -51,12 +51,12 @@ pass
 # perform selection on same sign and opposite sign only
 def main(sample, process):
     output="./results/"
-    if 'latinov5_16' in sample:
-        output+='latinov5_16/'
-    elif 'latinov5_17' in sample:
-        output+='latinov5_17/'
-    elif 'latinov5_18' in sample:
-        output+='latinov5_18/'
+    if 'latinov6_16' in sample:
+        output+='latinov6_16/'
+    elif 'latinov6_17' in sample:
+        output+='latinov6_17/'
+    elif 'latinov6_18' in sample:
+        output+='latinov6_18/'
 
     # Create output file
     if not os.path.isdir(output):
