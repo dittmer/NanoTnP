@@ -46,7 +46,7 @@ elif datasets == 'latinov5_18':
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
     # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50_ext.txt" )
+    samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
     # single electrons
     samplelists.append( dirs + "EGamma_Run2018.txt" )
 
