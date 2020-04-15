@@ -104,7 +104,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     p1.SetLeftMargin( c.GetLeftMargin() )
     p2.SetLeftMargin( c.GetLeftMargin() )
     firstGraph = True
-    leg = rt.TLegend(0.5,0.80,0.95 ,0.92)
+    leg = rt.TLegend(0.5,0.80,0.95 ,0.92)#HERE
     leg.SetFillColor(0)
     leg.SetBorderSize(0)
 
@@ -209,7 +209,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
             listOfMC[use_igr].SetLineColor(graphColors[use_igr])
 
         listOfTGraph1[use_igr].GetHistogram().SetMinimum(effiMin)
-        listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax)
+        listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax*1.4) #HERE
         p1.cd()
         listOfTGraph1[use_igr].Draw(option)
         if not listOfMC[use_igr] is None:
