@@ -1,7 +1,14 @@
 #!/bin/bash
 
-for year in latinov5_16 latinov5_17 latinov5_18
+set -e
+
+if [ -e /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3/x86_64-centos7-gcc7-opt/setup.sh ];then
+    echo "source /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3/x86_64-centos7-gcc7-opt/setup.sh"
+    source /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3/x86_64-centos7-gcc7-opt/setup.sh
+fi
+
+for year in latinov6_17 latinov6_18 #latinov6_16 latinov6_17 latinov6_18
 do
-    echo "python nanotnp.py -d ${year} -l local"
-    python nanotnp.py -d ${year} -l local
+    echo "python nanotnp.py -d ${year}"
+    python nanotnp.py -d ${year}
 done

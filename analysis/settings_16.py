@@ -39,7 +39,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO_ext2')
-    samplesDef['tagSel'].set_cut('tag_Ele_pt > 37') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 32') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'

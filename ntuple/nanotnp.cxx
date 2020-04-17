@@ -78,10 +78,10 @@ int main(int argc, char **argv) {
     auto df1 = Filterbaseline( df , mycfg , m_json );                                                                         // mild skim, HLT and JSON filter for DATA
     auto df2 = goodElectrons( df1 , mycfg );                                                                                  // definition of good electron
     auto df3 = goodJets( df2 , mycfg );                                                                                       // definition of good jets
-    auto df4 = cleanFromJet( df3 , mycfg );                                                                                   // cleaning good electron with good jets
+    //auto df4 = cleanFromJet( df3 , mycfg );                                                                                   // cleaning good electron with good jets
 
     // tag and probe producer
-    auto df5 = tagCandProducer( df4 , mycfg );                                                                                // standard tag cuts definition
+    auto df5 = tagCandProducer( df3 , mycfg );                                                                                // standard tag cuts definition
     auto df6 = ( !mycfg.isMC ) ? tagMatchProducer( df5 , mycfg , "trigger" ) : tagMatchProducer( df5 , mycfg , "gen" );       // data: tag matched with trigger object ; mc: tag match with gen level
     auto df8 = tagProducer( df6 );                                                                                            // tag candidates
 
