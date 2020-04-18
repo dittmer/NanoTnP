@@ -14,22 +14,22 @@ auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U
       return Helper::isRunLumiInJSON( m_json , RUN, LUM );
     };
 
-  std::cout<<" >>> HLT : "<<cfg.name<<" <<< "<<std::endl;
-  std::cout<<" >>> Json : "<<cfg.jsonFile<<" <<< "<<std::endl;
 
   if (cfg.name.find("NULL") != std::string::npos){
+    std::cout<<" >>> Running MC, no HLT and JSON filter <<< "<<std::endl;
     return df
-      .Filter("nElectron>=2"," --> At least two electrons")
-      .Filter("nLepton>=2"," --> At least two leptons")
+      .Filter("run==1"," --> MC dummy")
       ;
   }
   else{
+    std::cout<<" >>> HLT : "<<cfg.name<<" <<< "<<std::endl;
+    std::cout<<" >>> Json : "<<cfg.jsonFile<<" <<< "<<std::endl;
+
     std::string hlt(cfg.name +=" == true");
     return df
       .Define("passJSON",isPassJSON, { "run" , "luminosityBlock" } )
       .Filter("passJSON == 1"," --> Filtered by Golden Json")
       .Filter(hlt," --> passing trigger "+hlt)
-      .Filter("nElectron>=2"," --> At least two electrons")
       ;
   }
 }
