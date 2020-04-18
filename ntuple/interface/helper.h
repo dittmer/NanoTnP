@@ -1,5 +1,5 @@
-#ifndef NANOTNP_H
-#define NANOTNP_H
+#ifndef HELPER_H
+#define HELPER_H
 #include "ROOT/RDataFrame.hxx"
 #include "ROOT/RDFHelpers.hxx"
 #include "ROOT/RVec.hxx"

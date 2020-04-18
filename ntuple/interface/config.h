@@ -14,22 +14,19 @@ struct config_t {
 
   // trigger
   std::string name = "NULL";
-  int bit;
 
   // goodElectron definition
-  std::string goodElectron = "abs(Electron_eta) < 2.5 && Electron_pt > 10";
-
-  // goodJet definition
-  std::string goodJet = "Jet_pt > 30 && abs(Jet_eta) < 2.5 && Jet_jetId > 0 && Jet_puId > 4";  
-
-  // jet cleaning mathcing                                                                                                                                                                            
-  float jetclean_dR=0.3;
+  int LeptonID=11;
+  std::string LeptonCollection = "Sum(abs(Lepton_pdgId)==11)>=2";
+  std::string goodLeptonCut    = "abs(Lepton_eta) < 2.5 && Lepton_pt > 10";
 
   // tag candidate definition
-  std::string TagCandidate = "Electron_pt>35 && Electron_cutBased_Fall17_V1==4 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
+  std::string TagCandidate = "Lepton_pt>30 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
+  std::string tagEleCutBasedTight="Electron_cutBased_Fall17_V1==4";
 
   // trigger object matching
   float trig_dR = 0.3;
+  int bit;
 
   // gen-matching
   float gen_dR = 0.2;
@@ -49,6 +46,11 @@ struct config_t {
  * Declare all variables which will end up in the final reduced dataset
  */
 
+const std::vector<std::string> finalVariables = {
+  "nLepton",
+};
+
+/*
 const std::vector<std::string> finalVariables = {
   // event quantity
   "run" ,
@@ -118,5 +120,5 @@ const std::vector<std::string> finalVariables = {
   "event_met_pfphi" ,
 
 };
-
+*/
 #endif
