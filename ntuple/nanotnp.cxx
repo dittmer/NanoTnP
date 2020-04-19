@@ -1,6 +1,7 @@
 #include "interface/helper.h"
 #include "interface/config.h"
 #include "interface/cand_sequence.h"
+#include "interface/tnpPairs_sequence.h"
 
 //#include "interface/skim.h"
 //#include "interface/producer.h"
@@ -73,20 +74,19 @@ int main(int argc, char **argv) {
     
     ROOT::RDataFrame df("Events", infiles); // maybe make an empty dataframe?
 
-    auto df1 = Filterbaseline( df , mycfg , m_json ); // apply HLT and json
-    /*
+    auto df1 = hltfilter( df , mycfg , m_json ); // apply HLT and json
+    
     // Cand_sequence
     auto df2 = goodElectrons( df1 , mycfg );
     auto df3 = tagEleCutBasedTight( df2 , mycfg );
     auto df4 = tagEle( df3 , mycfg );
+    
     auto df5 = probeEle( df4 , mycfg ); // data no match
-    if ( mycfg.isMC ) {
-      auto genInfo = genEle( df5 , mycfg );
-      auto genInfo_tag_df = genTagProbeEle( genInfo , mycfg , "tagEle");
-      auto genInfo_probe_df = genTagProbeEle( genInfo_tag_df , mycfg , "probeEle" );
-      df5 = genInfo_probe_df;
-    }
-    */
+    auto df6 = (mycfg.isMC) ? genEle( df5 , mycfg ) : df5;
+    auto df7 = (mycfg.isMC) ? genTagProbeEle( df6 , mycfg , "tagEle" ) : df6;
+    auto df8 = (mycfg.isMC) ? genTagProbeEle( df7 , mycfg , "probeEle" ) : df7;
+    auto df9 = tnpEleIDs( df8 );
+    
     //tnpPairs_sequence
     //auto df5 = tnpPairingEleIDs( input );
 
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
     ***/
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
 
-    auto dfFinal = df1;
+    auto dfFinal = df9;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("fitter_tree", output, finalVariables);
     time.Stop();

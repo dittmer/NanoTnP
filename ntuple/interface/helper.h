@@ -48,10 +48,6 @@ namespace Helper {
    */
   template <typename T>
     int bitdecoder( T decimal , T kbit){
-    // shift bit from the left to right and inspect with AND operator, it will return decimal 
-    //int on=0;
-    //if ( decimal & ( 1 << kbit ) ) on=1;
-    //return on;
     // shift to specific bit to the left, and query on/off state
     return (decimal >> kbit & 1);
   }

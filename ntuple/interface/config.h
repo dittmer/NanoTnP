@@ -21,8 +21,7 @@ struct config_t {
   std::string goodLeptonCut    = "abs(Lepton_eta) < 2.5 && Lepton_pt > 10";
 
   // tag candidate definition
-  std::string TagCandidate = "Lepton_pt>30 && abs(Electron_eta)<= 2.1 && !(abs(Electron_eta)>= 1.4442 && abs(Electron_eta)<=1.566)";
-  std::string tagEleCutBasedTight="Electron_cutBased_Fall17_V1==4";
+  std::string TagCandidate = "Lepton_pt>30 && abs(Lepton_eta)<= 2.1 && !(abs(Lepton_eta)>= 1.4442 && abs(Lepton_eta)<=1.566)";
 
   // trigger object matching
   float trig_dR = 0.3;
@@ -30,7 +29,7 @@ struct config_t {
 
   // gen-matching
   float gen_dR = 0.2;
-  float gen_relPt = 50;
+  float gen_relPt = 50.;
   bool resolveAmbiguities    = false; //Forbid two RECO objects to match to the same GEN objec
   bool resolveByMatchQuality = true;  //False = just match input in order; True = pick lowest deltaR pair first
 
@@ -48,6 +47,25 @@ struct config_t {
 
 const std::vector<std::string> finalVariables = {
   "nLepton",
+  "Lepton_pdgId",
+  "Lepton_muonIdx",
+  "Lepton_electronIdx",
+  "isGoodElectron",
+  "tagEleCutBasedTight",
+  "tagEle",
+  "probeEle",
+  //"genEle",
+  "genTagEle",
+  "genProbe",
+  "probeEleTightHWW",
+  "probeElettHMVA" ,
+  "probeTightHWW_ttHMVA_0p7" ,
+  //"tnpEleIDs",
+  "tag_Idx",
+  "probe_Idx",
+  "nTnP",
+  "ipair",
+  "randomness",
 };
 
 /*

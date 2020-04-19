@@ -5,7 +5,7 @@
 
 /* init */
 template <typename T , typename U>
-auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U, U> > > &m_json) {
+auto hltfilter(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U, U> > > &m_json) {
 
   auto isPassJSON = [&m_json](unsigned& run , unsigned& luminosityBlock)
     {
@@ -13,8 +13,7 @@ auto Filterbaseline(T &df, config_t &cfg , std::map< U, std::vector< std::pair<U
       int LUM = static_cast<int>(luminosityBlock);
       return Helper::isRunLumiInJSON( m_json , RUN, LUM );
     };
-
-
+  
   if (cfg.name.find("NULL") != std::string::npos){
     std::cout<<" >>> Running MC, no HLT and JSON filter <<< "<<std::endl;
     return df
@@ -54,9 +53,24 @@ auto goodElectrons(T &df, config_t &cfg ) {
 /* tagEleCutBasedTight */
 template <typename T>
 auto tagEleCutBasedTight(T &df, config_t &cfg ) {
-  std::string cut = cfg.TagCandidate+=" && isGoodElectron==1 &&";
+  using namespace ROOT::VecOps;
+  auto Lepton_isTight = [](
+			   RVec<int>& Lepton_electronIdx ,
+			   RVec<int>& Electron_flag
+			   ) {
+    RVec<int> Lepton_isTight(Lepton_electronIdx.size(),0);
+    for (size_t i=0 ; i< Lepton_electronIdx.size() ; i++){
+      if ( Electron_flag[Lepton_electronIdx[i]] == 4 ){
+        Lepton_isTight[i] = 1;
+      }
+    }
+    return Lepton_isTight;
+  };
+  
   return df
-    .Define( "tagEleCutBasedTight" ,  cut+=cfg.tagEleCutBasedTight )
+    .Define( "tagEleCut"           ,  cfg.TagCandidate )
+    .Define( "tagEleCutBasedTight" , Lepton_isTight , { "Lepton_electronIdx" , "Electron_cutBased_Fall17_V1" } )
+    .Define( "tagCandidate" , "isGoodElectron==1 && tagEleCut==1 && tagEleCutBasedTight==1" )
     ;
 }
 
@@ -68,7 +82,7 @@ auto tagEle(T &df, config_t &cfg) {
   auto eleHLTProducer = [&cfg](
 			       RVec<int>&   id,
 			       RVec<int>&   filterbits ,
-			       RVec<int>&   istagcand ,
+			       RVec<int>&   tagCandidate ,
 			       RVec<float>& eta_el ,
 			       RVec<float>& phi_el ,
 			       RVec<float>& pt_trg ,
@@ -78,12 +92,12 @@ auto tagEle(T &df, config_t &cfg) {
     // get combination
     auto comb = Combinations(eta_el,eta_trg); // electron-trig object pair
     const auto numComb = comb[0].size();
-    RVec<int> matcher(eta_el.size(),0);  // trigger matcher
+    RVec<int> trigMatchTag(eta_el.size(),0);  // trigger matcher
     //RVec<int> mctruth(eta_el.size(),-1); // dummy
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
       const auto itrg = comb[1][j]; //trigobj
-      if ( !istagcand[iele]                                                  ) continue;
+      if ( !(tagCandidate[iele])     ) continue;
       //trigger object selection
       if ( abs(id[itrg]) != cfg.LeptonID                                               ) continue;
       //https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/triggerObjects_cff.py#L35-L46
@@ -94,10 +108,10 @@ auto tagEle(T &df, config_t &cfg) {
       if ( cfg.year=="2018" && pt_trg[itrg] < 32                             ) continue;
       const auto deltar = sqrt( pow(eta_el[iele] - eta_trg[itrg], 2) + pow(Helper::DeltaPhi(phi_el[iele], phi_trg[itrg]), 2));
       if ( deltar > cfg.trig_dR                                              ) continue; // Minimum deltaR for matching
-      matcher[iele] = 1;
+      trigMatchTag[iele] = 1;
     }
     //out = std::make_pair(matcher,mctruth);
-    return matcher;
+    return trigMatchTag;
   };
   //####### Lambda function
 
@@ -105,7 +119,7 @@ auto tagEle(T &df, config_t &cfg) {
     .Define( "tagEle" , eleHLTProducer , {
 	"TrigObj_id",
 	  "TrigObj_filterBits",
-	  "tagEleCutBasedTight",
+	  "tagCandidate",
 	  "Lepton_eta",
 	  "Lepton_phi",
 	  "TrigObj_pt",
@@ -139,7 +153,7 @@ auto genEle(T &df , config_t &cfg) {
       // https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/genparticles_cff.py#L48-L80
       if ( status_gen[j]!=1                     ) continue;
       // isPrompt or isDirectPromptTauDecay
-      if ( !Helper::bitdecoder(statusflag[j],0) || !Helper::bitdecoder(statusflag[j],5) ) continue;
+      //if ( !Helper::bitdecoder(statusflag[j],0) || !Helper::bitdecoder(statusflag[j],5) ) continue;
       // checking on electron mom
       int momIdx= mother_gen[j];
       // checking on matched electron mom
@@ -179,38 +193,38 @@ auto genTagProbeEle(T &df , config_t &cfg , std::string ele_type) {
     outbranch="genTagEle";
   }
   else if (ele_type=="probeEle"){
-    outbranch="genProb";
+    outbranch="genProbe";
   }
 
   //####### Lambda function
   auto MCMatcher = [ &cfg ] (
-			     RVec<int>& isgoodgen ,
-			     RVec<int>& istag, // genTagEle or genProbe
-			     //RVec<float>& pt_el,
+			     RVec<int>& genele,
+			     RVec<int>& tagProbeObject, // tagEle or probeEle
+			     RVec<float>& pt_el,
 			     RVec<float>& eta_el,
 			     RVec<float>& phi_el,
-			     //RVec<float>& gen_pt_el,
+			     RVec<float>& gen_pt_el,
 			     RVec<float>& gen_eta_el,
 			     RVec<float>& gen_phi_el
 			     ) {
-    RVec<int> mctruth(eta_el.size(),0);
+    RVec<int> mcMatchEle(eta_el.size(),0);
     // get combination
     auto comb = Combinations(eta_el,gen_eta_el); // electron-gen object pair
     const auto numComb = comb[0].size();
     for (size_t j=0 ; j < numComb ; j++){
       const auto iele = comb[0][j]; //electron
       const auto igen = comb[1][j]; //gen
-
-      if ( !istag[iele]     ) continue;
-      if ( !isgoodgen[igen] ) continue;
+      
+      if ( !tagProbeObject[iele]     ) continue;
+      if ( !genele[igen] ) continue;
 
       const auto deltar = sqrt( pow(eta_el[iele] - gen_eta_el[igen], 2) + pow(Helper::DeltaPhi(phi_el[iele], gen_phi_el[igen]), 2));
-      if ( deltar > cfg.gen_dR ) continue; // Minimum deltaR for matching
-      //const auto dpt_rel = fabs(pt_el[iele] - gen_pt_el[igen]) / pt_el[iele];
-      //if ( dpt_rel > cfg.gen_relPt                 ) continue; // Minimum deltaPt/Pt for matching
-      mctruth[iele] = 1;
+      const auto dpt_rel = fabs(pt_el[iele] - gen_pt_el[igen]) / gen_pt_el[igen];
+      if ( deltar > cfg.gen_dR                     ) continue; // Minimum deltaR for matching
+      if ( dpt_rel > cfg.gen_relPt                 ) continue; // Minimum deltaPt/Pt for matching
+      mcMatchEle[iele] = 1;
     } // end of for loop
-    return mctruth;
+    return mcMatchEle;
   };
   //####### Lambda function
 
@@ -219,10 +233,10 @@ auto genTagProbeEle(T &df , config_t &cfg , std::string ele_type) {
 	     {
 	       "genEle" , // genPart pruned
 		 ele_type,
-		 //"Lepton_pt" ,
+		 "Lepton_pt" ,
 		 "Lepton_eta" ,
 		 "Lepton_phi" ,
-		 //"GenPart_pt",
+		 "GenPart_pt",
 		 "GenPart_eta",
 		 "GenPart_phi"
 		}
@@ -237,10 +251,26 @@ auto genTagProbeEle(T &df , config_t &cfg , std::string ele_type) {
 /* process.probe */
 template <typename T>
 auto probeEle(T &df, config_t &cfg) {
+  using namespace ROOT::VecOps;
+  
+  auto Lepton_isttHMVA = [](
+			    RVec<int>& Lepton_electronIdx ,
+			    RVec<float>& Electron_flag
+			    ) {
+    RVec<int> Lepton_isttHMVA(Lepton_electronIdx.size(),0);
+    for (size_t i=0 ; i< Lepton_electronIdx.size() ; i++){
+      if ( Electron_flag[Lepton_electronIdx[i]] > 0.7 ){
+	Lepton_isttHMVA[i] = 1;
+      }
+    }
+    return Lepton_isttHMVA;
+  };
+  
   return df
+    .Define("probeEle", "isGoodElectron==1" )
     .Define("probeEleTightHWW", cfg.denom+"==1")
-    .Define("probeElettHMVA" , cfg.num+"[Lepton_electronIdx]>0.7")
-    .Define("probeEle","isGoodElectron==1")
+    .Define("probeElettHMVA" , Lepton_isttHMVA , { "Lepton_electronIdx" , cfg.num })
+    .Define("probeTightHWW_ttHMVA_0p7" , "probeEle==1 && probeEleTightHWW==1 && probeElettHMVA==1" )
     ;
 }
 
