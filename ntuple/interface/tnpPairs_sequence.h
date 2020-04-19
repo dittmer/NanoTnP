@@ -7,7 +7,7 @@
  * note: its reco object pairing, no gen-selection
 */
 template <typename T>
-auto tnpEleIDs(T &df){
+auto tnpPairingEleIDs(T &df){
   using namespace ROOT::VecOps;
   //####### Lambda function
   auto tnpPairing = [](
@@ -79,15 +79,14 @@ auto tnpEleIDs(T &df){
     };
   //####### Lambda function
   return df
-    .Define("tnpEleIDs", tnpPairing, { "tagEle" , "probeEle" , "Lepton_pt" , "Lepton_eta" , "Lepton_phi" , "Electron_mass" , "Lepton_electronIdx" } )
-    .Define("tag_Idx", "tnpEleIDs[0]")
-    .Define("probe_Idx","tnpEleIDs[1]")
-    .Define("nTnP","tnpEleIDs[2]")
-    .Define("ipair","tnpEleIDs[3]")
-    .Define("randomness","tnpEleIDs[4]")
-    .Define("validPair","tag_Idx!=-1 && probe_Idx!=-1")
+    .Define("tnpPairing", tnpPairing, { "tagEle" , "probeEle" , "Lepton_pt" , "Lepton_eta" , "Lepton_phi" , "Electron_mass" , "Lepton_electronIdx" } )
+    .Define("tag_Idx", "tnpPairing[0]")
+    .Define("probe_Idx","tnpPairing[1]")
+    .Define("nTnP","tnpPairing[2]")
+    .Define("ipair","tnpPairing[3]")
+    .Define("randomness","tnpPairing[4]")
+    .Define("tnpPairingEleID","tag_Idx!=-1 && probe_Idx!=-1")
     ;
-  
 }
 
 #endif

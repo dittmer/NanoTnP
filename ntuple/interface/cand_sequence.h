@@ -114,20 +114,25 @@ auto tagEle(T &df, config_t &cfg) {
     return trigMatchTag;
   };
   //####### Lambda function
-
-  return df
-    .Define( "tagEle" , eleHLTProducer , {
-	"TrigObj_id",
-	  "TrigObj_filterBits",
-	  "tagCandidate",
-	  "Lepton_eta",
-	  "Lepton_phi",
-	  "TrigObj_pt",
-	  "TrigObj_eta",
-	  "TrigObj_phi"
-	  }
-      )
-    ;
+  
+  if (cfg.isMC){
+    return df.Define( "tagEle" , "tagCandidate==1" );
+  }
+  else{
+    return df
+      .Define( "tagEle" , eleHLTProducer , {
+	  "TrigObj_id",
+	    "TrigObj_filterBits",
+	    "tagCandidate",
+	    "Lepton_eta",
+	    "Lepton_phi",
+	    "TrigObj_pt",
+	    "TrigObj_eta",
+	    "TrigObj_phi"
+	    }
+	)
+      ;
+  }
 }
 
 /* genEle */

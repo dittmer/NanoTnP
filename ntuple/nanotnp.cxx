@@ -2,9 +2,7 @@
 #include "interface/config.h"
 #include "interface/cand_sequence.h"
 #include "interface/tnpPairs_sequence.h"
-
-//#include "interface/skim.h"
-//#include "interface/producer.h"
+#include "interface/tree_sequence.h"
 
 /*
  * Main function, skimming step of analysis
@@ -41,7 +39,7 @@ int main(int argc, char **argv) {
       if (!mycfg.isMC) mycfg.bit      = 1; //hltEle27WPTightTrackIsoFilter
       if (!mycfg.isMC) mycfg.jsonFile = "./data/Certs/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt";
       mycfg.year                      = "2016";
-      mycfg.denom                     = "Lepton_isTightElectron_mva_90p_Iso2016";
+      mycfg.denom                     = "Lepton_isTightElectron_mva_90p_Iso2016"; 
       mycfg.num                       = "Electron_mvaTTH"; //>0.7
     }
     else if (input.find("_17") != std::string::npos){
@@ -85,41 +83,14 @@ int main(int argc, char **argv) {
     auto df6 = (mycfg.isMC) ? genEle( df5 , mycfg ) : df5;
     auto df7 = (mycfg.isMC) ? genTagProbeEle( df6 , mycfg , "tagEle" ) : df6;
     auto df8 = (mycfg.isMC) ? genTagProbeEle( df7 , mycfg , "probeEle" ) : df7;
-    auto df9 = tnpEleIDs( df8 );
+    auto df9 = tnpPairingEleIDs( df8 );
     
-    //tnpPairs_sequence
-    //auto df5 = tnpPairingEleIDs( input );
+    auto df10 = tnpEleIDs( df9 , mycfg );
+    auto df11 = AddEventWeight( df10 , mycfg );                                                                               // add event weights
 
-    //tree_sequence
-    //auto df6 = tnpEleIDs();
-    
-    /***
-    // skim plus object cleaning
-    auto df1 = Filterbaseline( df , mycfg , m_json );                                                                         // mild skim, HLT and JSON filter for DATA
-    auto df2 = goodElectrons( df1 , mycfg );                                                                                  // definition of good electron
-    auto df3 = goodJets( df2 , mycfg );                                                                                       // definition of good jets
-    //auto df4 = cleanFromJet( df3 , mycfg );                                                                                   // cleaning good electron with good jets
-
-    // tag and probe producer
-    auto df5 = tagCandProducer( df3 , mycfg );                                                                                // standard tag cuts definition
-    auto df6 = ( !mycfg.isMC ) ? tagMatchProducer( df5 , mycfg , "trigger" ) : tagMatchProducer( df5 , mycfg , "gen" );       // data: tag matched with trigger object ; mc: tag match with gen level
-    auto df8 = tagProducer( df6 );                                                                                            // tag candidates
-
-    // tag-probe pair producer (return pair Idx)
-    auto df9 = pairProducer( df8 );                                                                                           // tnp pair candidate
-    auto df10 = probeWPProducer( df9 );                                                                                       // definition of WP in interest on probe
-
-    // should be applied last step
-    auto df11 = DeclareVariables( df10 , mycfg );                                                                             // declare variables
-    auto df12 = AddEventWeight( df11 , mycfg );                                                                               // add event weights
-
-    auto dfFinal = df12;
-    auto report = dfFinal.Report();
-    dfFinal.Snapshot("fitter_tree", output, finalVariables);
-    ***/
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
 
-    auto dfFinal = df9;
+    auto dfFinal = df11;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("fitter_tree", output, finalVariables);
     time.Stop();

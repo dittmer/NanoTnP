@@ -5,7 +5,7 @@
  * configuration for ntuple
  */
 struct config_t {
-  // basic                                                                                                                                                                                                
+  // basic
   bool isMC=false;
   std::string mcweight="XSWeight*puWeight*METFilter_MC"; //nominal
   std::string year;
@@ -46,26 +46,64 @@ struct config_t {
  */
 
 const std::vector<std::string> finalVariables = {
+  
+  //cross check variables
   "nLepton",
   "Lepton_pdgId",
   "Lepton_muonIdx",
   "Lepton_electronIdx",
   "isGoodElectron",
   "tagEleCutBasedTight",
+  "tagCandidate",
   "tagEle",
   "probeEle",
   //"genEle",
-  "genTagEle",
-  "genProbe",
+  //"genTagEle",
+  //"genProbe",
   "probeEleTightHWW",
   "probeElettHMVA" ,
   "probeTightHWW_ttHMVA_0p7" ,
-  //"tnpEleIDs",
+  //"tnpPairing",
   "tag_Idx",
   "probe_Idx",
   "nTnP",
   "ipair",
   "randomness",
+  "tnpPairingEleID",
+    
+  //analysis variable
+  "tag_Ele_pt"              ,
+  "tag_Ele_eta"             ,
+  "tag_Ele_phi"             ,
+  "tag_Ele_mass"            ,
+  "tag_Ele_q"               ,
+
+  // probe kinematics
+  "probe_Ele_pt"            ,
+  "probe_Ele_eta"           ,
+  "probe_Ele_phi"           ,
+  "probe_Ele_mass"          ,
+  "probe_Ele_q"             ,
+
+  // mc probe
+  "mcTrue"                  ,
+
+  "pair_pt"                 ,
+  "pair_eta"                ,
+  "pair_phi"                ,
+  "pair_mass"               ,
+
+  "tag_Ele_trigMVA"         ,
+  "event_met_pfmet"         ,
+  "event_met_pfphi"         ,
+
+  "passingprobeEleTightHWW"                 ,
+  "passingprobeElettHMVA"                   ,
+  "passingprobeTightHWW_ttHMVA_0p7"         ,
+
+  "tag_TightHWW_SF" ,
+  "probe_TightHWW_SF" ,
+
 };
 
 /*
@@ -95,7 +133,7 @@ const std::vector<std::string> finalVariables = {
   "nTnP" ,
   //"ipair",
   "randomness",
-  
+
   // ntuple variables
   "tag_Ele_pt" ,
   "tag_Ele_eta" ,
@@ -113,7 +151,7 @@ const std::vector<std::string> finalVariables = {
   "pair_eta" ,
   "pair_phi" ,
   "pair_mass" ,
-  
+
   // WP component
   "passingMvattH" ,
   "passingHWW" ,
@@ -123,7 +161,7 @@ const std::vector<std::string> finalVariables = {
   //"passingMvaFall17V1Iso_WP90" ,
   //"passingMvaTTH" ,
   //"el_sc_abseta" ,
-  //"el_sieie" ,  
+  //"el_sieie" ,
   //"el_1overEminus1overP" ,
   //"el_dz" ,
   //"el_dxy" ,
