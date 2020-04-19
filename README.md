@@ -7,6 +7,14 @@ pacakges used for TnP study on nanoaod.
 | analysis | code for fitting |
 | validation | code for validating ntuple |
 
+# Change log
+```
+* previous version frozen to V1 branch, the master branch consist of changes
+* remove filters inbetween module to unbiase producer.
+* organize module
+* choosing pair close to zmass pole, randomize tag and probe selection in a pair.
+```
+
 # Samplelist v6
 ```
 # Run2016 v6
