@@ -27,11 +27,11 @@ ranges = {
 def bookHistogram(df, variable, range_, ismc):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
-    match="mcTrue"
+    match="mcTrue*tag_TightHWW_SF*probe_TightHWW_SF"
     #probe="probe_Ele_eta > 0 && probe_Ele_eta < 0.8 && probe_Ele_pt > 50 && probe_Ele_pt < 100"
     probe="1==1"
-    #flag="passingHWW_WP==1"
-    flag="1==1"
+    flag="passingprobeEleTightHWW==1"
+    #flag="1==1"
     return df.Define("plotweights", "plotweight*"+ match if ismc else "plotweight")\
              .Filter("tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
              .Filter(flag,"passing flag")\

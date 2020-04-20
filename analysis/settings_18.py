@@ -4,7 +4,9 @@ import os
 #############################################################
 # flag to be Tested
 flags = {
-    'passingMvattH'    : 'passingHWW==1 && passingMvattH==1'
+    'passingprobeEleTightHWW'         : 'passingprobeEleTightHWW==1',
+    'passingprobeElettHMVA'           : 'passingprobeElettHMVA==1',
+    'passingprobeTightHWW_ttHMVA_0p7' : 'passingprobeTightHWW_ttHMVA_0p7==1'
 }
 
 baseOutDir = 'results/Legacy2018/tnpEleID/runAll'
@@ -39,7 +41,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO')
-    samplesDef['tagSel'].set_cut('tag_Ele_pt > 37') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('tag_Ele_pt > 40') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -59,7 +61,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingHWW==1'
+cutBase   = 'tag_Ele_pt > 35 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingprobeEleTightHWW==1'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 
