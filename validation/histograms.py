@@ -15,11 +15,11 @@ ROOT.ROOT.EnableImplicitMT(6)
 ranges = {
     "tag_Ele_pt"     : ( 50 , 0.   , 500 ),
     "probe_Ele_pt"   : ( 50 , 0.   , 500 ),
-    "tag_Ele_eta"    : ( 20 , -2.5 , 2.5 ),
-    "probe_Ele_eta"  : ( 20 , -2.5 , 2.5 ),
+    "tag_Ele_eta"    : ( 60 , -3.0 , 3.0 ),
+    "probe_Ele_eta"  : ( 60 , -3.0 , 3.0 ),
     "pair_pt"        : ( 50 , 0.   , 500 ),
-    "pair_eta"       : ( 20 , -2.5 , 2.5 ),
-    "pair_mass"      : ( 60 , 60   , 120 ),
+    "pair_eta"       : ( 40 , -10.0 , 10.0 ),
+    "pair_mass"      : ( 80 , 50   , 130 ),
 
     }
 
@@ -27,7 +27,7 @@ ranges = {
 def bookHistogram(df, variable, range_, ismc):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
-    match="mcTrue*tag_TightHWW_SF*probe_TightHWW_SF"
+    match="mcTrue*probe_TightHWW_SF"
     #probe="probe_Ele_eta > 0 && probe_Ele_eta < 0.8 && probe_Ele_pt > 50 && probe_Ele_pt < 100"
     probe="1==1"
     flag="passingprobeEleTightHWW==1"
