@@ -46,7 +46,7 @@ struct config_t {
  */
 
 const std::vector<std::string> finalVariables = {
-  
+  /*
   //cross check variables
   //"nLepton",
   //"nElectron",
@@ -77,7 +77,7 @@ const std::vector<std::string> finalVariables = {
   "ipair",
   "randomness",
   "tnpPairingEleID",
-    
+  */
   //analysis variable
   "tag_Ele_pt"              ,
   "tag_Ele_eta"             ,
@@ -111,6 +111,8 @@ const std::vector<std::string> finalVariables = {
   "tag_TightHWW_SF" ,
   "probe_TightHWW_SF" ,
 
+  "plotweight" , 
+  "weight" ,
 };
 
 /*
