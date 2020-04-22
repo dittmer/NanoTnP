@@ -44,7 +44,7 @@ if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].set_cut('tag_Ele_pt > 40') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
-weightName = 'weight'
+weightName = 'weight*tag_TightHWW_SF*probe_TightHWW_SF'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
