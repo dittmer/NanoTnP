@@ -40,7 +40,7 @@ auto tnpPairingEleIDs(T &df){
       }
       // step 2 , select pair closest to the Z mass pole, 91.18 GeV
       auto nTnP = pair_candidate.size();
-      float zmassMin=999; int pairIdx = -1, tIdx = -1, pIdx = -1; int randomness = -1.; std::pair<int,int> tagProbePair;
+      float zmassMin=999.; int pairIdx = -1, tIdx = -1, pIdx = -1; int randomness = -1.; std::pair<int,int> tagProbePair;
       if (nTnP==0){
 	return std::vector<int>({tIdx , pIdx , static_cast<int>(nTnP) , pairIdx , randomness });
       }
@@ -50,8 +50,8 @@ auto tnpPairingEleIDs(T &df){
       else {
 	for (size_t ipair = 0 ; ipair < nTnP ; ipair++){
 	  auto zmass = pair_candidate[ipair].second;
-	  if ( abs(zmass-91.18) < zmassMin ){
-	    zmassMin = abs(zmass-91.18);
+	  if ( fabs(zmass-91.18) < zmassMin ){
+	    zmassMin = fabs(zmass-91.18);
 	    pairIdx = ipair;
 	  }//
 	} // end of for loop
@@ -59,9 +59,11 @@ auto tnpPairingEleIDs(T &df){
       } // end of if
       
       // step 3 , randomize tag selection if two electron statisfies tag selection
+      // if first is tag and second does not satisfy tag
       if ( tagele[tagProbePair.first] && !tagele[tagProbePair.second] ){
 	tIdx = tagProbePair.first; pIdx = tagProbePair.second;
       }
+      // both electrons satisfy tag, randomize selection
       else if ( tagele[tagProbePair.first] && tagele[tagProbePair.second] ){
 	// throw random number
 	TRandom3 generator = TRandom3(0);

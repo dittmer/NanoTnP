@@ -20,8 +20,8 @@ class efficiency:
     def __init__(self,ptBin,etaBin,effData,errEffData,effMC,errEffMC,effAltBkgModel,effAltSigModel,effAltMCSignal,effAltTagSel):
         self.ptBin      = ptBin
         self.etaBin     = etaBin
-        self.effData    = effData
-        self.effMC      = effMC
+        self.effData    = effData; #print(" --> effData : ",effData)
+        self.effMC      = effMC ; #print(" -->effMC : ",effMC)
         self.errEffData = errEffData        
         self.errEffMC   = errEffMC
         self.altEff = [-1]*7
@@ -87,15 +87,21 @@ class efficiency:
         errData2 = 1.0 / (1.0/(self.errEffData*self.errEffData)+1.0/(eff.errEffData*eff.errEffData))
         wData1   = 1.0 / (self.errEffData * self.errEffData) * errData2
         wData2   = 1.0 / (eff .errEffData * eff .errEffData) * errData2
-        newEffData      = wData1 * self.effData + wData2 * eff.effData;
+        newEffData      = wData1 * self.effData + wData2 * eff.effData
         newErrEffData   = math.sqrt(errData2)
         
         #        errMC2 = 1.0 / (1.0/(self.errEffMC*self.errEffMC)+1.0/(eff.errEffMC*eff.errEffMC))
         #wMC1   = 1.0 / (self.errEffMC * self.errEffMC) * errMC2
         #wMC2   = 1.0 / (eff .errEffMC * eff .errEffMC) * errMC2
-        newEffMC      = wData1 * self.effMC + wData2 * eff.effMC;
+        newEffMC      = wData1 * self.effMC + wData2 * eff.effMC
         newErrEffMC   = 0.00001#math.sqrt(errMC2)
-
+        
+        #errMC2 = 1.0 / (1.0/(self.errEffMC*self.errEffMC)+1.0/(eff.errEffMC*eff.errEffMC))
+        #wMC1   = 1.0 / (self.errEffMC * self.errEffMC) * errMC2
+        #wMC2   = 1.0 / (eff .errEffMC * eff .errEffMC) * errMC2
+        #newEffMC      = wMC1 * self.effMC + wMC2 * eff.effMC
+        #newErrEffMC   = math.sqrt(errMC2)
+        
         newEffAltBkgModel = wData1 * self.altEff[self.iAltBkgModel] + wData2 * eff.altEff[self.iAltBkgModel]
         newEffAltSigModel = wData1 * self.altEff[self.iAltSigModel] + wData2 * eff.altEff[self.iAltSigModel]
         newEffAltMCSignal = wData1 * self.altEff[self.iAltMCSignal] + wData2 * eff.altEff[self.iAltMCSignal]
@@ -316,15 +322,13 @@ class efficiencyList:
 
         h2.GetXaxis().SetTitle("SuperCluster #eta")
         h2.GetYaxis().SetTitle("p_{T} [GeV]")
-        return h2
-        
+        return h2        
                                 
-    def pt_1DGraph_list(self, doScaleFactor):
+    def pt_1DGraph_list(self, doScaleFactor, typeGR = 1):
 #        self.symmetrizeSystVsEta()
         self.combineSyst()
         listOfGraphs = {}
 
-        
         for ptBin in self.effList.keys():
             for etaBin in self.effList[ptBin].keys():
                 if etaBin[0] >= 0 and etaBin[1] > 0:
@@ -340,16 +344,21 @@ class efficiencyList:
                     effAverage = effPlus
                     if not effMinus is None:
                         effAverage = effPlus + effMinus
-
-                        
+ 
                     #if not listOfGraphs.has_key(etaBin):
                     if etaBin not in listOfGraphs:
                         ### init average efficiency 
                         listOfGraphs[etaBin] = []
 
                     effAverage.combineSyst(effAverage.effData,effAverage.effMC)
-                    aValue  = effAverage.effData
-                    anError = effAverage.systCombined 
+                    #### ADDED
+                    if typeGR==1:
+                        aValue  = effAverage.effData
+                        anError = effAverage.systCombined
+                    elif typeGR==-1:
+                        aValue  = effAverage.effMC
+                        anError = effAverage.systCombined
+                    #### ADDED
                     if doScaleFactor :
                         aValue  = effAverage.effData      / effAverage.effMC
                         anError = effAverage.systCombined / effAverage.effMC  

@@ -130,8 +130,8 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     if 'abs' in xAxis or 'Abs' in xAxis:
         xMin = 0.0
 
-    print('effDataList --> ',effDataList[list(effDataList.keys())[1]])
-    print('effMCList --> ',effMCList[list(effMCList.keys())[1]])
+    #print('effDataList --> ',effDataList[list(effDataList.keys())[1]])
+    #print('effMCList --> ',effMCList[list(effMCList.keys())[1]])
 
     effminmax =  findMinMax( effDataList )
     effiMin = effminmax[0]
@@ -337,12 +337,13 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
     cDummy.Print( pdfout + "[" )
 
 
-    EffiGraph1D( effGraph.pt_1DGraph_list( False ) , #eff Data
-                 effGraph.pt_1DGraph_list( False ) , #eff MC HERE
+    EffiGraph1D( effGraph.pt_1DGraph_list( False , 1 ) , #eff Data
+                 effGraph.pt_1DGraph_list( False , -1 ) , #eff MC HERE
                  #None, 
                  effGraph.pt_1DGraph_list( True ) , #SF
                  pdfout,
                  xAxis = axis[0], yAxis = axis[1] )
+    
 #EffiGraph1D( effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,False) , 
 #             effGraph.pt_1DGraph_list_customEtaBining(customEtaBining,True)   , False, pdfout )
 #    EffiGraph1D( effGraph.eta_1DGraph_list(False), effGraph.eta_1DGraph_list(True), True , pdfout )
