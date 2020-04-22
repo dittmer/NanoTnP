@@ -20,7 +20,9 @@ ranges = {
     "pair_pt"        : ( 50 , 0.   , 500 ),
     "pair_eta"       : ( 40 , -10.0 , 10.0 ),
     "pair_mass"      : ( 80 , 50   , 130 ),
-
+    "passingprobeEleTightHWW" : ( 2 , -0.5 , 0.5 ),
+    "passingprobeElettHMVA" : ( 2 , -0.5 , 1.5 ),
+    "passingprobeTightHWW_ttHMVA_0p7" : ( 2 , -0.5 , 1.5 ),
     }
 
 # Book a histogram for a specific variable
