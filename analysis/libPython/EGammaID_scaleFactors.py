@@ -89,7 +89,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     yUp = 0.45
     canName = 'toto' + xAxis
 
-    c = rt.TCanvas(canName,canName,50,50,H,W)
+    c = rt.TCanvas(canName,canName,50,50,H,W);
     c.SetTopMargin(0.055)
     c.SetBottomMargin(0.10)
     c.SetLeftMargin(0.12)
@@ -130,9 +130,16 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     if 'abs' in xAxis or 'Abs' in xAxis:
         xMin = 0.0
 
+    print('effDataList --> ',effDataList[list(effDataList.keys())[1]])
+    print('effMCList --> ',effMCList[list(effMCList.keys())[1]])
+
     effminmax =  findMinMax( effDataList )
     effiMin = effminmax[0]
     effiMax = effminmax[1]
+
+    #effminmaxMC = findMinMax( effMCList )
+    #effiMinMC = effminmaxMC[0]
+    #effiMaxMC = effminmaxMC[1]
 
     sfminmax =  findMinMax( sfList )
     sfMin = sfminmax[0]
@@ -142,7 +149,8 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     for key in sorted(effDataList.keys()):
         grBinsEffData = effUtil.makeTGraphFromList(effDataList[key], 'min', 'max')
         grBinsSF      = effUtil.makeTGraphFromList(sfList[key]     , 'min', 'max')
-        grBinsEffMC = None
+        #grBinsEffMC = None ## HERE effMCList
+        grBinsEffMC = effUtil.makeTGraphFromList(effMCList[key]     , 'min', 'max')
         if not effMCList is None:
             grBinsEffMC = effUtil.makeTGraphFromList(effMCList[key], 'min', 'max')
             grBinsEffMC.SetLineStyle( rt.kDashed )
@@ -233,12 +241,15 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
     p2.cd()
     lineAtOne.Draw()
 
-    c.cd()
+    c.cd(); #p1.SetLogy() #HERE
     p2.Draw()
     p1.Draw()
 
     leg.Draw()    
     CMS_lumi.CMS_lumi(c, 4, 10)
+
+    #c.Modified()
+    #c.Update()
 
     c.Print(nameout)
 
@@ -327,7 +338,8 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
 
 
     EffiGraph1D( effGraph.pt_1DGraph_list( False ) , #eff Data
-                 None, 
+                 effGraph.pt_1DGraph_list( False ) , #eff MC HERE
+                 #None, 
                  effGraph.pt_1DGraph_list( True ) , #SF
                  pdfout,
                  xAxis = axis[0], yAxis = axis[1] )
