@@ -21,9 +21,10 @@ labels = {
     "pair_pt"        : "pair p_{T} [GeV/c^2]",
     "pair_eta"       : "pair #eta",
     "pair_mass"      : "Mass (ll) [GeV/c]",
-    "passingprobeEleTightHWW" : "Probed Electron TightHWW",
-    "passingprobeElettHMVA" : "Probed Electron ttHMVA_0p7",
-    "passingprobeTightHWW_ttHMVA_0p7" : "Probed Electron TightHWW_ttHMVA_0p7",
+    "passingtagEleTightHWW" : "Tagged Electron TightHWW",
+    "passingprobeEleTightHWW" : "Probe Electron TightHWW",
+    "passingprobeElettHMVA" : "Probe Electron ttHMVA_0p7",
+    "passingprobeTightHWW_ttHMVA_0p7" : "Probe Electron TightHWW_ttHMVA_0p7",
     }
 
 # Retrieve a histogram from the input file based on the process and the variable

@@ -80,9 +80,11 @@ auto tnpEleIDs(T &df , config_t &cfg) {
     .Define( "event_met_pfmet"         , "PuppiMET_pt"                                                     )
     .Define( "event_met_pfphi"         , "PuppiMET_phi"                                                    )
 
-    .Define( "passingprobeEleTightHWW"                 , "probeEleTightHWW[probe_Idx]"                    )
-    .Define( "passingprobeElettHMVA"                   , "probeElettHMVA[probe_Idx]"                      )
+    .Define( "passingprobeEleTightHWW"                 , "probeEleTightHWW[probe_Idx]"                     )
+    .Define( "passingprobeElettHMVA"                   , "probeElettHMVA[probe_Idx]"                       )
     .Define( "passingprobeTightHWW_ttHMVA_0p7"         , "probeTightHWW_ttHMVA_0p7[probe_Idx]"             )
+
+    .Define( "passingtagEleTightHWW"                   , "tagEleTightHWW[tag_Idx]"                         )
 
     .Define( "tag_TightHWW_SF"      , (!cfg.isMC) ? "-1" : tagTightHWWSF )
     .Define( "probe_TightHWW_SF"    , (!cfg.isMC) ? "-1" : probeTightHWWSF )

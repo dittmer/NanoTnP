@@ -6,7 +6,7 @@ import numpy as np
 from ROOT import array
 ROOT.gROOT.SetBatch(True)
 
-ROOT.ROOT.EnableImplicitMT(6)
+ROOT.ROOT.EnableImplicitMT(10)
 
 # Declare range of the histogram for each variables
 # Each entry in the dictionary contains of the variable name as key and a tuple
@@ -15,11 +15,12 @@ ROOT.ROOT.EnableImplicitMT(6)
 ranges = {
     "tag_Ele_pt"     : ( 50 , 0.   , 500 ),
     "probe_Ele_pt"   : ( 50 , 0.   , 500 ),
-    "tag_Ele_eta"    : ( 60 , -3.0 , 3.0 ),
-    "probe_Ele_eta"  : ( 60 , -3.0 , 3.0 ),
+    "tag_Ele_eta"    : ( 120 , -3.0 , 3.0 ),
+    "probe_Ele_eta"  : ( 120 , -3.0 , 3.0 ),
     "pair_pt"        : ( 50 , 0.   , 500 ),
     "pair_eta"       : ( 40 , -10.0 , 10.0 ),
     "pair_mass"      : ( 80 , 50   , 130 ),
+    "passingtagEleTightHWW" : ( 2 , -0.5 , 0.5 ),
     "passingprobeEleTightHWW" : ( 2 , -0.5 , 0.5 ),
     "passingprobeElettHMVA" : ( 2 , -0.5 , 1.5 ),
     "passingprobeTightHWW_ttHMVA_0p7" : ( 2 , -0.5 , 1.5 ),
@@ -29,13 +30,13 @@ ranges = {
 def bookHistogram(df, variable, range_, ismc):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
-    match="mcTrue*probe_TightHWW_SF"
+    match="mcTrue*tag_TightHWW_SF*probe_TightHWW_SF"
     #probe="probe_Ele_eta > 0 && probe_Ele_eta < 0.8 && probe_Ele_pt > 50 && probe_Ele_pt < 100"
     probe="1==1"
     flag="passingprobeEleTightHWW==1"
     #flag="1==1"
     return df.Define("plotweights", "plotweight*"+ match if ismc else "plotweight")\
-             .Filter("tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
+             .Filter("tag_Ele_pt > 32 && abs(tag_Ele_eta) < 2.17 && passingtagEleTightHWW==1 && tag_Ele_q*probe_Ele_q < 0","Nominal cut")\
              .Filter(flag,"passing flag")\
              .Filter(probe,"probe low eta high pt cut")\
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "plotweights")

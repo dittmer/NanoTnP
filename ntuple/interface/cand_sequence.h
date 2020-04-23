@@ -60,7 +60,7 @@ auto tagEleCutBasedTight(T &df, config_t &cfg ) {
 			   ) {
     RVec<int> Lepton_isTight(Lepton_electronIdx.size(),0);
     for (size_t i=0 ; i< Lepton_electronIdx.size() ; i++){
-      if ( Electron_flag[Lepton_electronIdx[i]] == 4 ){
+      if ( Electron_flag[Lepton_electronIdx[i]] == 1 ){
         Lepton_isTight[i] = 1;
       }
     }
@@ -69,7 +69,8 @@ auto tagEleCutBasedTight(T &df, config_t &cfg ) {
   
   return df
     .Define( "tagEleCut"           ,  cfg.TagCandidate )
-    .Define( "tagEleCutBasedTight" , Lepton_isTight , { "Lepton_electronIdx" , "Electron_cutBased_Fall17_V1" } )
+    //.Define( "tagEleCutBasedTight" , Lepton_isTight , { "Lepton_electronIdx" , "Electron_cutBased_Fall17_V1" } )
+    .Define( "tagEleCutBasedTight" , cfg.denom+"==1" )
     .Define( "tagCandidate" , "isGoodElectron==1 && tagEleCut==1 && tagEleCutBasedTight==1" )
     ;
 }
@@ -114,9 +115,14 @@ auto tagEle(T &df, config_t &cfg) {
     return trigMatchTag;
   };
   //####### Lambda function
-  
+  std::string input = cfg.denom; input+="==1" ;
   if (cfg.isMC){
-    return df.Define( "tagEle" , "tagCandidate==1" );
+    return df
+      .Define( "tagEle" , "tagCandidate==1" )
+      .Define( "tagEleTightHWW" , "tagEle==1 && "+ input )
+      //.Define("tagElettHMVA" , Lepton_isttHMVA , { "Lepton_electronIdx" , cfg.num })
+      //.Define("tagTightHWW_ttHMVA_0p7" , "probeEle==1 && probeEleTightHWW==1 && probeElettHMVA==1" )
+      ;
   }
   else{
     return df
@@ -131,6 +137,7 @@ auto tagEle(T &df, config_t &cfg) {
 	    "TrigObj_phi"
 	    }
 	)
+      .Define( "tagEleTightHWW" , "tagEle==1 && "+ input )
       ;
   }
 }

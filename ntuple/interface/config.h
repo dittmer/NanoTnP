@@ -107,7 +107,7 @@ const std::vector<std::string> finalVariables = {
   "passingprobeEleTightHWW"                 ,
   "passingprobeElettHMVA"                   ,
   "passingprobeTightHWW_ttHMVA_0p7"         ,
-
+  "passingtagEleTightHWW"                   ,
   "tag_TightHWW_SF" ,
   "probe_TightHWW_SF" ,
 
