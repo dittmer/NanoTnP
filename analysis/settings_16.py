@@ -44,7 +44,7 @@ if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].set_cut('tag_Ele_pt > 35') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
-weightName = 'weight*probe_TightHWW_SF'
+weightName = 'weight*tag_TightHWW_SF*probe_TightHWW_SF'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
@@ -61,7 +61,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 30 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingprobeEleTightHWW==1'
+cutBase   = 'tag_Ele_pt > 30 && abs(tag_Ele_eta) < 2.17 && tag_Ele_q*probe_Ele_q < 0 && passingprobeEleTightHWW==1 && passingtagEleTightHWW==1'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 
