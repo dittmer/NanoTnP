@@ -3,9 +3,10 @@ pacakges used for TnP study on nanoaod.
 
 | pacakge | Description |
 | --- | --- |
-| ntuple | code for making ntuple |
+| ntuple | code for making ntuple from latino nanoaod |
 | analysis | code for fitting |
 | validation | code for validating ntuple |
+| skim | code for making ntuple from latino addtnptree nanoaod |
 
 # Change log
 ```
@@ -13,6 +14,7 @@ pacakges used for TnP study on nanoaod.
 * remove filters inbetween module to unbiase producer.
 * organize module
 * choosing pair close to zmass pole, randomize tag and probe selection in a pair.
+* make new folder
 ```
 
 # Samplelist v6
