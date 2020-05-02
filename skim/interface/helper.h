@@ -3,6 +3,7 @@
 #include "ROOT/RDataFrame.hxx"
 #include "ROOT/RDFHelpers.hxx"
 #include "ROOT/RVec.hxx"
+#include "ROOT/RSnapshotOptions.hxx"
 
 #include "Math/Vector4D.h"
 #include "TStopwatch.h"

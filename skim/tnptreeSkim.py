@@ -23,14 +23,14 @@ os.system("make")
 print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() - tcompile) , (time.time() - tcompile)/60. ) )
 
 # predefined samples
-if datasets == 'latinov6_16':
+if datasets == 'latinov7_16':
     lumi = "35.867"
     # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext2.txt" )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
     # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50.txt" )
+    #samplelists.append( dirs + "DYJetsToLL_M-50.txt" )
     # single electrons
-    samplelists.append( dirs + "SingleElectron_Run2016.txt" )
+    #samplelists.append( dirs + "SingleElectron_Run2016.txt" )
     
 elif datasets == 'latinov5_16':
     lumi = "35.867"
@@ -76,7 +76,7 @@ print("lumi : %s 1/fb" %(lumi))
 trun = time.time();
 for iproc in samplelists:
     sample = iproc.split('/')[-1].split('.txt')[0]
-    cmd="./nanotnp"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
+    cmd="./tnptreeSkim"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
     tproc = time.time()
     print(cmd)
     os.system(cmd)
