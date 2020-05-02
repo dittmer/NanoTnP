@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
   ROOT::EnableImplicitMT(10);
 
   if(argc != 4) {
-        std::cout << "Use executable with following arguments: ./skim input output integrated_luminosity" << std::endl;
+        std::cout << "Use executable with following arguments: ./nanotnp input output integrated_luminosity" << std::endl;
         return -1;
     }
 

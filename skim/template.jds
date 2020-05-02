@@ -1,0 +1,8 @@
+executable = mkShapes__WH3l_2016_v6_STXS__ALL__Zg.0.sh
+universe = vanilla
+output = mkShapes__WH3l_2016_v6_STXS__ALL__Zg.0.out
+error = mkShapes__WH3l_2016_v6_STXS__ALL__Zg.0.err
+log = mkShapes__WH3l_2016_v6_STXS__ALL__Zg.0.log
+request_cpus = 1
++JobFlavour = "testmatch"
+queue
