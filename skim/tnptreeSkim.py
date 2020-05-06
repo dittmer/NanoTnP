@@ -28,29 +28,20 @@ if datasets == 'latinov7_16':
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
     # alt DY NLO
-    #samplelists.append( dirs + "DYJetsToLL_M-50.txt" )
-    # single electrons
-    #samplelists.append( dirs + "SingleElectron_Run2016.txt" )
-    
-elif datasets == 'latinov5_16':
-    lumi = "35.867"
-    # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext2.txt" )
-    # alt DY NLO
     samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
     # single electrons
     samplelists.append( dirs + "SingleElectron_Run2016.txt" )
 
-elif datasets == 'latinov6_17':
+elif datasets == 'latinov7_17':
     lumi="41.53"
     # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )#"DYJetsToLL_M-50-LO.txt" )
+    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
     # alt DY NLO
     samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
     # single electrons
     samplelists.append( dirs + "SingleElectron_Run2017.txt" )
 
-elif datasets == 'latinov6_18':
+elif datasets == 'latinov7_18':
     lumi = "59.74"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
