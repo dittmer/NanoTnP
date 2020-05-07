@@ -36,8 +36,8 @@ universe = vanilla
 output = ${PWD}/jobs/${name}/${name}.out
 error = ${PWD}/jobs/${name}/${name}.err
 log = ${PWD}/jobs/${name}/${name}.log
-request_cpus = 2
-+JobFlavour = "workday"
+request_cpus = 1
++JobFlavour = "longlunch"
 queue
 EOF
     voms-proxy-init -voms cms -valid 168:00
