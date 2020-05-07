@@ -1,8 +1,4 @@
 #include "interface/helper.h"
-//#include "interface/config.h"
-//#include "interface/cand_sequence.h"
-//#include "interface/tnpPairs_sequence.h"
-//#include "interface/tree_sequence.h"
 
 
 /* variable to keep */
@@ -29,6 +25,7 @@ std::vector<std::string> finalVariables = {
   "Probe_mvaFall17V1Iso_WP90",
   "Probe_pfRelIso03_all",
   "Tag_cutBased_Fall17_V1",
+  "Probe_mvaTTH"
 };
 
 /*
@@ -62,15 +59,15 @@ int main(int argc, char **argv) {
     std::vector<std::string> infiles;
     std::ifstream file(input);
     std::string str;
+    bool isMC = (input.find("Run") != std::string::npos) ? false : true;
     while (std::getline(file, str)) { infiles.push_back(str); }
     
-    ROOT::RDataFrame df("Events", infiles); // maybe make an empty dataframe?
+    ROOT::RDataFrame df("Events", infiles);
     
     // Skim
     auto df1 = df
       .Filter("abs(Tag_pdgId)!=13 && abs(Probe_pdgId)!=13"," --> Tag and Probe are electron")
-      .Filter("Probe_pt>10 && abs(Probe_eta)<2.5"," --> Probe candidate skim")
-      .Filter("Tag_cutBased_Fall17_V1 == 4 && Tag_pt>30 && abs(Tag_eta)<2.1 && !(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)"," --> Tag candidate skim")
+      .Filter("Tag_pt>30 && abs(Tag_eta)<2.1 && !(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)"," --> Tag candidate skim")
       ;
 
     // dataset specific

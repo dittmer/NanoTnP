@@ -11,6 +11,7 @@ cutIso = '(Probe_pfRelIso03_all < 0.06)'
 # flag to be Tested
 flags = {
     'passingMVA94Xwp90isoHWWiso0p06'           : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingttHMVA0p7'                         : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1) && (Probe_mvaTTH > 0.7)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
 baseOutDir = 'results/Legacy2018/tnpEleID/validation'
@@ -45,7 +46,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50')
-    samplesDef['tagSel'].set_cut('Tag_pt > 37') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('Tag_pt > 38') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -65,9 +66,10 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'Tag_pt > 30 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
+cutBase   = 'Tag_pt > 35 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
+#additionalCuts = {}
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*Tag_pt*(1-cos(event_met_pfphi-Tag_phi))) < 45',
     1 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*Tag_pt*(1-cos(event_met_pfphi-Tag_phi))) < 45',
