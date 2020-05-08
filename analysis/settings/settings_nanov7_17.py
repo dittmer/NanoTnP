@@ -2,17 +2,18 @@ import os
 #############################################################
 ########## General settings
 #############################################################
-cutLoose = '( ( abs(Probe_eta) > 1.497 && Probe_sieie < 0.03 && Probe_eInvMinusPInv < 0.014 ) || ( abs(Probe_eta) < 1.497 ) )'
-cutDz = '( ( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 ) || ( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ) )'
-cutDxy = '( ( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 ) || ( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ) )'
+cutLoose = '(( abs(Probe_eta) > 1.497 && (Probe_sieie < 0.03 ) && (Probe_eInvMinusPInv < 0.014)) ||( abs(Probe_eta) < 1.497))'
+cutDz = '(( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
+cutDxy = '(( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
 cutIso = '(Probe_pfRelIso03_all < 0.06)'
 
 # flag to be Tested
 flags = {
     'passingMVA94Xwp90isoHWWiso0p06'           : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingttHMVA0p7'                         : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1) && (Probe_mvaTTH > 0.7)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
-baseOutDir = 'results/Legacy2017/tnpEleID/validation'
+baseOutDir = '%s/results/Legacy2017/tnpEleID/validation' % os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -44,7 +45,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO')
-    samplesDef['tagSel'].set_cut('Tag_pt > 43') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('Tag_pt > 40') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -64,7 +65,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'Tag_cutBased_Fall17_V1 == 4 && Tag_pt > 38 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
+cutBase   = 'Tag_pt > 35 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 

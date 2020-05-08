@@ -2,9 +2,9 @@
 
 set -e
 
-WP="passingMVA94Xwp90isoHWWiso0p06"
-
-for config in settings_nanov7_18.py
+#WP="passingMVA94Xwp90isoHWWiso0p06"
+WP="passingMVA80Xwp90Iso16"
+for config in settings_nanov7_16.py #settings_nanov7_17.py settings_nanov7_18.py
 do
     name=`echo $config | awk -F '.' '{print $1}'`
     echo "Running on $name"
@@ -12,14 +12,14 @@ do
     cat<<EOF > jobs/$name/$name.sh
 #!/bin/bash
 
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --checkBins
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --createBins
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --createHist
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --mcSig --altSig
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --altSig
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --altBkg
-python tnpEGM_fitter.py settings/${config} --flag ${WP} --sumUp
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --checkBins
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --createBins
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --createHist
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --mcSig --altSig
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --altSig
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --doFit --altBkg
+python ${PWD}/tnpEGM_fitter.py settings/${config} --flag ${WP} --sumUp
 
 EOF
 
@@ -33,6 +33,7 @@ else
     cat<<EOF > jobs/$name/$name.sub
 executable = ${PWD}/jobs/${name}/${name}.sh
 universe = vanilla
+input = settings/${config}
 output = ${PWD}/jobs/${name}/${name}.out
 error = ${PWD}/jobs/${name}/${name}.err
 log = ${PWD}/jobs/${name}/${name}.log

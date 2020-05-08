@@ -21,16 +21,16 @@ looseDef  = cutMissingInnerHits +' && '+ cutdz +' && '+ cutd0
 
 #probe_Ele_chIso = Electron_miniPFRelIso_chg
 
-cutIso16Barrel = '((abs(Probe_eta) < 1.479) && ( Probe_miniPFRelIso_chg + Probe_miniPFRelIso_all < {0}))'.format(0.0588)
-cutIso16Endcap = '((abs(Probe_eta) > 1.479) && ( Probe_miniPFRelIso_chg + Probe_miniPFRelIso_all < {0}))'.format(0.0571)
+cutIso16Barrel = '((abs(Probe_eta) < 1.479) && ( Probe_pfRelIso03_chg + Probe_pfRelIso03_all < {0}))'.format(0.0588)
+cutIso16Endcap = '((abs(Probe_eta) > 1.479) && ( Probe_pfRelIso03_chg + Probe_pfRelIso03_all < {0}))'.format(0.0571)
 
 # flag to be Tested                                                                                                                                   
 flags = {
     'passingMVA80Xwp90Iso16'        : '({0}) && (passingMVA80Xwp90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingttHMVA0p7'              : '({0}) && (passingMVA80Xwp90 == 1) && ( {1} || {2} ) && (Probe_mvaTTH > 0.7)'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
 }
 
-
-baseOutDir = 'results/Legacy2016/tnpEleID/validation'
+baseOutDir = '%s/results/Legacy2016/tnpEleID/validation' %os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
