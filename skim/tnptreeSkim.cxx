@@ -25,7 +25,9 @@ std::vector<std::string> finalVariables = {
   "Probe_mvaFall17V1Iso_WP90",
   "Probe_pfRelIso03_all",
   "Tag_cutBased_Fall17_V1",
-  "Probe_mvaTTH"
+  "Probe_mvaTTH",
+  "Probe_lostHits",
+  "Probe_pfRelIso03_chg",
 };
 
 /*
