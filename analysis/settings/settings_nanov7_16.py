@@ -3,31 +3,16 @@ import os
 ########## General settings
 #############################################################
 # flag to be Tested
-# probe_Ele_nonTrigMVA == Probe_mvaSpring16GP
-cutMissingInnerHits = 'Probe_lostHits==0'
-cutdz = '(( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
-cutd0 = '(( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
-#looseDef  = 'passingHLTsafe ==1 && '+ cutMissingInnerHits +' && '+ cutdz +' && '+ cutd0
-looseDef  = cutMissingInnerHits +' && '+ cutdz +' && '+ cutd0
 
-#cutpass80 = '(( abs(Probe_eta) < 0.8 && Probe_mvaSpring16GP > %f ) ||  ( abs(Probe_eta) > 0.8 && abs(Probe_eta) < 1.479&& Probe_mvaSpring16GP > %f ) || ( abs(Probe_eta) > 1.479 && Probe_mvaSpring16GP > %f ) )' % (0.967083,0.929117,0.726311)
-#cutpass90 = '(( abs(Probe_eta) < 0.8 && Probe_mvaSpring16GP > %f ) ||  ( abs(Probe_eta) > 0.8 && abs(Probe_eta) < 1.479&& Probe_mvaSpring16GP > %f ) || ( abs(Probe_eta) > 1.479 && Probe_mvaSpring16GP > %f ) )' % (0.913286,0.805013,0.358969)
-#effArea = '(abs(Probe_eta)>2.4)*0.2393 || (abs(Probe_eta)>2.3)*0.1937 || (abs(Probe_eta)>2.2)*0.1635 ||  (abs(Probe_eta)>2.0)*0.1230 ||  (abs(Probe_eta)>1.479)*0.1213 ||  (abs(Probe_eta)>1.0)*1.715 || (abs(Probe_eta)>0)*0.1703'
-#cutIso15Barrel = '((abs(Probe_eta) < 1.479) && (Probe_chIso + TMath::Max(0.0,probe_Ele_neuIso + probe_Ele_phoIso -(event_rho)*({0})))/Probe_pt < {1})'.format(effArea, 0.0354)
-#cutIso15Endcap = '((abs(Probe_eta) > 1.479) && (probe_Ele_chIso + TMath::Max(0.0,probe_Ele_neuIso + probe_Ele_phoIso -(event_rho)*({0})))/Probe_pt < {1})'.format(effArea, 0.0646)
-
-#cutIso16Barrel = '((abs(Probe_eta) < 1.479) && (probe_Ele_chIso + TMath::Max(0.0,probe_Ele_neuIso + probe_Ele_phoIso -(event_rho)*({0})))/Probe_pt < {1})'.format(effArea, 0.0588)
-#cutIso16Endcap = '((abs(Probe_eta) > 1.479) && (probe_Ele_chIso + TMath::Max(0.0,probe_Ele_neuIso + probe_Ele_phoIso -(event_rho)*({0})))/Probe_pt < {1})'.format(effArea, 0.0571)
-
-#probe_Ele_chIso = Electron_miniPFRelIso_chg
-
-cutIso16Barrel = '((abs(Probe_eta) < 1.479) && ( Probe_pfRelIso03_chg + Probe_pfRelIso03_all < {0}))'.format(0.0588)
-cutIso16Endcap = '((abs(Probe_eta) > 1.479) && ( Probe_pfRelIso03_chg + Probe_pfRelIso03_all < {0}))'.format(0.0571)
+# https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L3883-L3915
+common = '(abs(Probe_eta)<2.5 && Probe_mvaSpring16GP_WP90 == 1 && Probe_lostHits<1)'
+barrel = '( (abs(Probe_eta) <= 1.479) && (Probe_dxy < 0.05) && (Probe_dz < 0.1) && (Probe_pfRelIso03_all < {0}) )'.format(0.0588)
+endcap = '( (abs(Probe_eta) > 1.479) && (Probe_dxy < 0.1) && (Probe_dz < 0.2) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
 
 # flag to be Tested                                                                                                                                   
 flags = {
-    'passingMVA80Xwp90Iso16'        : '({0}) && (passingMVA80Xwp90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
-    'passingttHMVA0p7'              : '({0}) && (passingMVA80Xwp90 == 1) && ( {1} || {2} ) && (Probe_mvaTTH > 0.7)'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingMVA80Xwp90Iso16'        : '({0}) && ( {1} || {2} )'.format(common,barral,endcap),
+    'passingttHMVA0p7'              : '({0}) && (Probe_mvaTTH > 0.7) && ( {1} || {2} )'.format(common,barral,endcap),
 }
 
 baseOutDir = '%s/results/Legacy2016/tnpEleID/validation' %os.getcwd()

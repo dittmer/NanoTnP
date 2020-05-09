@@ -28,6 +28,8 @@ std::vector<std::string> finalVariables = {
   "Probe_mvaTTH",
   "Probe_lostHits",
   "Probe_pfRelIso03_chg",
+  "Probe_mvaFall17V1noIso_WP90",
+  "Probe_convVeto"
 };
 
 /*
@@ -62,6 +64,10 @@ int main(int argc, char **argv) {
     std::ifstream file(input);
     std::string str;
     bool isMC = (input.find("Run") != std::string::npos) ? false : true;
+
+    // dataset specific variable
+    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_mvaSpring16GP_WP90");
+
     while (std::getline(file, str)) { infiles.push_back(str); }
     
     ROOT::RDataFrame df("Events", infiles);

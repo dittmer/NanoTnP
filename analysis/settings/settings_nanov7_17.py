@@ -2,15 +2,16 @@ import os
 #############################################################
 ########## General settings
 #############################################################
-cutLoose = '(( abs(Probe_eta) > 1.497 && (Probe_sieie < 0.03 ) && (Probe_eInvMinusPInv < 0.014)) ||( abs(Probe_eta) < 1.497))'
-cutDz = '(( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
-cutDxy = '(( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
+# https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L2586-L2629
+common = '( abs(Probe_eta) < 2.5 && Probe_cutBased_Fall17_V1 >= 3 && Probe_mvaFall17V1noIso_WP90 == 1 && Probe_convVeto == 1 )'
+barral = '( ( abs(Probe_eta) <= 1.497 ) && ( abs(Probe_dxy) < 0.05 ) && ( abs(Probe_dz) < 0.1 ) )' 
+endcap = '( ( abs(Probe_eta) > 1.497 ) && ( Probe_sieie < 0.03 ) && ( Probe_eInvMinusPInv < 0.014 ) && ( abs(Probe_dxy) < 0.1 ) && ( abs(Probe_dz) < 0.2 ) )'
 cutIso = '(Probe_pfRelIso03_all < 0.06)'
 
 # flag to be Tested
 flags = {
-    'passingMVA94Xwp90isoHWWiso0p06'           : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1)'.format(cutDxy,cutDz,cutLoose,cutIso),
-    'passingttHMVA0p7'                         : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1 >= 3) && (Probe_mvaFall17V1Iso_WP90 == 1) && (Probe_mvaTTH > 0.7)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingMVA94Xwp90isoHWWiso0p06'           : '({0}) && ( ({1}) || ({2}) ) && ({3})'.format(common,barral,endcap,cutIso),
+    'passingttHMVA0p7'                         : '({0}) && (Probe_mvaTTH > 0.7) && ( ({1}) || ({2}) ) && ({3})'.format(common,barral,endcap,cutIso)
 }
 
 baseOutDir = '%s/results/Legacy2017/tnpEleID/validation' % os.getcwd()
