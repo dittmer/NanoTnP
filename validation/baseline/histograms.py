@@ -17,7 +17,7 @@ ranges = {
     "Probe_pt"   : ( 50 , 0.   , 500 ),
     "Tag_eta"    : ( 120 , -3.0 , 3.0 ),
     "Probe_eta"  : ( 120 , -3.0 , 3.0 ),
-    "pair_mass"      : ( 80 , 50   , 130 ),
+    "pair_mass"      : ( 80 , 60   , 140 ),
     }
 
 # Book a histogram for a specific variable

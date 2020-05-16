@@ -1,5 +1,8 @@
 #include "interface/helper.h"
 
+/* skimmer for 
+https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/modules/addTnpTree.py
+*/
 
 /* variable to keep */
 std::vector<std::string> finalVariables = {
@@ -27,9 +30,9 @@ std::vector<std::string> finalVariables = {
   "Tag_cutBased_Fall17_V1",
   "Probe_mvaTTH",
   "Probe_lostHits",
-  "Probe_pfRelIso03_chg",
-  "Probe_mvaFall17V1noIso_WP90",
-  "Probe_convVeto"
+  "Probe_convVeto",
+  "Tag_sc_eta",
+  "Probe_sc_eta"
 };
 
 /*
@@ -67,6 +70,8 @@ int main(int argc, char **argv) {
 
     // dataset specific variable
     if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_mvaSpring16GP_WP90");
+    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Tag_mvaSpring16GP");
+    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_cutBased_HLTPreSel");
 
     while (std::getline(file, str)) { infiles.push_back(str); }
     
@@ -75,6 +80,7 @@ int main(int argc, char **argv) {
     // Skim
     auto df1 = df
       .Filter("abs(Tag_pdgId)!=13 && abs(Probe_pdgId)!=13"," --> Tag and Probe are electron")
+      .Filter("abs(Probe_eta)<2.5"," --> Probe candidate skim")
       .Filter("Tag_pt>30 && abs(Tag_eta)<2.1 && !(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)"," --> Tag candidate skim")
       ;
 
@@ -85,12 +91,14 @@ int main(int argc, char **argv) {
       ;
     auto df3 = (isMC) ? df2 : df2.Filter("TnP_trigger==1"," --> data is matched to HLT filter");
 
-    // variable for low pt cut
+    // Define variables
     auto df4 = df3
-      .Define("tag_Ele_trigMVA","Tag_mvaFall17V1Iso") //ElectronMVAEstimatorRun2Fall17IsoV1Values
+      .Define("tag_Ele_trigMVA","Tag_mvaFall17V1Iso")
       .Define("event_met_pfmet","PuppiMET_pt")
       .Define("event_met_pfphi","PuppiMET_phi")
       .Define("pair_mass","TnP_mass")
+      .Define("Tag_sc_eta","Tag_deltaEtaSC+Tag_eta")
+      .Define("Probe_sc_eta","Probe_deltaEtaSC+Probe_eta")
       ;
 
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
