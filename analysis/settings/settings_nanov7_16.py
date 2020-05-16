@@ -19,9 +19,8 @@ cutIso16Endcap = '( (abs(Probe_eta) > 1.479) && (Probe_pfRelIso03_all < {0}) )'.
 
 # flag to be Tested
 flags = {
-    'passingMVA80Xwp90' : '({0}) && (Probe_mvaSpring16GP_WP90 == 1)'.format(looseDef),
-    'passingMVA80Xwp90Iso16' : '({0}) && (passingMVA80Xwp90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
-    'passingttHMVA0p7' : '({0}) && (Probe_mvaTTH > 0.7) && (passingMVA80Xwp90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingMVA80Xwp90Iso16' : '({0}) && (Probe_mvaSpring16GP_WP90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingttHMVA0p7' : '({0}) && (Probe_mvaTTH > 0.7) && (Probe_mvaSpring16GP_WP90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
 }
 
 baseOutDir = '%s/results/Legacy2016/tnpEleID/validation' %os.getcwd()
