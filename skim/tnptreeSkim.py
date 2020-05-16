@@ -40,6 +40,12 @@ elif datasets == 'latinov7_17':
     samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
     # single electrons
     samplelists.append( dirs + "SingleElectron_Run2017.txt" )
+    # broken into period
+    samplelists.append( dirs + "RunB.txt" )
+    samplelists.append( dirs + "RunC.txt" )
+    samplelists.append( dirs + "RunD.txt" )
+    samplelists.append( dirs + "RunE.txt" )
+    samplelists.append( dirs + "RunF.txt" )
 
 elif datasets == 'latinov7_18':
     lumi = "59.74"
