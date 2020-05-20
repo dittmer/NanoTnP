@@ -58,7 +58,7 @@ nanov7_16 = {
 }
 
 nanov7_17 = {
-    'DYJetsToLL_M-50-LO' : tnpSample('DYJetsToLL_M-50-LO_ext1.root',
+    'DYJetsToLL_M-50-LO' : tnpSample('DYJetsToLL_M-50-LO_ext1',
                                           latinov7_17 + 'DYJetsToLL_M-50-LO_ext1.root',
                                      isMC = True, nEvts =  -1 ),
 
