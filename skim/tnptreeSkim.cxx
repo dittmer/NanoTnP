@@ -78,16 +78,22 @@ int main(int argc, char **argv) {
     ROOT::RDataFrame df("Events", infiles);
     
     // Skim
+    std::string tagCut="1==1";
+    if ( input.find("_16") != std::string::npos ) tagCut="Tag_pt>32 && abs(Tag_eta)<2.17";
+    if ( input.find("_17") != std::string::npos ) tagCut="Tag_pt>40";
+    if ( input.find("_18") != std::string::npos ) tagCut="Tag_pt>37";
+
     auto df1 = df
       .Filter("abs(Tag_pdgId)!=13 && abs(Probe_pdgId)!=13"," --> Tag and Probe are electron")
       .Filter("abs(Probe_eta)<2.5"," --> Probe candidate skim")
-      .Filter("Tag_pt>30 && abs(Tag_eta)<2.1 && !(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)"," --> Tag candidate skim")
+      .Filter("!(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)"," --> Tag candidate eta skim")
+      .Filter( tagCut ," --> Tag candidate pt skim : "+tagCut)
       ;
 
     // dataset specific
     auto df2 = df1
       .Define("mcTrue", (isMC) ? "Tag_isGenMatched*Probe_isGenMatched" : "1")
-      .Define("weight" , (isMC) ? "genWeight*baseW*puWeight" : "1")
+      .Define("weight" , (isMC) ? "genWeight*puWeight" : "1")
       ;
     auto df3 = (isMC) ? df2 : df2.Filter("TnP_trigger==1"," --> data is matched to HLT filter");
 
