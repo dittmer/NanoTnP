@@ -48,7 +48,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50')
-    samplesDef['tagSel'].set_cut('Tag_pt > 37') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('Tag_pt > 42') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -68,7 +68,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'Tag_pt > 30 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
+cutBase   = 'Tag_pt > 37 && Tag_charge*Probe_charge < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 #additionalCuts = {}

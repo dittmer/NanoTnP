@@ -10,12 +10,12 @@ import os
 #endcap = '( (abs(Probe_eta) > 1.479) && (Probe_dxy < 0.1) && (Probe_dz < 0.2) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
 
 cutMissingInnerHits = 'Probe_lostHits<1'
-cutdz = '(( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
-cutd0 = '(( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
+cutdz = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
+cutd0 = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
 looseDef  = 'Probe_cutBased_HLTPreSel ==1 && '+ cutMissingInnerHits +' && '+ cutdz +' && '+ cutd0
 
-cutIso16Barrel = '( (abs(Probe_eta) < 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0588)
-cutIso16Endcap = '( (abs(Probe_eta) > 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
+cutIso16Barrel = '( (abs(Probe_sc_eta) < 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0588)
+cutIso16Endcap = '( (abs(Probe_sc_eta) > 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
 
 # flag to be Tested
 flags = {
@@ -55,7 +55,7 @@ if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
     samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO')
-    samplesDef['tagSel'].set_cut('Tag_pt > 32 && Tag_mvaSpring16GP > 0.95') #canceled non trig MVA cut
+    samplesDef['tagSel'].set_cut('Tag_pt > 37 && Tag_mvaSpring16GP > 0.95') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -67,7 +67,7 @@ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-    { 'var' : 'Probe_eta' , 'type': 'float', 'bins': [ -2.5 , -2.0 , -1.566 , -1.442 , -0.8 , 0.0 , 0.8 , 1.442 , 1.566 , 2.0 , 2.5 ] },
+    { 'var' : 'Probe_sc_eta' , 'type': 'float', 'bins': [ -2.5 , -2.0 , -1.566 , -1.442 , -0.8 , 0.0 , 0.8 , 1.442 , 1.566 , 2.0 , 2.5 ] },
     { 'var' : 'Probe_pt' , 'type': 'float', 'bins': [ 10 , 15 , 20 , 35 , 50 , 90 , 150 , 500 ] },
 ]
 
@@ -75,7 +75,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'Tag_pt > 30 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
+cutBase   = 'Tag_pt > 32 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
 additionalCuts = { 
