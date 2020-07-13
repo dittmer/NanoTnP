@@ -13,7 +13,9 @@ cutIso = '(Probe_pfRelIso03_all < 0.06)'
 # flag to be Tested
 flags = {
     'passingMVA94Xwp90isoHWWiso0p06'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingMVA94Xwp90isoHWWiso0p06SS'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1) && (Probe_3charge==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
     'passingttHMVA0p7'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingttHMVA0p7SS'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1) && (Probe_3charge==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
 baseOutDir = '%s/results/Legacy2018/nanov6/tnpEleID' %os.getcwd()
