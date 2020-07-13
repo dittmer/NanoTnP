@@ -3,20 +3,23 @@ import os
 ########## General settings
 #############################################################
 
-# https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L458-L479
+# commision nanoaod
+# https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L2418-L2439
 
-cutLoose = '(( abs(Probe_eta) > 1.497 && (Probe_sieie < 0.03) && (Probe_eInvMinusPInv < 0.014)) ||( abs(Probe_eta) < 1.497))'
-cutDz = '(( abs(Probe_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
-cutDxy = '(( abs(Probe_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
+cutLoose = '(( abs(Probe_sc_eta) > 1.497 && (Probe_sieie < 0.03) && (Probe_eInvMinusPInv < 0.014)) ||( abs(Probe_sc_eta) < 1.497))'
+cutDz = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
+cutDxy = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
 cutIso = '(Probe_pfRelIso03_all < 0.06)'
 
 # flag to be Tested
 flags = {
     'passingMVA94Xwp90isoHWWiso0p06'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingMVA94Xwp90isoHWWiso0p06SS'  : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1) && (Probe_3charge==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
     'passingttHMVA0p7'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
+    'passingttHMVA0p7SS'  : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1) && (Probe_3charge==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
-baseOutDir = '%s/results/Legacy2018/tnpEleID/validation' %os.getcwd()
+baseOutDir = '%s/results/Legacy2017/nanov6/tnpEleID/validation/RunE' % os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -27,10 +30,16 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
-    'data'   : tnpSamples.nanov7_18['data_Run2018'].clone(),
-    'mcNom'  : tnpSamples.nanov7_18['DYJetsToLL_M-50-LO'].clone(),
-    'mcAlt'  : tnpSamples.nanov7_18['DYJetsToLL_M-50'].clone(),
-    'tagSel' : tnpSamples.nanov7_18['DYJetsToLL_M-50-LO'].clone(),
+    #'data'   : tnpSamples.nanov6_17['data_Run2017'].clone(),
+    #'data'   : tnpSamples.nanov6_17['data_Run2017B'].clone(),
+    #'data'   : tnpSamples.nanov6_17['data_Run2017C'].clone(),               
+    #'data'   : tnpSamples.nanov6_17['data_Run2017D'].clone(),
+    #'data'   : tnpSamples.nanov6_17['data_Run2017CD'].clone(),
+    'data'   : tnpSamples.nanov6_17['data_Run2017E'].clone(),                    
+    #'data'   : tnpSamples.nanov6_17['data_Run2017F'].clone(),
+    'mcNom'  : tnpSamples.nanov6_17['DYJetsToLL_M-50-LO'].clone(),
+    'mcAlt'  : tnpSamples.nanov6_17['DYJetsToLL_M-50'].clone(),
+    'tagSel' : tnpSamples.nanov6_17['DYJetsToLL_M-50-LO'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
@@ -47,8 +56,8 @@ if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_mcTruth()
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_mcTruth()
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_mcTruth()
 if not samplesDef['tagSel'] is None:
-    samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50')
-    samplesDef['tagSel'].set_cut('Tag_pt > 42') #canceled non trig MVA cut
+    samplesDef['tagSel'].rename('mcAltSel_DYJetsToLL_M-50-LO')
+    samplesDef['tagSel'].set_cut('Tag_pt > 45') #canceled non trig MVA cut
 
 ## set MC weight, simple way (use tree weight) 
 weightName = 'weight'
@@ -60,7 +69,7 @@ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-    { 'var' : 'Probe_eta' , 'type': 'float', 'bins': [ -2.5 , -2.0 , -1.566 , -1.442 , -0.8 , 0.0 , 0.8 , 1.442 , 1.566 , 2.0 , 2.5 ] },
+    { 'var' : 'Probe_sc_eta' , 'type': 'float', 'bins': [ -2.5 , -2.0 , -1.566 , -1.442 , -0.8 , 0.0 , 0.8 , 1.442 , 1.566 , 2.0 , 2.5 ] },
     { 'var' : 'Probe_pt' , 'type': 'float', 'bins': [ 10 , 15 , 20 , 35 , 50 , 90 , 150 , 500 ] },
 ]
 
@@ -68,10 +77,9 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'Tag_pt > 37 && Tag_charge*Probe_charge < 0'
+cutBase   = 'Tag_pt > 40 && Tag_charge*Probe_charge < 0'
 
 # can add addtionnal cuts for some bins (first check bin number using tnpEGM --checkBins)
-#additionalCuts = {}
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*Tag_pt*(1-cos(event_met_pfphi-Tag_phi))) < 45',
     1 : 'tag_Ele_trigMVA > 0.92 && sqrt( 2*event_met_pfmet*Tag_pt*(1-cos(event_met_pfphi-Tag_phi))) < 45',
@@ -101,7 +109,6 @@ additionalCuts = {
 #############################################################
 ########## fitting params to tune fit by hand if necessary
 #############################################################
-# x[ initial value , min , max ]
 tnpParNomFit = [
     "meanP[-0.0,-5.0,5.0]","sigmaP[0.9,0.5,5.0]",
     "meanF[-0.0,-5.0,5.0]","sigmaF[0.9,0.5,5.0]",

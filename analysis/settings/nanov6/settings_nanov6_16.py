@@ -4,26 +4,26 @@ import os
 #############################################################
 # flag to be Tested
 
+# comission nanoaod
 # https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/data/LeptonSel_cfg.py#L3883-L3915
-#common = '(abs(Probe_eta)<2.5 && Probe_mvaSpring16GP_WP90 == 1 && Probe_lostHits<1)'
-#barrel = '( (abs(Probe_eta) < 1.479) && (Probe_dxy < 0.05) && (Probe_dz < 0.1) && (Probe_pfRelIso03_all < {0}) )'.format(0.0588)
-#endcap = '( (abs(Probe_eta) > 1.479) && (Probe_dxy < 0.1) && (Probe_dz < 0.2) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
 
 cutMissingInnerHits = 'Probe_lostHits<1'
-cutdz = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dz) < 0.2 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dz) < 0.1 ))'
-cutd0 = '(( abs(Probe_sc_eta) > 1.497 && abs(Probe_dxy) < 0.1 )||( abs(Probe_sc_eta) < 1.497 && abs(Probe_dxy) < 0.05 ))'
+cutdz = '(( abs(Probe_sc_eta) > 1.479 && abs(Probe_dz) < 0.2 )||( abs(Probe_sc_eta) < 1.479 && abs(Probe_dz) < 0.1 ))'
+cutd0 = '(( abs(Probe_sc_eta) > 1.479 && abs(Probe_dxy) < 0.1 )||( abs(Probe_sc_eta) < 1.479 && abs(Probe_dxy) < 0.05 ))'
 looseDef  = 'Probe_cutBased_HLTPreSel ==1 && '+ cutMissingInnerHits +' && '+ cutdz +' && '+ cutd0
 
-cutIso16Barrel = '( (abs(Probe_sc_eta) < 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0588)
+cutIso16Barrel = '( (abs(Probe_sc_eta) < 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.05880)
 cutIso16Endcap = '( (abs(Probe_sc_eta) > 1.479) && (Probe_pfRelIso03_all < {0}) )'.format(0.0571)
 
 # flag to be Tested
 flags = {
     'passingMVA80Xwp90Iso16' : '({0}) && (Probe_mvaSpring16GP_WP90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingMVA80Xwp90Iso16SS' : '({0}) && (Probe_mvaSpring16GP_WP90 == 1) && (Probe_3charge==1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
     'passingttHMVA0p7' : '({0}) && (Probe_mvaTTH > 0.7) && (Probe_mvaSpring16GP_WP90 == 1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
+    'passingttHMVA0p7SS' : '({0}) && (Probe_mvaTTH > 0.7) && (Probe_mvaSpring16GP_WP90 == 1) && (Probe_3charge==1) && ( {1} || {2} )'.format(looseDef,cutIso16Barrel,cutIso16Endcap),
 }
 
-baseOutDir = '%s/results/Legacy2016/tnpEleID/validation' %os.getcwd()
+baseOutDir = '%s/results/Legacy2016/nanov6/tnpEleID/validation' %os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -34,10 +34,10 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
-    'data'   : tnpSamples.nanov7_16['data_Run2016'].clone(),
-    'mcNom'  : tnpSamples.nanov7_16['DYJetsToLL_M-50-LO'].clone(),
-    'mcAlt'  : tnpSamples.nanov7_16['DYJetsToLL_M-50'].clone(),
-    'tagSel' : tnpSamples.nanov7_16['DYJetsToLL_M-50-LO'].clone(),
+    'data'   : tnpSamples.nanov6_16['data_Run2016'].clone(),
+    'mcNom'  : tnpSamples.nanov6_16['DYJetsToLL_M-50-LO'].clone(),
+    'mcAlt'  : tnpSamples.nanov6_16['DYJetsToLL_M-50'].clone(),
+    'tagSel' : tnpSamples.nanov6_16['DYJetsToLL_M-50-LO'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
