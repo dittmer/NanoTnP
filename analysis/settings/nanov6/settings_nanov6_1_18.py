@@ -16,7 +16,7 @@ flags = {
     'passingttHMVA0p7'    : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
-baseOutDir = '%s/results/Legacy2018/nanov6/tnpEleID/validation' %os.getcwd()
+baseOutDir = '%s/results/Legacy2018/nanov6/tnpEleID' %os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
