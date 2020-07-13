@@ -37,7 +37,7 @@ TnP () {
 #TnP settings_nanov6_17.py passingttHMVA0p7SS
 
 # 2018
-TnP settings_nanov6_18.py passingMVA94Xwp90isoHWWiso0p06
-TnP settings_nanov6_18.py passingMVA94Xwp90isoHWWiso0p06SS
-TnP settings_nanov6_18.py passingttHMVA0p7
-TnP settings_nanov6_18.py passingttHMVA0p7SS
+TnP settings_nanov6_1_18.py passingMVA94Xwp90isoHWWiso0p06
+TnP settings_nanov6_1_18.py passingMVA94Xwp90isoHWWiso0p06SS
+TnP settings_nanov6_1_18.py passingttHMVA0p7
+TnP settings_nanov6_1_18.py passingttHMVA0p7SS
