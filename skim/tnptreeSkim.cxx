@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     std::vector<std::string> infiles;
     std::ifstream file(input);
     std::string str;
-    bool isMC = (input.find("Run") != std::string::npos) ? false : true;
+    bool isMC = ( input.find("Run") != std::string::npos || input.find("Single") != std::string::npos || input.find("EGamma") != std::string::npos ) ? false : true;
 
     // dataset specific variable
     if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_mvaSpring16GP_WP90");
