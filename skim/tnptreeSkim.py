@@ -5,7 +5,7 @@ import os, sys, time
 cwd = os.getcwd()
 usage = "usage: %prog [options]"
 parser = OptionParser(usage)
-parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="latinov5_17")
+parser.add_option("-d","--dataset", action="store", type="string", dest="dataset", default="Full2016v7_102X")
 parser.add_option("-l","--location", action="store", type="string", dest="location", default="eos")
 parser.add_option("-o","--output", action="store", type="string", dest="output", default="%s/results/" %(cwd))
 
@@ -23,38 +23,38 @@ os.system("make")
 print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() - tcompile) , (time.time() - tcompile)/60. ) )
 
 # predefined samples
-if datasets == 'latinov7_16':
+if datasets == 'Full2016v7_102X':
     lumi = "35.867"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
     # alt DY NLO
     samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
     # single electrons
-    samplelists.append( dirs + "SingleElectron_Run2016.txt" )
+    samplelists.append( dirs + "SingleElectron.txt" )
 
-elif datasets == 'latinov7_17':
+elif datasets == 'Full2017v7_102X':
     lumi="41.53"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
     # alt DY NLO
     samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
     # single electrons
-    samplelists.append( dirs + "SingleElectron_Run2017.txt" )
+    #samplelists.append( dirs + "SingleElectron.txt" )
     # broken into period
-    samplelists.append( dirs + "RunB.txt" )
-    samplelists.append( dirs + "RunC.txt" )
-    samplelists.append( dirs + "RunD.txt" )
-    samplelists.append( dirs + "RunE.txt" )
-    samplelists.append( dirs + "RunF.txt" )
+    samplelists.append( dirs + "SingleElectron_RunB.txt" )
+    samplelists.append( dirs + "SingleElectron_RunC.txt" )
+    samplelists.append( dirs + "SingleElectron_RunD.txt" )
+    samplelists.append( dirs + "SingleElectron_RunE.txt" )
+    samplelists.append( dirs + "SingleElectron_RunF.txt" )
 
-elif datasets == 'latinov7_18':
+elif datasets == 'Full2018v7_102X':
     lumi = "59.74"
     # DY LO
     samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
     # alt DY NLO
     samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
     # single electrons
-    samplelists.append( dirs + "EGamma_Run2018.txt" )
+    samplelists.append( dirs + "EGamma.txt" )
 
 else:
     print(' >>> ERROR: Dude... really? Pick one datasets here <<<')

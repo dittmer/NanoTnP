@@ -1,5 +1,5 @@
 #!/bin/bash
 
-python tnptreeSkim.py -d latinov7_16
-python tnptreeSkim.py -d latinov7_17
-python tnptreeSkim.py -d latinov7_18
+python tnptreeSkim.py -d Full2016v7_102X
+python tnptreeSkim.py -d Full2017v7_102X
+python tnptreeSkim.py -d Full2018v7_102X

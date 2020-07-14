@@ -32,7 +32,8 @@ std::vector<std::string> finalVariables = {
   "Probe_lostHits",
   "Probe_convVeto",
   "Tag_sc_eta",
-  "Probe_sc_eta"
+  "Probe_sc_eta",
+  "Probe_3charge"
 };
 
 /*
@@ -105,6 +106,7 @@ int main(int argc, char **argv) {
       .Define("pair_mass","TnP_mass")
       .Define("Tag_sc_eta","Tag_deltaEtaSC+Tag_eta")
       .Define("Probe_sc_eta","Probe_deltaEtaSC+Probe_eta")
+      .Define("Probe_3charge","Probe_tightCharge==2")
       ;
 
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
