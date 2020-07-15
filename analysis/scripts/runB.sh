@@ -2,7 +2,7 @@
 
 set -e
 
-VER="v6"
+VER="v7"
 
 if [ `echo ${PWD} | awk -F "/" '{print $NF}'` != "analysis" ]; then
 
@@ -24,20 +24,8 @@ TnP () {
 
 }
 
-# 2016
-#TnP settings_nanov6_16.py passingMVA80Xwp90Iso16
-#TnP settings_nanov6_16.py passingMVA80Xwp90Iso16SS
-#TnP settings_nanov6_16.py passingttHMVA0p7
-#TnP settings_nanov6_16.py passingttHMVA0p7SS
-
 # 2017
-#TnP settings_nanov6_17.py passingMVA80Xwp90Iso16
-#TnP settings_nanov6_17.py passingMVA80Xwp90Iso16SS
-#TnP settings_nanov6_17.py passingttHMVA0p7
-#TnP settings_nanov6_17.py passingttHMVA0p7SS
-
-# 2018
-TnP settings_nanov6_1_18.py passingMVA94Xwp90isoHWWiso0p06
-TnP settings_nanov6_1_18.py passingMVA94Xwp90isoHWWiso0p06SS
-TnP settings_nanov6_1_18.py passingttHMVA0p7
-TnP settings_nanov6_1_18.py passingttHMVA0p7SS
+TnP settings_nano${VER}_B_17.py passingMVA94Xwp90isoHWWiso0p06
+TnP settings_nano${VER}_B_17.py passingMVA94Xwp90isoHWWiso0p06SS
+TnP settings_nano${VER}_B_17.py passingttHMVA0p7
+TnP settings_nano${VER}_B_17.py passingttHMVA0p7SS

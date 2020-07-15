@@ -19,7 +19,7 @@ flags = {
     'passingttHMVA0p7SS'  : '({0}) && ({1}) && ({2}) && ({3}) && (Probe_mvaTTH>0.7) && (Probe_cutBased_Fall17_V1>=3) && (Probe_mvaFall17V1Iso_WP90==1) && (Probe_3charge==1)'.format(cutDxy,cutDz,cutLoose,cutIso),
 }
 
-baseOutDir = '%s/results/Legacy2017/nanov6/tnpEleID/RunE' % os.getcwd()
+baseOutDir = '%s/results/Legacy2017/nanov7/tnpEleID/RunB' % os.getcwd()
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -30,16 +30,16 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'fitter_tree'
 
 samplesDef = {
-    #'data'   : tnpSamples.nanov6_17['data_Run2017'].clone(),
-    #'data'   : tnpSamples.nanov6_17['data_Run2017B'].clone(),
-    #'data'   : tnpSamples.nanov6_17['data_Run2017C'].clone(),               
-    #'data'   : tnpSamples.nanov6_17['data_Run2017D'].clone(),
-    #'data'   : tnpSamples.nanov6_17['data_Run2017CD'].clone(),
-    'data'   : tnpSamples.nanov6_17['data_Run2017E'].clone(),                    
-    #'data'   : tnpSamples.nanov6_17['data_Run2017F'].clone(),
-    'mcNom'  : tnpSamples.nanov6_17['DYJetsToLL_M-50-LO'].clone(),
-    'mcAlt'  : tnpSamples.nanov6_17['DYJetsToLL_M-50'].clone(),
-    'tagSel' : tnpSamples.nanov6_17['DYJetsToLL_M-50-LO'].clone(),
+    #'data'   : tnpSamples.nanov7_17['data_Run2017'].clone(),
+    'data'   : tnpSamples.nanov7_17['data_Run2017B'].clone(),
+    #'data'   : tnpSamples.nanov7_17['data_Run2017C'].clone(),               
+    #'data'   : tnpSamples.nanov7_17['data_Run2017D'].clone(),
+    #'data'   : tnpSamples.nanov7_17['data_Run2017CD'].clone(),
+    #'data'   : tnpSamples.nanov7_17['data_Run2017E'].clone(),                    
+    #'data'   : tnpSamples.nanov7_17['data_Run2017F'].clone(),
+    'mcNom'  : tnpSamples.nanov7_17['DYJetsToLL_M-50-LO'].clone(),
+    'mcAlt'  : tnpSamples.nanov7_17['DYJetsToLL_M-50'].clone(),
+    'tagSel' : tnpSamples.nanov7_17['DYJetsToLL_M-50-LO'].clone(),
 }
 
 ## some sample-based cuts... general cuts defined here after
