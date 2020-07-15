@@ -73,6 +73,7 @@ print("lumi : %s 1/fb" %(lumi))
 trun = time.time();
 for iproc in samplelists:
     sample = iproc.split('/')[-1].split('.txt')[0]
+    # process-in ; process-out ; sample ; lumi 
     cmd="./tnptreeSkim"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
     tproc = time.time()
     print(cmd)

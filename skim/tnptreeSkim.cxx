@@ -70,9 +70,9 @@ int main(int argc, char **argv) {
     bool isMC = ( input.find("Run") != std::string::npos || input.find("Single") != std::string::npos || input.find("EGamma") != std::string::npos ) ? false : true;
 
     // dataset specific variable
-    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_mvaSpring16GP_WP90");
-    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Tag_mvaSpring16GP");
-    if ( input.find("_16") != std::string::npos ) finalVariables.push_back("Probe_cutBased_HLTPreSel");
+    if ( input.find("2016") != std::string::npos ) finalVariables.push_back("Probe_mvaSpring16GP_WP90");
+    if ( input.find("2016") != std::string::npos ) finalVariables.push_back("Tag_mvaSpring16GP");
+    if ( input.find("2016") != std::string::npos ) finalVariables.push_back("Probe_cutBased_HLTPreSel");
 
     while (std::getline(file, str)) { infiles.push_back(str); }
     
@@ -80,9 +80,9 @@ int main(int argc, char **argv) {
     
     // Skim
     std::string tagCut="1==1";
-    if ( input.find("_16") != std::string::npos ) tagCut="Tag_pt>32 && abs(Tag_eta)<2.17";
-    if ( input.find("_17") != std::string::npos ) tagCut="Tag_pt>40";
-    if ( input.find("_18") != std::string::npos ) tagCut="Tag_pt>37";
+    if ( input.find("2016") != std::string::npos ) tagCut="Tag_pt>32 && abs(Tag_eta)<2.17";
+    if ( input.find("2017") != std::string::npos ) tagCut="Tag_pt>40";
+    if ( input.find("2018") != std::string::npos ) tagCut="Tag_pt>37";
 
     auto df1 = df
       .Filter("abs(Tag_pdgId)!=13 && abs(Probe_pdgId)!=13"," --> Tag and Probe are electron")
