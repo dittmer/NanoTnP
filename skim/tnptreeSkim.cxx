@@ -111,11 +111,12 @@ int main(int argc, char **argv) {
       ;
 
     RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
-    auto df5 = BDT_evaluate( df4 , model );
+    auto df5 = BDT_composite_var( df4 );
+    auto df6 = BDT_evaluate( df5 , model );
 
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
 
-    auto dfFinal = df5;
+    auto dfFinal = df6;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("fitter_tree", output, finalVariables);
     time.Stop();
