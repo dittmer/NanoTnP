@@ -25,41 +25,39 @@ print("--- compilation took : %.3f seconds (%.3f minutes) ---" % ( (time.time() 
 # predefined samples
 if datasets == 'Full2016v7_102X':
     lumi = "35.867"
-    # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
-    # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
-    # single electrons
-    samplelists.append( dirs + "SingleElectron.txt" )
+    for itxt in [
+        "DYJetsToLL_M-50-LO_ext1.txt" , # DY LO
+        "DYJetsToLL_M-50_ext2.txt" ,    # alt DY NLO
+        "SingleElectron.txt"            # single electron
+        ]:
+        samplelists.append( "%s/%s" %(dirs,itxt) )
 
 elif datasets == 'Full2017v7_102X':
     lumi="41.53"
-    # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO_ext1.txt" )
-    # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50_ext1.txt" )
-    # single electrons
-    #samplelists.append( dirs + "SingleElectron.txt" )
-    # broken into period
-    samplelists.append( dirs + "SingleElectron_RunB.txt" )
-    samplelists.append( dirs + "SingleElectron_RunC.txt" )
-    samplelists.append( dirs + "SingleElectron_RunD.txt" )
-    samplelists.append( dirs + "SingleElectron_RunE.txt" )
-    samplelists.append( dirs + "SingleElectron_RunF.txt" )
+    for itxt in [
+        "DYJetsToLL_M-50-LO_ext1.txt" ,
+        "DYJetsToLL_M-50_ext1.txt",
+        "SingleElectron_RunB.txt",
+        "SingleElectron_RunC.txt",
+        "SingleElectron_RunD.txt",
+        "SingleElectron_RunE.txt",
+        "SingleElectron_RunF.txt"
+        ]:
+        samplelists.append( "%s/%s" %(dirs,itxt) )
 
 elif datasets == 'Full2018v7_102X':
     lumi = "59.74"
-    # DY LO
-    samplelists.append( dirs + "DYJetsToLL_M-50-LO.txt" )
-    # alt DY NLO
-    samplelists.append( dirs + "DYJetsToLL_M-50_ext2.txt" )
-    # single electrons
-    samplelists.append( dirs + "EGamma.txt" )
+    for itxt in [
+        "DYJetsToLL_M-50-LO.txt",
+        "DYJetsToLL_M-50_ext2.txt",
+        "EGamma.txt"
+        ]:
+        samplelists.append( "%s/%s" %(dirs,itxt) )
 
 else:
     print(' >>> ERROR: Dude... really? Pick one datasets here <<<')
     os.system('ls data')
-    print(' exp: python nanotnp.py -y latinov5_17')
+    print(' exp: python nanotnp.py -y Full2018v7_102X')
     sys.exit(0)
 
 if not os.path.exists(output):
@@ -73,7 +71,7 @@ print("lumi : %s 1/fb" %(lumi))
 trun = time.time();
 for iproc in samplelists:
     sample = iproc.split('/')[-1].split('.txt')[0]
-    # process-in ; process-out ; sample ; lumi 
+    # process-in ; process-out ; sample ; lumi
     cmd="./tnptreeSkim"; cmd+=" %s %s/%s.root %s" %(iproc,output,sample,lumi)
     tproc = time.time()
     print(cmd)

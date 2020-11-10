@@ -1,6 +1,7 @@
 #include "interface/helper.h"
+#include "interface/bdt.h"
 
-/* skimmer for 
+/* skimmer for
 https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/modules/addTnpTree.py
 */
 
@@ -58,7 +59,7 @@ int main(int argc, char **argv) {
     std::cout << ">>> Process input: " << input << std::endl;
     std::cout << ">>> Process output: " << output << std::endl;
     //std::cout << ">>> Integrated luminosity: " << mycfg.lumi << std::endl;
-    
+
     // Initialize time
     TStopwatch time;
     time.Start();
@@ -75,9 +76,9 @@ int main(int argc, char **argv) {
     if ( input.find("2016") != std::string::npos ) finalVariables.push_back("Probe_cutBased_HLTPreSel");
 
     while (std::getline(file, str)) { infiles.push_back(str); }
-    
+
     ROOT::RDataFrame df("Events", infiles);
-    
+
     // Skim
     std::string tagCut="1==1";
     if ( input.find("2016") != std::string::npos ) tagCut="Tag_pt>32 && abs(Tag_eta)<2.17";
@@ -109,9 +110,12 @@ int main(int argc, char **argv) {
       .Define("Probe_3charge","Probe_tightCharge==2")
       ;
 
+    RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
+    auto df5 = BDT_evaluate( df4 , model );
+
     //ROOT::RDF::SaveGraph(df,"graph_"+sample+".dot");
 
-    auto dfFinal = df4;
+    auto dfFinal = df5;
     auto report = dfFinal.Report();
     dfFinal.Snapshot("fitter_tree", output, finalVariables);
     time.Stop();
