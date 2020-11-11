@@ -144,23 +144,16 @@ namespace Helper {
     return false;
   }
 
-  /**  
   struct config_t {
-    // basic
-    bool isMC=false;
-    bool passHLT=false;
-    // jet cleaning
-    float jetclean_dR=0.3;
-    //trigger
-    std::string name = "NULL";
-    std::string bit = "NULL";
-    // tag and pair flag
-    bool resolveAmbiguity=false;
-    // cert
-    std::string jsonFile;
-    //std::map<int, std::vector<std::pair<int, int> > > jsonFile;
+    std::string input;
+    std::string output;
+    std::string lumi;
+
+    bool isMC;
+    std::vector<std::string> infiles;
+    std::vector<std::string> outputVar;
   };
-  **/
+  
 } //helper
 
 #endif
