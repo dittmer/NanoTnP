@@ -81,19 +81,25 @@ auto TnP(T &df , Helper::config_t &cfg) {
 
 // BDT WORKFLOW
 template <typename T>
-auto Evaluate( T &df , Helper::config_t &cfg ){
+auto BDT( T &df , Helper::config_t &cfg ){
+  // https://root.cern/doc/master/tmva003__RReader_8C.html
 
+  auto df1 = df
+    //.Alias( "Electron_dxy" , "TMath::Log(TMath::Abs(Electron_dxy))" )
+    //.Alias( "Electron_dz" , "TMath::Log(TMath::Abs(Electron_dz))" )
+    //.Alias( "Electron_jetPtRelv2" , "(Electron_jetIdx >= 0)*(Electron_jetPtRelv2)" )
+    //.Alias( "Jet_btagDeepFlavB" , "(Electron_jetIdx >= 0)*(Jet_btagDeepFlavB[TMath::Max( double(Electron_jetIdx) , 0.0 )])" )
+    .Define( "Electron_miniPFRelIso_neu_vec" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" )
+    .Define( "Electron_miniPFRelIso_neu" , "Electron_miniPFRelIso_neu_vec[0]" )
+    ;
+  auto df2 = BDT_lambda( df1 );
+  
   RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
   std::vector<std::string> variables = model.GetVariableNames();
-  //for(auto i : variables) {
-  //    cfg.outputVar.push_back(i);
-  //}
-  //cfg.outputVar.push_back("mvaBDTG");
+
+  auto df3 = df2.Define("mvaBDTG", Compute< 11 , float >(model) , variables );
   
-  auto df1 = BDT_composite_var( df );
-  //auto df2 = df1.Define("mvaBDTG", Compute< 11 , float >(model) , variables );
-  
-  return df1;
+  return df3;
 }
 
 #endif
