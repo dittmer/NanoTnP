@@ -40,16 +40,19 @@ int main(int argc, char **argv) {
   std::cout << ">>> Process output: " << mycfg.output << std::endl;
 
   ROOT::RDataFrame df("Events", mycfg.infiles);
+  
+  // Modular workflow //
+  auto df1 = TnP( df , mycfg );
+  auto df2 = BDT( df1 , mycfg );
+  auto dfout = df2;
+  // ---------- //
+  
+  dfout.Snapshot( "fitter_tree", mycfg.output , mycfg.outputVar );
 
-  auto dfout1 = TnP( df , mycfg );
-  auto dfout2 = Evaluate( dfout1 , mycfg ); // evaluate MVA variables
-
-  dfout2.Snapshot( "fitter_tree", mycfg.output , mycfg.outputVar );
-
-  auto report = dfout2.Report();
+  auto report = dfout.Report();
   report->Print();
 
-  ROOT::RDF::SaveGraph(df,"graph.dot");
+  ROOT::RDF::SaveGraph( dfout , "graph.dot" );
 
   time.Stop();
   time.Print();
