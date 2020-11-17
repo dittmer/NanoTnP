@@ -5,9 +5,6 @@ minimalistic TnP package on nanoAod.
 The package produces the necessary ntuple format for identification efficiency of electrons. 
 The tag is a well identified and isolated electron which pass an electron trigger to increase the purity. Once the tag electron is selected then we look for another object which is reconstructed as electron. After passing some kinematical selection, we get the total probe selection. The invariant mass of the pair is then reconstructed from Tag and Probe electron and a Z boson mass window is imposed. We ask the Probe to pass the ID working point and compute the efficiency. Once we obtain the efficiency for both DATA and MC then we can compute the scale factor, which is the ratio of efficiencies of DATA and MC.
 
-~~## Brief technical aspect
-The package constructed in plug-in-play modular nature, in EDM's language, a series of EDMProducer/EDMFilter parameterized with PSet before EDAnalyzer, string in cms sequence. Thanks to RDataframe, module is implemented as collective transformation fucntions (lambda function implemented to compute particle-based quantity) which lazily executed upon action. Benefits are, speed and better cpu utilization.~~
-
 Default definition
  
 | Object Definition | Description |
@@ -25,19 +22,4 @@ Default definition
  
  ```
  source /cvmfs/sft.cern.ch/lcg/views/LCG_95apython3/x86_64-centos7-gcc7-opt/setup.sh
- git clone git@github.com:SiewYan/NanoTnP.git
- cd skim
- # for Full2018v7_102X
- python nanotnp.py -y Full2018v7_102X 
  ```
-  - default at 10 cores for parallelism
-  - 2017's approximately takes ~ 13 mins (data, mc, altmc)
-  - 2018's approximately takes ~ 19 mins (data, mc, altmc)
-  
-  A `results` folder will appear containing the output.
- 
- ## To-do
- ~~- [x] mcTruth for tag only... needed probe is mcTruth requirement ?
- - [x] json selection on data for now.
- ~~- [ ] missing trigger filter for 2017, `hltEle35noerWPTightGsfTrackIsoFilter`.
- - [ ] implement `PromptGenLepton2l`. ~~

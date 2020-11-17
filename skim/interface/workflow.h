@@ -31,7 +31,9 @@ std::vector<std::string> TnP_variables = {
   "Probe_convVeto",
   "Tag_sc_eta",
   "Probe_sc_eta",
-  "Probe_3charge"
+  "Probe_3charge",
+  "nElectron",
+  "Electron_pt"
 };
 
 // TnP WORKFLOW 
@@ -84,21 +86,31 @@ template <typename T>
 auto BDT( T &df , Helper::config_t &cfg ){
   // https://root.cern/doc/master/tmva003__RReader_8C.html
 
+  cfg.outputVar.push_back("mvaBDTG");
+
   auto df1 = df
-    //.Alias( "Electron_dxy" , "TMath::Log(TMath::Abs(Electron_dxy))" )
-    //.Alias( "Electron_dz" , "TMath::Log(TMath::Abs(Electron_dz))" )
-    //.Alias( "Electron_jetPtRelv2" , "(Electron_jetIdx >= 0)*(Electron_jetPtRelv2)" )
-    //.Alias( "Jet_btagDeepFlavB" , "(Electron_jetIdx >= 0)*(Jet_btagDeepFlavB[TMath::Max( double(Electron_jetIdx) , 0.0 )])" )
-    .Define( "Electron_miniPFRelIso_neu_vec" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" )
-    .Define( "Electron_miniPFRelIso_neu" , "Electron_miniPFRelIso_neu_vec[0]" )
+    .Define( "Electron_pt_0" , "Electron_pt[0]" )
+    .Define( "Electron_eta_0" , "Electron_eta[0]" )
+    .Define( "Electron_miniPFRelIso_chg_0" , "Electron_miniPFRelIso_chg[0]" )
+    .Define( "Electron_miniPFRelIso_neu_0" , "(Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg)[0]" )
+    .Define( "Electron_dxy_0" , "Electron_dxy[0]" )
+    .Define( "Electron_dz_0" , "Electron_dz[0]" )
+    .Define( "Electron_sip3d_0" , "Electron_sip3d[0]" )
+    .Define( "Electron_mvaFall17V1Iso_WP90_0" , "float(Electron_mvaFall17V1Iso_WP90[0])" )
+    .Define( "Jet_btagDeepFlavB_0" , "((Electron_jetIdx >= 0)*(Jet_btagDeepFlavB[Electron_jetIdx[0]]))[0]" )
+    .Define( "Electron_jetPtRelv2_0" , "((Electron_jetIdx >= 0)*(Electron_jetPtRelv2[0]))[0]" )
     ;
-  auto df2 = BDT_lambda( df1 );
+  auto df2 = BDT_lambda( df1 ); // Electron_jetPtRatio
   
   RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
-  std::vector<std::string> variables = model.GetVariableNames();
+  auto computeModel = Compute< 11 , float >(model);
+  auto variables = model.GetVariableNames();
 
-  auto df3 = df2.Define("mvaBDTG", Compute< 11 , float >(model) , variables );
-  
+  //auto df3 = df2.Define("mvaBDTG", computeModel , variables );
+  auto df3 = df2.Define("mvaBDTG", computeModel ,
+			{
+			  "Electron_pt_0", "Electron_eta_0", "Electron_miniPFRelIso_chg_0", "Electron_miniPFRelIso_neu_0", "Electron_dxy_0", "Electron_dz_0", "Electron_sip3d_0", "Electron_mvaFall17V1Iso_WP90_0", "Jet_btagDeepFlavB_0", "Electron_jetPtRelv2_0", "Electron_jetPtRatio"
+			    } );
   return df3;
 }
 
