@@ -8,8 +8,24 @@ using namespace TMVA::Experimental;
 template <typename T>
 auto BDT_preprocess(T &df) {
   using namespace ROOT::VecOps;
+
+  // lambda function 1 : jet_btagDeepFlavB
+  auto jetbtagdeep = [](
+			const RVec<float> &jet_btagDeepFlavB,
+			const RVec<int> &electron_jetIdx
+			){
+    size_t nsize = electron_jetIdx.size();
+    RVec<float> out( nsize );
+    int iter;
+    for ( size_t i = 0 ; i < nsize ; i++ ) {
+      iter = i;
+      if ( electron_jetIdx[i] < 0 ) iter = 0;
+      out.push_back(jet_btagDeepFlavB[iter]);
+    }
+    return out;
+  };
   
-  // lambda function for complicated variable derivation
+  // lambda function 2 : Electron_jetPtRatio
   auto jetPtRatio = [](
 		       const RVec<float> &electron_miniPFRelIso_all,
 		       const RVec<int> &electron_jetIdx,
@@ -19,7 +35,7 @@ auto BDT_preprocess(T &df) {
     // Electron_jetPtRatio
     // proxy for jet pt when no associated jets found
     size_t nsize = electron_pt.size();
-    RVec<float> electron_jetPtRatio( nsize , 0. );
+    RVec<float> electron_jetPtRatio( nsize );
     
     float A; float B;
     for ( size_t i = 0 ; i < nsize ; i++ ) {
@@ -41,7 +57,7 @@ auto BDT_preprocess(T &df) {
     .Define( "Electron_miniPFRelIso_chg_bdt" , "Electron_miniPFRelIso_chg" )
     .Define( "Electron_miniPFRelIso_neu_bdt" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" )
     .Define( "Electron_dxy_bdt" , "log(Electron_dxy[Electron_dxy > 0])" )
-    .Define( "Jet_btagDeepFlavB_bdt" , "Jet_btagDeepFlavB[Electron_jetIdx >0]" )
+    .Define( "Jet_btagDeepFlavB_bdt" , jetbtagdeep , { "Jet_btagDeepFlavB" , "Electron_jetIdx" } )
     .Define( "Electron_jetPtRelv2_bdt" , "Electron_jetPtRelv2[Electron_jetIdx >0]" )
     .Define( "Electron_jetPtRatio_bdt" , jetPtRatio , { "Electron_miniPFRelIso_all" , "Electron_jetIdx" , "Electron_pt" , "Jet_pt" } )
     ;
@@ -61,6 +77,7 @@ auto BDT_reader( T &df , const std::vector<TMVA::Reader*> &readers , const std::
 		    const RVec<float> &electron_jetPtRelv2,
 		    const RVec<float> &electron_jetPtRatio
 		    ){
+    // looking at only first index
     Helper::electron_miniPFRelIso_chg_[nslot] = electron_miniPFRelIso_chg[0];
     Helper::electron_miniPFRelIso_neu_[nslot] = electron_miniPFRelIso_neu[0];
     Helper::electron_dxy_[nslot]              = electron_dxy[0];
