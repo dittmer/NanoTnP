@@ -77,14 +77,19 @@ auto BDT_reader( T &df , const std::vector<TMVA::Reader*> &readers , const std::
 		    const RVec<float> &electron_jetPtRelv2,
 		    const RVec<float> &electron_jetPtRatio
 		    ){
-    // looking at only first index
-    Helper::electron_miniPFRelIso_chg_[nslot] = electron_miniPFRelIso_chg[0];
-    Helper::electron_miniPFRelIso_neu_[nslot] = electron_miniPFRelIso_neu[0];
-    Helper::electron_dxy_[nslot]              = electron_dxy[0];
-    Helper::jet_btagDeepFlavB_[nslot]         = jet_btagDeepFlavB[0];
-    Helper::electron_jetPtRelv2_[nslot]       = electron_jetPtRelv2[0];
-    Helper::electron_jetPtRatio_[nslot]       = electron_jetPtRatio[0];
-    return readers[nslot]->EvaluateMVA(bdtname);
+    
+    size_t nsize = electron_miniPFRelIso_chg.size();
+    RVec<float> out(nsize);
+    for ( size_t i = 0 ; i < nsize ; i++ ) {
+      Helper::electron_miniPFRelIso_chg_[nslot] = electron_miniPFRelIso_chg[i];
+      Helper::electron_miniPFRelIso_neu_[nslot] = electron_miniPFRelIso_neu[i];
+      Helper::electron_dxy_[nslot]              = electron_dxy[i];
+      Helper::jet_btagDeepFlavB_[nslot]         = jet_btagDeepFlavB[i];
+      Helper::electron_jetPtRelv2_[nslot]       = electron_jetPtRelv2[i];
+      Helper::electron_jetPtRatio_[nslot]       = electron_jetPtRatio[i];
+      out.push_back(readers[nslot]->EvaluateMVA(bdtname));
+    }
+    return out;
   };
   
   return df.DefineSlot( "mvaBDT" , predict ,
