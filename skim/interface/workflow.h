@@ -36,11 +36,11 @@ std::vector<std::string> TnP_variables = {
   "Electron_pt"
 };
 
-// TnP WORKFLOW 
+// TnP WORKFLOW
 template <typename T>
 auto TnP(T &df , Helper::config_t &cfg) {
   // https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/modules/addTnpTree.py
-  
+
   // dataset specific variables
   cfg.outputVar = TnP_variables;
   if ( cfg.input.find("2016") != std::string::npos ) cfg.outputVar.push_back("Probe_mvaSpring16GP_WP90");
@@ -81,36 +81,55 @@ auto TnP(T &df , Helper::config_t &cfg) {
   return df_out;
 }
 
-// BDT WORKFLOW
+// BDT Experimental WORKFLOW
 template <typename T>
-auto BDT( T &df , Helper::config_t &cfg ){
+auto BDT_Experimental( T &df , Helper::config_t &cfg ){
   // https://root.cern/doc/master/tmva003__RReader_8C.html
 
+  // append BDT variable for output
   cfg.outputVar.push_back("mvaBDTG");
 
-  auto df1 = df
-    .Define( "Electron_pt_0" , "Electron_pt[0]" )
-    .Define( "Electron_eta_0" , "Electron_eta[0]" )
-    .Define( "Electron_miniPFRelIso_chg_0" , "Electron_miniPFRelIso_chg[0]" )
-    .Define( "Electron_miniPFRelIso_neu_0" , "(Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg)[0]" )
-    .Define( "Electron_dxy_0" , "Electron_dxy[0]" )
-    .Define( "Electron_dz_0" , "Electron_dz[0]" )
-    .Define( "Electron_sip3d_0" , "Electron_sip3d[0]" )
-    .Define( "Electron_mvaFall17V1Iso_WP90_0" , "float(Electron_mvaFall17V1Iso_WP90[0])" )
-    .Define( "Jet_btagDeepFlavB_0" , "((Electron_jetIdx >= 0)*(Jet_btagDeepFlavB[Electron_jetIdx[0]]))[0]" )
-    .Define( "Electron_jetPtRelv2_0" , "((Electron_jetIdx >= 0)*(Electron_jetPtRelv2[0]))[0]" )
-    ;
-  auto df2 = BDT_lambda( df1 ); // Electron_jetPtRatio
-  
-  RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
-  auto computeModel = Compute< 11 , float >(model);
-  auto variables = model.GetVariableNames();
+  // variable : Electron_miniPFRelIso_chg
+  // variable : Electron_miniPFRelIso_neu
+  // variable : Electron_dxy
+  // variable : Jet_btagDeepFlavB
+  // variable : Electron_jetPtRelv2
+  // variable : Electron_jetPtRatio
 
-  //auto df3 = df2.Define("mvaBDTG", computeModel , variables );
-  auto df3 = df2.Define("mvaBDTG", computeModel ,
-			{
-			  "Electron_pt_0", "Electron_eta_0", "Electron_miniPFRelIso_chg_0", "Electron_miniPFRelIso_neu_0", "Electron_dxy_0", "Electron_dz_0", "Electron_sip3d_0", "Electron_mvaFall17V1Iso_WP90_0", "Jet_btagDeepFlavB_0", "Electron_jetPtRelv2_0", "Electron_jetPtRatio"
-			    } );
+  // pre-inference skimming and preparing derived variables
+  auto df1 = df
+    .Filter( "Electron_jetIdx >= 0","takes a non-zero value only when there are associated jets")
+    .Define( "Electron_miniPFRelIso_neu" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" );
+  auto df2 = jetPtRatio( df1 );
+
+  RReader model("data/xml/TMVAClassification_BDTG.weights.xml");
+  auto computeModel = Compute< 6 , float >(model);
+  auto variables = model.GetVariableNames();
+  
+  auto df3 = df2.Define("mvaBDTG", computeModel , variables );
+
+  return df3;
+}
+
+// BDT classical
+template <typename T>
+auto BDT_Classical( T &df , Helper::config_t &cfg ){
+  // https://github.com/latinos/PlotsConfigurations/blob/master/Configurations/WH3l/FullRunII_BDTv6/Full2016/hww_WH3l_OSSF_mvaBDTG.C
+  
+  // append BDT variable for output
+  cfg.outputVar.push_back("mvaBDT");
+  // create readers
+  const std::string BDT_name = "BDT::BDTG";
+  const std::string BDT_file = "data/xml/test_BDTG.weights.xml";
+  std::vector<TMVA::Reader*> readers = Helper::BDT_Readers( BDT_name , BDT_file );
+  
+  // pre-inference skimming and preparing derived variable
+  auto df1 = df
+    .Define( "Electron_miniPFRelIso_neu" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" );
+  auto df2 = jetPtRatio( df1 );
+
+  auto df3 = BDT_reader( df2 , readers , BDT_name ); // thread-safety with DefineSlot
+
   return df3;
 }
 

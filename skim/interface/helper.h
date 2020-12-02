@@ -26,6 +26,10 @@
 
 #include "TMath.h"
 
+// TMVA
+#include "TMVA/RReader.hxx"
+#include "TMVA/RInferenceUtils.hxx"
+
 namespace Helper {
 
   /*
@@ -35,6 +39,9 @@ namespace Helper {
     bool operator() (std::pair<std::pair<int,int>,float> i , std::pair<std::pair<int,int>,float> j) { return ( (i.second) < (j.second) ); }
   };
 
+  /*
+   * Index by deltaR
+   */
   template <typename T>
     std::vector<int> IndexBydeltaR(T v){
     dRSorter comparator;
@@ -71,6 +78,9 @@ namespace Helper {
       return r;
     }
 
+  /*
+   * vector maker
+   */
   template<typename T>
     TLorentzVector VectorMaker(T pt, T eta, T phi, T m){
     TLorentzVector out;
@@ -146,6 +156,9 @@ namespace Helper {
     return false;
   }
 
+  /*
+   * struct configuration
+   */
   struct config_t {
     std::string input;
     std::string output;
@@ -156,6 +169,44 @@ namespace Helper {
     std::vector<std::string> outputVar;
   };
   
+  
+  /*
+   * BDT classical reader 
+   */
+  
+  /*****************************************************/
+  const auto poolSize = ROOT::GetThreadPoolSize();
+  // list of variables
+  std::vector<float> electron_miniPFRelIso_chg_(poolSize);
+  std::vector<float> electron_miniPFRelIso_neu_(poolSize);
+  std::vector<float> electron_dxy_(poolSize);
+  std::vector<float> jet_btagDeepFlavB_(poolSize);
+  std::vector<float> electron_jetPtRelv2_(poolSize);
+  std::vector<float> electron_jetPtRatio_(poolSize);
+  
+  /****************************************************/
+  
+  template<typename T>
+    std::vector<TMVA::Reader*> BDT_Readers( T &modelname , T &modelfile ) {
+    //using namespace ROOT::VecOps;
+    // Create the TMVA::Reader
+    const auto poolSize = ROOT::GetThreadPoolSize();
+    // initialize reader for each thread
+    std::vector<TMVA::Reader*> readers(poolSize);    
+    
+    for (size_t i=0 ; i<readers.size() ; i++ ){
+      readers[i] = new TMVA::Reader(); // new return a pointer
+      readers[i]->AddVariable( "Electron_miniPFRelIso_chg" , &electron_miniPFRelIso_chg_[i] );
+      readers[i]->AddVariable( "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" , &electron_miniPFRelIso_neu_[i] );
+      readers[i]->AddVariable( "log(abs(Electron_dxy))" , &electron_dxy_[i] );
+      readers[i]->AddVariable( "(Electron_jetIdx>=0)*(Jet_btagDeepFlavB[max(Electron_jetIdx,0)])" , &jet_btagDeepFlavB_[i] );
+      readers[i]->AddVariable( "(Electron_jetIdx>=0)*(Electron_jetPtRelv2)" , &electron_jetPtRelv2_[i] );
+      readers[i]->AddVariable( "(Electron_jetIdx==-1)*((1)/(1+(Electron_miniPFRelIso_all)))+(Electron_jetIdx>=0)*((Electron_pt)/(Jet_pt[max(Electron_jetIdx,0)]))" , &electron_jetPtRatio_[i] );
+      readers[i]->BookMVA( modelname , modelfile );
+    }
+
+    return readers;
+  }
 } //helper
 
 #endif

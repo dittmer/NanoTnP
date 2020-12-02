@@ -73,6 +73,7 @@ for iproc in samplelists:
     cmd="./skim"; cmd+=" %s %s/%s.root %s" %( iproc , output , sample , txtfiles[datasets]['lumi'] )
     tproc = time.time()
     print(cmd)
+    #os.system('gdb --args %s' %cmd)
     os.system(cmd)
     print("--- running on %s took : %.3f seconds (%.3f minutes) ---" % ( sample , (time.time() - tproc) , (time.time() - tproc)/60. ) )
 print("--- Total run time : %.3f seconds (%.3f minutes) ---" % ( (time.time() - trun) , (time.time() - trun)/60. ) )

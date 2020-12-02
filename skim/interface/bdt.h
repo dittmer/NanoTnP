@@ -1,14 +1,12 @@
 #ifndef BDT_H
 #define BDT_H
 #include "helper.h"
-#include "TMVA/RReader.hxx"
-#include "TMVA/RInferenceUtils.hxx"
 
 // https://github.com/root-project/root/blob/master/tutorials/tmva/tmva003_RReader.C
 using namespace TMVA::Experimental;
 
 template <typename T>
-auto BDT_lambda(T &df) {
+auto jetPtRatio(T &df) {
   using namespace ROOT::VecOps;
   // https://github.com/srudra3/LeptonID/blob/master/ClassificationBDT_ele.py
   auto makeBDTvar = [](
@@ -36,7 +34,7 @@ auto BDT_lambda(T &df) {
     }
     
     // return the first index 
-    return electron_jetPtRatio[0];
+    return electron_jetPtRatio;
   };
 
   return df
@@ -44,5 +42,29 @@ auto BDT_lambda(T &df) {
     ;
 }
 
+template<typename T>
+auto BDT_reader( T &df , const std::vector<TMVA::Reader*> &readers , const std::string &bdtname ) {
+  using namespace ROOT::VecOps;
+  
+  auto predict = [&](
+		    unsigned int nslot,
+		    const RVec<float> &electron_miniPFRelIso_chg,
+		    const RVec<float> &electron_miniPFRelIso_neu,
+		    const RVec<float> &electron_dxy,
+		    const RVec<float> &jet_btagDeepFlavB,
+		    const RVec<float> &electron_jetPtRelv2,
+		    const RVec<float> &electron_jetPtRatio
+		    ){
+    Helper::electron_miniPFRelIso_chg_[nslot] = electron_miniPFRelIso_chg[0];
+    Helper::electron_miniPFRelIso_neu_[nslot] = electron_miniPFRelIso_neu[0];
+    Helper::electron_dxy_[nslot]              = electron_dxy[0];
+    Helper::jet_btagDeepFlavB_[nslot]         = jet_btagDeepFlavB[0];
+    Helper::electron_jetPtRelv2_[nslot]       = electron_jetPtRelv2[0];
+    Helper::electron_jetPtRatio_[nslot]       = electron_jetPtRatio[0];
+    return readers[nslot]->EvaluateMVA(bdtname);
+  };
+  
+  return df.DefineSlot( "mvaBDT" , predict , { "Electron_miniPFRelIso_chg" , "Electron_miniPFRelIso_neu" , "Electron_dxy" , "Jet_btagDeepFlavB" , "Electron_jetPtRelv2" , "Electron_jetPtRatio" } );
+}
 
 #endif

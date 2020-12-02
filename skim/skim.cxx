@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   
   // Modular workflow //
   auto df1 = TnP( df , mycfg );
-  auto df2 = BDT( df1 , mycfg );
+  auto df2 = BDT_Classical( df1 , mycfg );
   auto dfout = df2;
   // ---------- //
   
