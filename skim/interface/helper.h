@@ -175,14 +175,13 @@ namespace Helper {
    */
   
   /*****************************************************/
-  const auto poolSize = ROOT::GetThreadPoolSize();
   // list of variables
-  std::vector<float> electron_miniPFRelIso_chg_(poolSize);
-  std::vector<float> electron_miniPFRelIso_neu_(poolSize);
-  std::vector<float> electron_dxy_(poolSize);
-  std::vector<float> jet_btagDeepFlavB_(poolSize);
-  std::vector<float> electron_jetPtRelv2_(poolSize);
-  std::vector<float> electron_jetPtRatio_(poolSize);
+  std::vector<float> electron_miniPFRelIso_chg_;
+  std::vector<float> electron_miniPFRelIso_neu_;
+  std::vector<float> electron_dxy_;
+  std::vector<float> jet_btagDeepFlavB_;
+  std::vector<float> electron_jetPtRelv2_;
+  std::vector<float> electron_jetPtRatio_;
   
   /****************************************************/
   
@@ -192,7 +191,14 @@ namespace Helper {
     // Create the TMVA::Reader
     const auto poolSize = ROOT::GetThreadPoolSize();
     // initialize reader for each thread
-    std::vector<TMVA::Reader*> readers(poolSize);    
+    std::vector<TMVA::Reader*> readers(poolSize);
+    // resize 
+    electron_miniPFRelIso_chg_.resize(poolSize);
+    electron_miniPFRelIso_neu_.resize(poolSize);
+    electron_dxy_.resize(poolSize);
+    jet_btagDeepFlavB_.resize(poolSize);
+    electron_jetPtRelv2_.resize(poolSize);
+    electron_jetPtRatio_.resize(poolSize);
     
     for (size_t i=0 ; i<readers.size() ; i++ ){
       readers[i] = new TMVA::Reader(); // new return a pointer

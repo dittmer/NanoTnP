@@ -6,10 +6,11 @@
 using namespace TMVA::Experimental;
 
 template <typename T>
-auto jetPtRatio(T &df) {
+auto BDT_preprocess(T &df) {
   using namespace ROOT::VecOps;
-  // https://github.com/srudra3/LeptonID/blob/master/ClassificationBDT_ele.py
-  auto makeBDTvar = [](
+  
+  // lambda function for complicated variable derivation
+  auto jetPtRatio = [](
 		       const RVec<float> &electron_miniPFRelIso_all,
 		       const RVec<int> &electron_jetIdx,
 		       const RVec<float> &electron_pt,
@@ -25,22 +26,27 @@ auto jetPtRatio(T &df) {
       float mini_Iso_all = electron_miniPFRelIso_all[i];
       int jIdx= electron_jetIdx[i];
       float pt = electron_pt[i];
-
+      
       A=0.; B=0.;
       if (jIdx == -1) A = 1. / (1. + mini_Iso_all);
       if (jIdx >= 0 ) B = pt / jet_pt[jIdx];
       
       electron_jetPtRatio.push_back(A+B);
     }
-    
-    // return the first index 
     return electron_jetPtRatio;
   };
 
+  // https://github.com/srudra3/LeptonID/blob/master/ClassificationBDT_ele.py
   return df
-    .Define( "Electron_jetPtRatio" , makeBDTvar , { "Electron_miniPFRelIso_all" , "Electron_jetIdx" , "Electron_pt" , "Jet_pt" } )
+    .Define( "Electron_miniPFRelIso_chg_bdt" , "Electron_miniPFRelIso_chg" )
+    .Define( "Electron_miniPFRelIso_neu_bdt" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" )
+    .Define( "Electron_dxy_bdt" , "log(Electron_dxy[Electron_dxy > 0])" )
+    .Define( "Jet_btagDeepFlavB_bdt" , "Jet_btagDeepFlavB[Electron_jetIdx >0]" )
+    .Define( "Electron_jetPtRelv2_bdt" , "Electron_jetPtRelv2[Electron_jetIdx >0]" )
+    .Define( "Electron_jetPtRatio_bdt" , jetPtRatio , { "Electron_miniPFRelIso_all" , "Electron_jetIdx" , "Electron_pt" , "Jet_pt" } )
     ;
 }
+
 
 template<typename T>
 auto BDT_reader( T &df , const std::vector<TMVA::Reader*> &readers , const std::string &bdtname ) {
@@ -64,7 +70,16 @@ auto BDT_reader( T &df , const std::vector<TMVA::Reader*> &readers , const std::
     return readers[nslot]->EvaluateMVA(bdtname);
   };
   
-  return df.DefineSlot( "mvaBDT" , predict , { "Electron_miniPFRelIso_chg" , "Electron_miniPFRelIso_neu" , "Electron_dxy" , "Jet_btagDeepFlavB" , "Electron_jetPtRelv2" , "Electron_jetPtRatio" } );
+  return df.DefineSlot( "mvaBDT" , predict ,
+			{
+			  "Electron_miniPFRelIso_chg_bdt" ,
+			    "Electron_miniPFRelIso_neu_bdt" ,
+			    "Electron_dxy_bdt" ,
+			    "Jet_btagDeepFlavB_bdt" ,
+			    "Electron_jetPtRelv2_bdt" ,
+			    "Electron_jetPtRatio_bdt"
+			    }
+			);
 }
 
 #endif

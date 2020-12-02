@@ -123,14 +123,11 @@ auto BDT_Classical( T &df , Helper::config_t &cfg ){
   const std::string BDT_file = "data/xml/test_BDTG.weights.xml";
   std::vector<TMVA::Reader*> readers = Helper::BDT_Readers( BDT_name , BDT_file );
   
-  // pre-inference skimming and preparing derived variable
-  auto df1 = df
-    .Define( "Electron_miniPFRelIso_neu" , "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" );
-  auto df2 = jetPtRatio( df1 );
+  // pre-processing dataframe for TMVA reader
+  auto df1 = BDT_preprocess( df );
+  auto df2 = BDT_reader( df1 , readers , BDT_name ); // thread-safety with DefineSlot
 
-  auto df3 = BDT_reader( df2 , readers , BDT_name ); // thread-safety with DefineSlot
-
-  return df3;
+  return df2;
 }
 
 #endif
