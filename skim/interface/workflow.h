@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "bdt.h"
 
+// tnp variable output definition
 std::vector<std::string> TnP_variables = {
   "mcTrue",
   "weight",

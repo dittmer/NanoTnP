@@ -23,16 +23,17 @@ dataset_config = {
 
 def skim(dataset):
 
-    global output
-    
+    global output,dirs
+
     # load data config
     dataset_ = dataset_config[dataset]
     output += "/out/%s" %dataset
+    dirs += "/%s" %dataset
 
     if not os.path.exists(output): 
         os.system("rm -rf %s" %output)
         os.system("mkdir -p %s" %output)
-    print('dirs :', dirs)
+    
     samplelists = [ "%s/%s" %(dirs,itxt) for itxt in dataset_['filelist'] ]\
 
     ## compile
