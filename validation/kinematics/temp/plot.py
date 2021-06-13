@@ -8,27 +8,24 @@ from pathlib import Path
 import os
 from helper import *
 
-from skim.skim import dataset_config
-from validation.kinematics.histograms import ranges as labels
-
 ROOT.gROOT.SetBatch(True)
 ROOT.TH1.SetDefaultSumw2()
 ROOT.gStyle.SetOptStat(0)
 
 # Declare human readable label for each variable
-#labels = {
-#    "tag_Ele_pt"     : "Tagged Electron p_{T} [GeV/c^2]",
-#    "probe_Ele_pt"   : "Probed Electron p_{T} [GeV/c^2]",
-#    "tag_Ele_eta"    : "Tagged Electron #eta",
-#    "probe_Ele_eta"  : "Probed Electron #eta",
-#    "pair_pt"        : "pair p_{T} [GeV/c^2]",
-#    "pair_eta"       : "pair #eta",
-#    "pair_mass"      : "Mass (ll) [GeV/c]",
-#    "passingtagEleTightHWW" : "Tagged Electron TightHWW",
-#    "passingprobeEleTightHWW" : "Probe Electron TightHWW",
-#    "passingprobeElettHMVA" : "Probe Electron ttHMVA_0p7",
-#    "passingprobeTightHWW_ttHMVA_0p7" : "Probe Electron TightHWW_ttHMVA_0p7",
-#    }
+labels = {
+    "tag_Ele_pt"     : "Tagged Electron p_{T} [GeV/c^2]",
+    "probe_Ele_pt"   : "Probed Electron p_{T} [GeV/c^2]",
+    "tag_Ele_eta"    : "Tagged Electron #eta",
+    "probe_Ele_eta"  : "Probed Electron #eta",
+    "pair_pt"        : "pair p_{T} [GeV/c^2]",
+    "pair_eta"       : "pair #eta",
+    "pair_mass"      : "Mass (ll) [GeV/c]",
+    "passingtagEleTightHWW" : "Tagged Electron TightHWW",
+    "passingprobeEleTightHWW" : "Probe Electron TightHWW",
+    "passingprobeElettHMVA" : "Probe Electron ttHMVA_0p7",
+    "passingprobeTightHWW_ttHMVA_0p7" : "Probe Electron TightHWW_ttHMVA_0p7",
+    }
 
 # Retrieve a histogram from the input file based on the process and the variable
 # name
@@ -67,7 +64,13 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
     hist['BkgSum'] = hist['DY'].Clone("BkgSum")
     
     # Data
-    dataIn= "SingleElectron" if "18" not in path else "EGamma"
+    dataIn=""
+    if '_16' in path:
+        dataIn="SingleElectron_Run2016"
+    elif '_17' in path:
+        dataIn="SingleElectron_Run2017"
+    elif '_18' in path:
+        dataIn="EGamma_Run2018"
     hist['DATA'] = getHistogram(tfile , dataIn , variable)
 
     ######################################################################3
@@ -196,21 +199,19 @@ pass
 
 # Loop over all variable names and make a plot for each
 if __name__ == "__main__":
-
-    # convert result folder in skim to histograms
-    for ifold in os.listdir("%s/validation/kinematics/results/" %( os.environ['BASETNP'] ) ):
-        lm = dataset_config[ifold]['lumi']
-        pth = "%s/validation/kinematics/results/%s" %( os.environ['BASETNP'] , ifold )
-        for imc in [ "DYJetsToLL_M-50_LO" , "DYJetsToLL_M-50" ] :
-            for variable in labels.keys(): 
-                print("variable : ", variable)
-                histo1D( "%s/histogram.root" % pth , 
-                         pth , 
-                         imc , 
-                         variable , 
-                         labels[variable][1] , 
-                         lm , 
-                         4 , 
-                         False if 'eta' in variable else True 
-                     )
-                
+    parser = argparse.ArgumentParser()
+    parser.add_argument("path", type=str, help="Full path to ROOT file with all histograms")
+    parser.add_argument("output", type=str, help="Output directory for plots")
+    parser.add_argument("sample", type=str, help="Monte Carlo sample for comparison with data")
+    #parser.add_argument("scale", type=float, help="Scaling of the integrated luminosity")
+    args = parser.parse_args()
+    
+    lm=""
+    if '_16' in args.path:
+        lm="35.867"
+    elif '_17' in args.path:
+        lm="41.53"
+    elif '_18' in args.path:
+        lm="59.74"
+    
+    for variable in labels.keys(): histo1D( args.path , args.output , args.sample , variable , labels[variable] , lm , 4 , False if 'eta' in variable else True )

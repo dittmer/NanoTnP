@@ -13,7 +13,11 @@ https://github.com/latinos/LatinoAnalysis/blob/master/NanoGardener/python/module
  */
 int main(int argc, char **argv) {
 
-  ROOT::EnableImplicitMT(10);
+  //may return 0 when not able to detect   
+  const auto processor_count = std::thread::hardware_concurrency();
+
+  std::cout << "ncpu detected : " << processor_count << ", using it all!" << std::endl;
+  ROOT::EnableImplicitMT(processor_count);
 
   if(argc != 4) {
         std::cout << "Use executable with following arguments: ./tnptreeSkim input output integrated_luminosity" << std::endl;

@@ -26,6 +26,8 @@
 
 #include "TMath.h"
 
+#include <thread>
+
 // TMVA
 #include "TMVA/RReader.hxx"
 #include "TMVA/RInferenceUtils.hxx"
