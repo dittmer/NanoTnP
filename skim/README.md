@@ -41,7 +41,7 @@ python skim.py -b
 ./scripts/merge.sh
 
 ## merged output in 
-./out
+./results/latino17/merged
 ```
 
 ### dry run submit job
