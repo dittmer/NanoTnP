@@ -13,6 +13,22 @@ nanoV7_16 = '%s/../skim/results/Full2016v7_102X/' % cwd
 nanoV7_17 = '%s/../skim/results/Full2017v7_102X/' % cwd
 nanoV7_18 = '%s/../skim/results/Full2018v7_102X/' % cwd
 
+latinov8_16 = '%s/../skim/out/latinov8_16_106X/' % cwd
+latinov8_17 = '%s/../skim/out/latinov8_17_106X/' % cwd
+latinov8_18 = '%s/../skim/out/latinov8_18_106X/' % cwd
+
+nanov8_17 = {
+     'DYJetsToLL_M-50-LO' : tnpSample('DYJetsToLL_M-50_LO',
+                                     latinov8_17 + 'DYJetsToLL_M-50_LO.root',
+                                     isMC = True, nEvts =  -1 ),
+
+    'DYJetsToLL_M-50' : tnpSample('DYJetsToLL_M-50',
+                                  latinov8_17 + 'DYJetsToLL_M-50.root',
+                                  isMC = True, nEvts =  -1 ),
+
+    'data_Run2017' : tnpSample('SingleElectron' , latinov8_17 + 'SingleElectron.root' , lumi = 41.53 ),
+}
+
 nanov5_16 = {
     'DYJetsToLL_M-50-LO_ext2' : tnpSample('DYJetsToLL_M-50-LO_ext2',
                                      latinov6_16 + 'DYJetsToLL_M-50-LO_ext2.root',

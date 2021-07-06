@@ -2,7 +2,7 @@
 
 set -e
 
-VER="v7"
+VER="v8"
 
 if [ `echo ${PWD} | awk -F "/" '{print $NF}'` != "analysis" ]; then
 
@@ -25,7 +25,7 @@ TnP () {
 }
 
 # 2017
-TnP settings_nano${VER}_B_17.py passingMVA94Xwp90isoHWWiso0p06
-TnP settings_nano${VER}_B_17.py passingMVA94Xwp90isoHWWiso0p06SS
-TnP settings_nano${VER}_B_17.py passingttHMVA0p7
-TnP settings_nano${VER}_B_17.py passingttHMVA0p7SS
+TnP settings_nano${VER}_17.py passingMVA94Xwp90isoHWWiso0p06
+TnP settings_nano${VER}_17.py passingMVA94Xwp90isoHWWiso0p06SS
+TnP settings_nano${VER}_17.py passingttHMVA0p7
+TnP settings_nano${VER}_17.py passingttHMVA0p7SS
