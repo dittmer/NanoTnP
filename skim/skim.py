@@ -2,7 +2,7 @@ import os, sys, time
 import subprocess as sp
 from optparse import OptionParser
 
-from skim.data.dataset_def import dataset_config
+from data.dataset_def import dataset_config
 
 cwd = os.getcwd()
 

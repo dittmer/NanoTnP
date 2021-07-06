@@ -15,10 +15,10 @@ do
 	for iname in `ls $BASETNP/skim/results/${ifold}/*.root | xargs -n1 basename | awk -F "__" '{print $1}' | uniq`
 	do
 	    echo hadding $iname
-	    #python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/${iname}.root $BASETNP/skim/results/${ifold}/${iname}__*.root
+	    python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/${iname}.root $BASETNP/skim/results/${ifold}/${iname}__*.root
 	done
 	# hadd all data
 	# for validation
-	python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/SingleElectron.root $BASETNP/skim/results/${ifold}/merged/SingleElectron_Run*.root 
+	#python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/SingleElectron.root $BASETNP/skim/results/${ifold}/merged/SingleElectron_Run*.root 
     fi
 done
