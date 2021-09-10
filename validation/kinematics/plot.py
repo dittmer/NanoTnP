@@ -69,16 +69,6 @@ def bookHistogram( df , variable , range_ , lumi="1." ):
              .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "plotweights")
 pass
 
-
-# main function of the plotting step
-#
-# The major part of the code below is dedicated to define a nice-looking layout.
-# The interesting part is the combination of the histograms to the QCD estimation.
-# There, we take the data histogram from the control region and subtract all known
-# processes defined in simulation and define the remaining part as QCD. Then,
-# this shape is extrapolated into the signal region with a scale factor.
-
-
 # Loop over all variable names and make a plot for each
 if __name__ == "__main__":
 
@@ -132,59 +122,18 @@ if __name__ == "__main__":
     # Write histograms to output file
     for variable in variables: hists[variable].SetName( "{}_{}".format( Name_ , variable ) ); hists[variable].Write()
 
-    #tfile.Close()
-
     # plot!
     for imc in Mc_:
+        out_ = '%s/%s' %( outpath , imc )
+        if not os.path.isdir(out_): os.system( 'mkdir -p %s' %out_ )
+        print( "using mc sample : " , imc )
         for variable in variables:
-        print("variable : ", variable)
-        ###
-        histo1D( "./results/histo_%s.root" %Name_ , pth ,
-                 imc ,
-                 variable ,
-                 ranges[variable][1] ,
-                 lm ,
-                 4 ,
-                 False if 'eta' in variable else True
-        )
+            print( "variable : " , variable )
+            ### sample variable
+            # DYJetsToLL_M-50_LO_Tag_pt
+            hist_mc = getHistogram( tfile , "{}_{}".format( imc.split('/')[-1].split('.root')[0] , variable ) )
+            hist_data = getHistogram( tfile , "{}_{}".format( Name_ , variable ) )
+        
+            histo1D( hist_data , hist_mc , out_ , variable , ranges[variable][1] , Lumi_ , 4 , False if 'eta' in variable else True )
 
-    '''
-    # convert result folder in skim to histograms
-    for ifold in os.listdir("%s/validation/kinematics/results/" %( os.environ['BASETNP'] ) ):
-
-        lm = dataset_config[ifold]['lumi']
-        pth = "%s/validation/kinematics/results/%s" %( os.environ['BASETNP'] , ifold )
-        if os.path.isfile( "%s/histogram.root" % pth ) : os.system("rm %s/histogram.root" %pth )
-        os.system("hadd -f %s/histogram.root %s/*.root" % ( pth , pth ) )
-        for imc in [ "DYJetsToLL_M-50_LO" , "DYJetsToLL_M-50" ] :
-            for variable in ranges.keys():
-                print("variable : ", variable)
-                histo1D( "%s/histogram.root" % pth ,
-                         pth ,
-                         imc ,
-                         variable ,
-                         ranges[variable][1] ,
-                         lm ,
-                         4 ,
-                         False if 'eta' in variable else True
-                     )
-
-
-    # convert result folder in skim to histograms
-    for ifold in os.listdir("%s/validation/kinematics/results/" %( os.environ['BASETNP'] ) ):
-        lm = dataset_config[ifold]['lumi']
-        pth = "%s/validation/kinematics/results/%s" %( os.environ['BASETNP'] , ifold )
-        for imc in [ "DYJetsToLL_M-50_LO" , "DYJetsToLL_M-50" ] :
-            for variable in labels.keys():
-                print("variable : ", variable)
-                histo1D( "%s/histogram.root" % pth ,
-                         pth ,
-                         imc ,
-                         variable ,
-                         labels[variable][1] ,
-                         lm ,
-                         4 ,
-                         False if 'eta' in variable else True
-                     )
-
-    '''
+    tfile.Close()

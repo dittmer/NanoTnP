@@ -131,30 +131,19 @@ pass
 
 # Retrieve a histogram from the input file based on the process and the variable
 # name
-def getHistogram(tfile, name, variable):
-    name = "{}_{}".format(name, variable)
+def getHistogram( tfile , name ):
     h = tfile.Get(name)
     if not h:
         raise Exception("Failed to load histogram {}.".format(name))
     return h
 pass
 
-def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=False):
-    tfile = ROOT.TFile(path, "READ")
+def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=False ):
 
     hist={}
-
-    ########################################################################
-    # Simulation
-    #  DY
-    hist['DY'] = getHistogram(tfile, samplename, variable)
-
-    # clone bkgsum template
+    hist['DATA'] = hdata.Clone("DATA")
+    hist['DY'] = hmc.Clone("DY")
     hist['BkgSum'] = hist['DY'].Clone("BkgSum")
-
-    # Data
-    dataIn= "SingleElectron" if "18" not in path else "EGamma"
-    hist['DATA'] = getHistogram(tfile , dataIn , variable)
 
     ######################################################################3
     # Plotting style
@@ -197,7 +186,7 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
     leg.SetFillColor(0)
     leg.SetTextSize(0.03)
     leg.AddEntry(hist['DATA'], 'Data', "pl")
-    leg.AddEntry(hist['DY'], samplename, "f")
+    leg.AddEntry(hist['DY'], 'DY' , "f")
     c1 = TCanvas("c1", list(hist.values())[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad
@@ -273,9 +262,9 @@ def histo1D(path, output, samplename, variable, xlabel, scale, ratio=0, logy=Fal
 
     c1.Update()
 
-    if not os.path.isdir(output):
-        os.system('mkdir -p %s' % output )
+    #if not os.path.isdir(output):
+    #    os.system('mkdir -p %s' % output )
 
-    c1.SaveAs("{}/{}.pdf".format(output, variable))
-    c1.SaveAs("{}/{}.png".format(output, variable))
+    c1.SaveAs( "{}/{}.pdf".format(output, variable) )
+    c1.SaveAs( "{}/{}.png".format(output, variable) )
 pass
