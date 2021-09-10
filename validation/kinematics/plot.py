@@ -50,7 +50,7 @@ ranges = {
 
 ### RDataframe
 # Book a histogram for a specific variable                                                                                                                                                   
-def bookHistogram(df, variable, range_, ismc):
+def bookHistogram( df , variable , range_ , lumi="1." ):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     #passingtagEleTightHWW==1
@@ -60,7 +60,7 @@ def bookHistogram(df, variable, range_, ismc):
     #flag="passingprobeEleTightHWW==1"
     flag="1==1"
     # what is plotweight
-    WEIGHT = match if ismc else "1==1"
+    WEIGHT = match + "*" + lumi
     print( "WEIGHT : ", WEIGHT )
     return df.Define( "plotweights" , WEIGHT )\
              .Filter( "Tag_pt > 32 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0" , "Nominal cut" )\
@@ -240,9 +240,10 @@ if __name__ == "__main__":
     print( 'MC   : ', Mc_   )
     
     # apply selection, book histogram
-    if not os.path.isdir("./results"): os.system( 'mkdir -p ./results' )
+    outpath = './results/%s' %Name_
+    if not os.path.isdir(outpath): os.system( 'mkdir -p %s' %outpath )
     # root file consist of variables for each sample
-    tfile = ROOT.TFile( "./results/histo_%s.root" %( Name_ ) , "RECREATE" )
+    tfile = ROOT.TFile( "%s/histo_%s.root" %( outpath , Name_ ) , "RECREATE" )
 
     variables = ranges.keys()
     hists={}
@@ -256,20 +257,36 @@ if __name__ == "__main__":
         # Load skimmed dataset and apply baseline selection (if any)
         df = ROOT.ROOT.RDataFrame( 'fitter_tree' , imc )
         # Book histogram
-        for variable in variables: hists[variable] = bookHistogram( df , variable , ranges[variable][0] , False )
+        for variable in variables: hists[variable] = bookHistogram( df , variable , ranges[variable][0] , Lumi_ )
 
         # Write histograms to output file
         for variable in variables: hists[variable].SetName( "{}_{}".format( mcName , variable ) ); hists[variable].Write()
 
     hists.clear()
+
+    print(" --> DATA : %s" %Name_ )
     # Process Data
     ddf = ROOT.ROOT.RDataFrame( 'fitter_tree' , Data_ )
     # Book histogram
-    for variable in variables: hists[variable] = bookHistogram( ddf , variable , ranges[variable][0] , True )
+    for variable in variables: hists[variable] = bookHistogram( ddf , variable , ranges[variable][0] )
     # Write histograms to output file                                                                                                                                                     
     for variable in variables: hists[variable].SetName( "{}_{}".format( Name_ , variable ) ); hists[variable].Write()
 
-    tfile.Close()
+    #tfile.Close()
+
+    # plot!
+    for imc in Mc_:
+        for variable in variables:
+        print("variable : ", variable)
+        ###
+        histo1D( "./results/histo_%s.root" %Name_ , pth ,
+                 imc ,
+                 variable ,
+                 ranges[variable][1] ,
+                 lm ,
+                 4 ,
+                 False if 'eta' in variable else True
+        )                            
 
     '''
     # convert result folder in skim to histograms                                                                                                                                           
