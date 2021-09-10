@@ -2,7 +2,7 @@
 # The plotting combines the histograms to plots which allow us to study the
 # initial dataset based on observables motivated through physics.
 
-import argparse, os
+import argparse, os, sys
 import ROOT
 from pathlib import Path
 import numpy as np
@@ -50,23 +50,23 @@ ranges = {
 
 ### RDataframe
 # Book a histogram for a specific variable
-def bookHistogram( df , variable , range_ , lumi="1." ):
+def bookHistogram( df , variable , range_ , lumi=None ):
     ##.Filter("probe_Ele_pt > 35 && abs(probe_Ele_eta) < 2.17","high pt low eta probe ele")\
     #match="tag_PromptGenLepMatch*probe_PromptGenLepMatch"
     #passingtagEleTightHWW==1
-    match="mcTrue" #*tag_TightHWW_SF*probe_TightHWW_SF"
+    match="mcTrue*weight" #*tag_TightHWW_SF*probe_TightHWW_SF"
     #probe="probe_Ele_eta > 0 && probe_Ele_eta < 0.8 && probe_Ele_pt > 50 && probe_Ele_pt < 100"
     probe="1==1"
     #flag="passingprobeEleTightHWW==1"
     flag="1==1"
     # what is plotweight
-    WEIGHT = match + "*" + lumi
+    WEIGHT = match + "*" + lumi if lumi is not None else "1."
     print( "WEIGHT : ", WEIGHT )
-    return df.Define( "plotweights" , WEIGHT )\
+    return df.Define( "weights" , WEIGHT )\
              .Filter( "Tag_pt > 32 && abs(Tag_eta) < 2.17 && Tag_charge*Probe_charge < 0" , "Nominal cut" )\
              .Filter( flag , "passing flag" )\
              .Filter( probe , "probe low eta high pt cut" )\
-             .Histo1D(ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "plotweights")
+             .Histo1D( ROOT.ROOT.RDF.TH1DModel(variable, variable, range_[0], range_[1], range_[2]), variable, "weights" )
 pass
 
 # Loop over all variable names and make a plot for each
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     variables = ranges.keys()
     hists={}
-
+    
     # Process skimmed datasets and produce histograms of variables
     # Process MC
     for imc in Mc_:
@@ -121,19 +121,17 @@ if __name__ == "__main__":
     for variable in variables: hists[variable] = bookHistogram( ddf , variable , ranges[variable][0] )
     # Write histograms to output file
     for variable in variables: hists[variable].SetName( "{}_{}".format( Name_ , variable ) ); hists[variable].Write()
-
+    
     # plot!
     for imc in Mc_:
-        out_ = '%s/%s' %( outpath , imc )
+        mcName = imc.split('/')[-1].split('.root')[0]
+        out_ = '%s/%s' %( outpath , mcName )
         if not os.path.isdir(out_): os.system( 'mkdir -p %s' %out_ )
         print( "using mc sample : " , imc )
         for variable in variables:
             print( "variable : " , variable )
-            ### sample variable
-            # DYJetsToLL_M-50_LO_Tag_pt
-            hist_mc = getHistogram( tfile , "{}_{}".format( imc.split('/')[-1].split('.root')[0] , variable ) )
+            hist_mc = getHistogram( tfile , "{}_{}".format( mcName , variable ) )
             hist_data = getHistogram( tfile , "{}_{}".format( Name_ , variable ) )
-        
-            histo1D( hist_data , hist_mc , out_ , variable , ranges[variable][1] , Lumi_ , 4 , False if 'eta' in variable else True )
+            histo1D( hist_data , hist_mc , out_ , variable , ranges[variable][1] , Lumi_ , True , False if 'eta' in variable else True )
 
     tfile.Close()

@@ -138,7 +138,7 @@ def getHistogram( tfile , name ):
     return h
 pass
 
-def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=False ):
+def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=False , logy=False ):
 
     hist={}
     hist['DATA'] = hdata.Clone("DATA")
@@ -258,13 +258,11 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=F
     gPad.Modified()
     gPad.Update()
     c1.cd(1)
-    drawCMS("%s" %scale, "Object Study")
+    drawCMS( "%s" %scale, "Object Study")
 
     c1.Update()
 
-    #if not os.path.isdir(output):
-    #    os.system('mkdir -p %s' % output )
-
+    print( "{}/{}.pdf".format( output , variable) )
     c1.SaveAs( "{}/{}.pdf".format(output, variable) )
     c1.SaveAs( "{}/{}.png".format(output, variable) )
 pass
