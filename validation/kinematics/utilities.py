@@ -138,16 +138,16 @@ def getHistogram( tfile , name ):
     return h
 pass
 
-def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=False , logy=False ):
+def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=False ):
 
     hist={}
-    hist['DATA'] = hdata.Clone("DATA")
-    hist['DY'] = hmc.Clone("DY")
+    hist['DATA'] = hdata
+    hist['DY'] = hmc
     hist['BkgSum'] = hist['DY'].Clone("BkgSum")
 
     ######################################################################3
     # Plotting style
-    #hist['BkgSum'].Reset("MICES")
+    hist['BkgSum'].Reset("MICES")
     hist['BkgSum'].SetFillStyle(3003)
     hist['BkgSum'].SetFillColor(1)
     hist['BkgSum'].SetMarkerStyle(0)
@@ -185,8 +185,8 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=False , lo
     leg.SetFillStyle(0) #1001
     leg.SetFillColor(0)
     leg.SetTextSize(0.03)
-    leg.AddEntry(hist['DATA'], 'Data', "pl")
-    leg.AddEntry(hist['DY'], 'DY' , "f")
+    leg.AddEntry( hist['DATA'] , 'Data' , "pl" )
+    leg.AddEntry( hist['DY'] , 'DY_LO' if 'LO' in hist['DY'].GetName() else 'DY_NLO' , "f")
     c1 = TCanvas("c1", list(hist.values())[-1].GetXaxis().GetTitle(), 800, 800 if ratio else 600 )
 
     #Ratio pad

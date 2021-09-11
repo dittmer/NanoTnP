@@ -4,7 +4,6 @@
 
 import argparse, os, sys
 import ROOT
-from pathlib import Path
 import numpy as np
 from ROOT import array
 from utilities import *
@@ -122,6 +121,8 @@ if __name__ == "__main__":
     # Write histograms to output file
     for variable in variables: hists[variable].SetName( "{}_{}".format( Name_ , variable ) ); hists[variable].Write()
     
+    #tfile = ROOT.TFile( "./results/UL2018_ABCD/histo_UL2018_ABCD.root" , "READ" )
+    
     # plot!
     for imc in Mc_:
         mcName = imc.split('/')[-1].split('.root')[0]
@@ -132,6 +133,6 @@ if __name__ == "__main__":
             print( "variable : " , variable )
             hist_mc = getHistogram( tfile , "{}_{}".format( mcName , variable ) )
             hist_data = getHistogram( tfile , "{}_{}".format( Name_ , variable ) )
-            histo1D( hist_data , hist_mc , out_ , variable , ranges[variable][1] , Lumi_ , True , False if 'eta' in variable else True )
+            histo1D( hist_data , hist_mc , out_ , variable , ranges[variable][1] , Lumi_ , 4 , False if 'eta' in variable else True )
 
     tfile.Close()
