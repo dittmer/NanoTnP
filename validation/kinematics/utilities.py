@@ -133,8 +133,7 @@ pass
 # name
 def getHistogram( tfile , name ):
     h = tfile.Get(name)
-    if not h:
-        raise Exception("Failed to load histogram {}.".format(name))
+    if not h: raise Exception("Failed to load histogram {}".format(name))
     return h
 pass
 
@@ -147,7 +146,6 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=F
 
     ######################################################################3
     # Plotting style
-    hist['BkgSum'].Reset("MICES")
     hist['BkgSum'].SetFillStyle(3003)
     hist['BkgSum'].SetFillColor(1)
     hist['BkgSum'].SetMarkerStyle(0)
@@ -176,7 +174,7 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=F
     # stack
     bkg = THStack('bkg', ";"+xlabel+";"+hist['BkgSum'].GetYaxis().GetTitle())
     # ADD ALL BKG
-    for proc in [ 'DY' ]: bkg.Add(hist[proc])
+    bkg.Add(hist['DY'])
 
     #Legend
     n=len(hist)
@@ -199,8 +197,7 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=F
     c1.GetPad(bool(ratio)).SetTopMargin(0.06)
     c1.GetPad(bool(ratio)).SetRightMargin(0.05)
     c1.GetPad(bool(ratio)).SetTicks(1, 1)
-    if logy:
-        c1.GetPad(bool(ratio)).SetLogy()
+    if logy: c1.GetPad(bool(ratio)).SetLogy()
 
     #Draw
     bkg.Draw("HIST") # stack
@@ -212,6 +209,7 @@ def histo1D( hdata , hmc , output , variable , xlabel , scale , ratio=0 , logy=F
     bkg.SetMinimum(max(min(hist['BkgSum'].GetBinContent(hist['BkgSum'].GetMinimumBin()), hist['DATA'].GetMinimum()), 5.e-1)  if logy else 0.)
 
     #bkg.SetMinimum(1.0)
+    bkg.SetMinimum(10)
 
     leg.Draw()
 
