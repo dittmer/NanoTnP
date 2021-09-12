@@ -11,10 +11,10 @@ brilcalc lumi -b "STABLE BEAMS" \
 
 | Dataset | Recorded Lumi | Golden JSON |
 | --- | --- | --- |
-| UL2016 | | | |
-| UL2016 | | | |
-| UL2017 | | | Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt |
-| UL2018 | | | Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt |
+| UL2016 | | |
+| UL2016 | | |
+| UL2017 | | Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt |
+| UL2018 | | Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt |
 
 ## Analysis weight
 
