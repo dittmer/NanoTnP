@@ -92,11 +92,11 @@ if __name__ == "__main__":
     outpath = './results/%s' %Name_
     if not os.path.isdir(outpath): os.system( 'mkdir -p %s' %outpath )
     # root file consist of variables for each sample
-    #tfile = ROOT.TFile( "%s/histo_%s.root" %( outpath , Name_ ) , "RECREATE" )
+    tfile = ROOT.TFile( "%s/histo_%s.root" %( outpath , Name_ ) , "RECREATE" )
 
     variables = ranges.keys()
     hists={}
-    '''
+    
     # Process skimmed datasets and produce histograms of variables
     # Process MC
     for imc in Mc_:
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     for variable in variables: hists[variable] = bookHistogram( ddf , variable , ranges[variable][0] )
     # Write histograms to output file
     for variable in variables: hists[variable].SetName( "{}_{}".format( Name_ , variable ) ); hists[variable].Write()
-    '''
+    
     tfile = ROOT.TFile( "./results/UL2018_ABCD/histo_UL2018_ABCD.root" , "READ" )
     
     # plot!
