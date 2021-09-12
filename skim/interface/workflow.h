@@ -64,7 +64,7 @@ auto TnP(T &df , Helper::config_t &cfg) {
   // dataset specific
   auto df2 = df1
     .Define( "mcTrue" , (cfg.isMC) ? "Tag_isGenMatched*Probe_isGenMatched" : "1" )
-    .Define( "weight" , (cfg.isMC) ? "genWeight*puWeight" : "1"                  )
+    .Define( "weight" , (cfg.isMC) ? "baseW*genWeight*puWeight" : "1"                  )
     ;
   auto df3 = (cfg.isMC) ? df2 : df2.Filter( "TnP_trigger==1" , " --> data is matched to HLT filter" );
 
