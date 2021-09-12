@@ -19,7 +19,7 @@ brilcalc lumi -b "STABLE BEAMS" \
 ## Analysis weight
 
 ```
-MC Weight = puW * baseW * LUMI * ...
+MC Weight = genWeight*baseW*puWeight
 ```
 
 ## Default Working Points
