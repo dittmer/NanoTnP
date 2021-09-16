@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# 41.48
 python plot.py -n UL2017_BCDEF -l 41.48 -r \
     ../../skim/results/latino17/DYJetsToLL_M-50_LO.root \
     ../../skim/results/latino17/DYJetsToLL_M-50.root \
