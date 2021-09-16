@@ -171,50 +171,6 @@ namespace Helper {
     std::vector<std::string> outputVar;
   };
   
-  
-  /*
-   * BDT classical reader 
-   */
-  
-  /*****************************************************/
-  // list of variables
-  std::vector<float> electron_miniPFRelIso_chg_;
-  std::vector<float> electron_miniPFRelIso_neu_;
-  std::vector<float> electron_dxy_;
-  std::vector<float> jet_btagDeepFlavB_;
-  std::vector<float> electron_jetPtRelv2_;
-  std::vector<float> electron_jetPtRatio_;
-  
-  /****************************************************/
-  
-  template<typename T>
-    std::vector<TMVA::Reader*> BDT_Readers( T &modelname , T &modelfile ) {
-    //using namespace ROOT::VecOps;
-    // Create the TMVA::Reader
-    const auto poolSize = ROOT::GetThreadPoolSize();
-    // initialize reader for each thread
-    std::vector<TMVA::Reader*> readers(poolSize);
-    // resize 
-    electron_miniPFRelIso_chg_.resize(poolSize);
-    electron_miniPFRelIso_neu_.resize(poolSize);
-    electron_dxy_.resize(poolSize);
-    jet_btagDeepFlavB_.resize(poolSize);
-    electron_jetPtRelv2_.resize(poolSize);
-    electron_jetPtRatio_.resize(poolSize);
-    
-    for (size_t i=0 ; i<readers.size() ; i++ ){
-      readers[i] = new TMVA::Reader(); // new return a pointer
-      readers[i]->AddVariable( "Electron_miniPFRelIso_chg" , &electron_miniPFRelIso_chg_[i] );
-      readers[i]->AddVariable( "Electron_miniPFRelIso_all-Electron_miniPFRelIso_chg" , &electron_miniPFRelIso_neu_[i] );
-      readers[i]->AddVariable( "log(abs(Electron_dxy))" , &electron_dxy_[i] );
-      readers[i]->AddVariable( "(Electron_jetIdx>=0)*(Jet_btagDeepFlavB[max(Electron_jetIdx,0)])" , &jet_btagDeepFlavB_[i] );
-      readers[i]->AddVariable( "(Electron_jetIdx>=0)*(Electron_jetPtRelv2)" , &electron_jetPtRelv2_[i] );
-      readers[i]->AddVariable( "(Electron_jetIdx==-1)*((1)/(1+(Electron_miniPFRelIso_all)))+(Electron_jetIdx>=0)*((Electron_pt)/(Jet_pt[max(Electron_jetIdx,0)]))" , &electron_jetPtRatio_[i] );
-      readers[i]->BookMVA( modelname , modelfile );
-    }
-
-    return readers;
-  }
 } //helper
 
 #endif
