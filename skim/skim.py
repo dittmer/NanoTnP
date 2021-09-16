@@ -147,11 +147,12 @@ if __name__ == "__main__":
 
     ##
     print("")
-    print( "EO       : " , EOS      )
+    print( "EOS      : " , EOS      )
     print( "dataset  : " , dataset  )
     print( "location : " , location )
-    print( "batch    : " , batch    ) 
-    print( "nfile    : " , nfile    )
+    print( "batch    : " , batch    )
+    if batch:
+        print( "nfile    : " , nfile    )
     print( "test     : " , test     )
     print("")
 
