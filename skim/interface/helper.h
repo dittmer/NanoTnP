@@ -165,6 +165,7 @@ namespace Helper {
     std::string input;
     std::string output;
     std::string lumi;
+    std::string year;
 
     bool isMC;
     std::vector<std::string> infiles;

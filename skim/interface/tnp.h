@@ -52,26 +52,26 @@ auto TnP(T &df , Helper::config_t &cfg) {
 
   // dataset specific variables
   cfg.outputVar = TnP_variables;
-  if ( cfg.input.find("2016") != std::string::npos ) cfg.outputVar.push_back("Probe_mvaSpring16GP_WP90");
-  if ( cfg.input.find("2016") != std::string::npos ) cfg.outputVar.push_back("Tag_mvaSpring16GP");
-  if ( cfg.input.find("2016") != std::string::npos ) cfg.outputVar.push_back("Probe_cutBased_HLTPreSel");
+  if ( cfg.year == "2016" ) {
+    cfg.outputVar.push_back("Probe_mvaSpring16GP_WP90");
+    cfg.outputVar.push_back("Tag_mvaSpring16GP");
+    cfg.outputVar.push_back("Probe_cutBased_HLTPreSel");
+  }
 
-  // single electron trigger treshold
+  // Tag pt cuts are already at 2 GeV above trigger threshold, but no eta cut applied for 2016
   std::string tagCut="1==1";
-  if ( cfg.input.find("2016") != std::string::npos ) tagCut="Tag_pt>32 && abs(Tag_eta)<2.17";
-  if ( cfg.input.find("2017") != std::string::npos ) tagCut="Tag_pt>40";
-  if ( cfg.input.find("2018") != std::string::npos ) tagCut="Tag_pt>37";
+  if ( cfg.year == "2016" ) tagCut="abs(Tag_eta)<2.07";
 
   auto df1 = df
     .Filter( "abs(Tag_pdgId)!=13 && abs(Probe_pdgId)!=13"      , " --> Tag and Probe are electron"      )
     .Filter( "abs(Probe_eta)<2.5"                              , " --> Probe candidate skim"            ) 
     .Filter( "!(abs(Tag_eta)>= 1.4442 && abs(Tag_eta)<=1.566)" , " --> Tag candidate eta skim"          )
-    .Filter( tagCut                                            , " --> Tag candidate pt skim : "+tagCut )
+    .Filter( tagCut                                            , " --> Tag candidate trig skim : "+tagCut )
     ;
 
   // dataset specific
   auto df2 = df1
-    .Define( "mcTrue" , (cfg.isMC) ? "Tag_isGenMatched*Probe_isGenMatched" : "1" )
+    .Define( "mcTrue" , (cfg.isMC) ? "Tag_isGenMatched*Probe_isGenMatched>0" : "1" )
     .Define( "weight" , (cfg.isMC) ? "baseW*genWeight*puWeight" : "1"                  )
     ;
   auto df3 = (cfg.isMC) ? df2 : df2.Filter( "TnP_trigger==1" , " --> data is matched to HLT filter" );

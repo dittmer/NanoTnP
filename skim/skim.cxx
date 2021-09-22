@@ -21,8 +21,8 @@ int main(int argc, char **argv) {
   std::cout << "ncpu detected : " << processor_count << ", using it all!" << std::endl;
   ROOT::EnableImplicitMT(processor_count);
 
-  if(argc != 4) {
-        std::cout << "Use executable with following arguments: ./tnptreeSkim input output integrated_luminosity" << std::endl;
+  if(argc != 5) {
+        std::cout << "Use executable with following arguments: ./skim input output integrated_luminosity year" << std::endl;
         return -1;
   }
 
@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
   mycfg.input = argv[1];
   mycfg.output = argv[2];
   mycfg.lumi = argv[3];
+  mycfg.year = argv[4];
   mycfg.isMC = ( mycfg.input.find("Run") != std::string::npos || mycfg.input.find("Single") != std::string::npos || mycfg.input.find("EGamma") != std::string::npos ) ? false : true;
 
   // filelist

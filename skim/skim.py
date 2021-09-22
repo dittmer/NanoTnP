@@ -36,17 +36,17 @@ def prepare( dataset_ ):
         path = "%s/%s/%s/" %( EOS , camp , addtnp )
         
         # infer samples
-        samples = [ r.split('-UL')[0] if "Run" in r else r.split('__')[0].replace('M-','M-50') for r in sp.getoutput( "ls %s/* | xargs -n1 basename | tr -d '[:digit:]' | uniq" % path ).split("\n") ]
-        
+        samples = sorted(list(set([f.split('__')[0] for f in os.listdir(path)])))
         for sample in samples:
-            sample = sample.strip('nanoLatino_').replace( 'Run' , camp.split('_')[0] )
-            print("Preparing textfile : %s" %sample )
-            os.system( "ls %s/*%s* > %s/%s.txt" %( path , sample , location , sample ) )
-            out.append( "%s/%s.txt" %( location , sample ) )
+            nicename = sample.strip('nanoLatino_')
+            if '-UL' in nicename : nicename = nicename.split('-UL')[0]
+            print("Preparing textfile : %s" %nicename )
+            os.system( "ls %s/*%s__part* > %s/%s.txt" %( path , sample , location , nicename ) )
+            out.append( "%s/%s.txt" %( location , nicename ) )
     return out
 pass
 
-def submit_script( sample_name__ , jobname_ , output_ , lumi_ ):
+def submit_script( sample_name__ , jobname_ , output_ , lumi_ , year_):
     outscript=jobname_.replace('.txt','.sh')
     outname=jobname_.split('/')[-1].split('.txt')[0]
     # condor
@@ -69,7 +69,7 @@ def submit_script( sample_name__ , jobname_ , output_ , lumi_ ):
         #script.write( 'make\n')
         script.write( 'cd $TMPDIR\n' )
         script.write( 'pwd\n' )
-        script.write( '$HOME/skim %s %s/%s.root %s\n' %( jobname_ , output_ , outname , lumi_ ) )
+        script.write( '$HOME/skim %s %s/%s.root %s %s\n' %( jobname_ , output_ , outname , lumi_ , year_) )
         script.close()
     os.system( 'chmod +x %s' %outscript )
         
@@ -93,31 +93,31 @@ def submit_script( sample_name__ , jobname_ , output_ , lumi_ ):
         print("--> prepare condor jobs")
     pass
 
-def text_writer( split_line_ , output_ , sample_name_ , lumi_ ):
+def text_writer( split_line_ , output_ , sample_name_ , lumi_ , year_):
     for num , ichunck in enumerate(split_line_) :
         jobname = '%s/%s__job%s.txt' %( output_ , sample_name_ , num )
         f=open( jobname , 'w' )
         if batch : ichunck = map( lambda x : 'root://eoscms.cern.ch/'+x , ichunck )
         f.write( '\n'.join(ichunck) )
-        submit_script( sample_name_ , jobname , output_ , lumi_ )
+        submit_script( sample_name_ , jobname , output_ , lumi_ , year_)
         f.close()
     pass
 
-def prepare_batch( proctxt , sample_name , lumi , nfile ):
+def prepare_batch( proctxt , sample_name , lumi , year , nfile ):
     # text file
     textfile = open( proctxt , 'r')
     Lines = [ itxt.replace('\n','') for itxt in textfile.readlines() ]
     split_line = [ Lines[ i:i+nfile ] for i in range(0, len(Lines), nfile) ]
-    text_writer( split_line , output , sample_name , lumi )
+    text_writer( split_line , output , sample_name , lumi , year)
     pass
 
-def execute( sample_ , iproc_ , output_ , lumi_ ):
+def execute( sample_ , iproc_ , output_ , lumi_ , year_ ):
     cmd="./skim"
     if batch :
-        prepare_batch( iproc_ , sample_ , lumi_ , nfile )
+        prepare_batch( iproc_ , sample_ , lumi_ , year_ , nfile )
     else :
         trun = time.time();
-        cmd+=" %s %s/%s.root %s" %( iproc_ , output_ , sample_ , lumi_  )
+        cmd+=" %s %s/%s.root %s %s" %( iproc_ , output_ , sample_ , lumi_ , year_ )
         tproc = time.time()
         if test:
             print(cmd)
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     if batch: os.system('voms-proxy-init -voms cms -valid 168:00')
     for iproc in samplelists:
         sample = iproc.split('/')[-1].split('.txt')[0]
-        execute( sample , iproc , output , dataset_['lumi'] )
+        execute( sample , iproc , output , dataset_['lumi'] , dataset_['year'] )
