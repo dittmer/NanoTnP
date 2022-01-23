@@ -22,10 +22,10 @@ std::vector<std::string> TnP_variables = {
   "Probe_eInvMinusPInv",
   "Probe_dz",
   "Probe_dxy",
-  "Probe_cutBased_Fall17_V1",
-  "Probe_mvaFall17V1Iso_WP90",
+  "Probe_cutBased",
+  "Probe_mvaFall17V2Iso_WP90",
   "Probe_pfRelIso03_all",
-  "Tag_cutBased_Fall17_V1",
+  "Tag_cutBased",
   "Probe_mvaTTH",
   "Probe_lostHits",
   "Probe_convVeto",
@@ -52,11 +52,12 @@ auto TnP(T &df , Helper::config_t &cfg) {
 
   // dataset specific variables
   cfg.outputVar = TnP_variables;
-  if ( cfg.year == "2016" ) {
-    cfg.outputVar.push_back("Probe_mvaSpring16GP_WP90");
-    cfg.outputVar.push_back("Tag_mvaSpring16GP");
-    cfg.outputVar.push_back("Probe_cutBased_HLTPreSel");
-  }
+  // Not needed for UL
+  //if ( cfg.year == "2016" ) {
+  //  cfg.outputVar.push_back("Probe_mvaSpring16GP_WP90");
+  //  cfg.outputVar.push_back("Tag_mvaSpring16GP");
+  //  cfg.outputVar.push_back("Probe_cutBased_HLTPreSel");
+  //}
 
   // Tag pt cuts are already at 2 GeV above trigger threshold, but no eta cut applied for 2016
   std::string tagCut="1==1";
@@ -78,7 +79,7 @@ auto TnP(T &df , Helper::config_t &cfg) {
 
   // Define variables
   auto df_out = df3
-    .Define( "tag_Ele_trigMVA" , "Tag_mvaFall17V1Iso"         )
+    .Define( "tag_Ele_trigMVA" , "Tag_mvaFall17V2Iso"         )
     .Define( "event_met_pfmet" , "PuppiMET_pt"                )
     .Define( "event_met_pfphi" , "PuppiMET_phi"               )
     .Define( "pair_mass"       , "TnP_mass"                   )

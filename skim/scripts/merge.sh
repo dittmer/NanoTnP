@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s extglob
 
 set -e
 
@@ -19,6 +20,11 @@ do
 	done
 	# hadd all data
 	# for validation
-	#python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/SingleElectron.root $BASETNP/skim/results/${ifold}/merged/SingleElectron_Run*.root 
+    fi
+    if [ $ifold == "latino18" ]
+    then
+	python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/EGamma.root $BASETNP/skim/results/${ifold}/merged/EGamma*.root
+    else
+	python $BASETNP/skim/scripts/haddnano.py $BASETNP/skim/results/${ifold}/merged/SingleElectron.root $BASETNP/skim/results/${ifold}/merged/SingleElectron*.root
     fi
 done

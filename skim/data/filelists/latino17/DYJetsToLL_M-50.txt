@@ -1,4 +1,4 @@
-/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv8_Full2017v8/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part0.root
-/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv8_Full2017v8/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part1.root
-/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv8_Full2017v8/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part2.root
-/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv8_Full2017v8/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part3.root
+/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv9_Full2017v9/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part0.root
+/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv9_Full2017v9/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part1.root
+/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv9_Full2017v9/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part2.root
+/eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL17_106x_nAODv9_Full2017v9/MCTandP__addTnPEle//nanoLatino_DYJetsToLL_M-50__part3.root
