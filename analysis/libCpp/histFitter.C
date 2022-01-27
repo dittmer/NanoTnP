@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TCanvas.h"
 #include "TPaveText.h"
+#include "RooAddPdf.h"
 
 /// include pdfs
 #include "RooCBExGaussShape.h"
@@ -122,8 +123,16 @@ void tnpFitter::setWorkspace(std::vector<std::string> workspace) {
   _work->factory(TString::Format("nBkgP[%f,0.5,%f]",_nTotP*0.1,_nTotP*1.5));
   _work->factory(TString::Format("nSigF[%f,0.5,%f]",_nTotF*0.9,_nTotF*1.5));
   _work->factory(TString::Format("nBkgF[%f,0.5,%f]",_nTotF*0.1,_nTotF*1.5));
-  _work->factory("SUM::pdfPass(nSigP*sigPass,nBkgP*bkgPass)");
-  _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
+  _work->factory("RooExtendPdf::sigPassNorm(sigPass,nSigP)");
+  _work->factory("RooExtendPdf::sigFailNorm(sigFail,nSigF)");
+  _work->factory("RooExtendPdf::bkgPassNorm(bkgPass,nBkgP)");
+  _work->factory("RooExtendPdf::bkgFailNorm(bkgFail,nBkgF)");
+  RooArgList pass_pdfs(_work->argSet("sigPassNorm,bkgPassNorm"));
+  RooArgList fail_pdfs(_work->argSet("sigFailNorm,bkgFailNorm"));
+  RooAddPdf pdfPass("pdfPass","pdfPass",pass_pdfs);
+  RooAddPdf pdfFail("pdfFail","pdfFail",fail_pdfs);
+  _work->import(pdfPass);
+  _work->import(pdfFail);
   _work->Print();			         
 }
 
@@ -173,13 +182,13 @@ void tnpFitter::fits(bool mcTruth,string title) {
   pFail->SetTitle("failing probe");
   
   _work->data("hPass") ->plotOn( pPass );
-  _work->pdf("pdfPass")->plotOn( pPass, LineColor(kRed) );
-  _work->pdf("pdfPass")->plotOn( pPass, Components("bkgPass"),LineColor(kBlue),LineStyle(kDashed));
+  _work->pdf("pdfPass")->plotOn( pPass, LineColor(kRed), Name("totPdf"), Normalization(1.0,RooAbsReal::RelativeExpected));
+  _work->pdf("pdfPass")->plotOn( pPass, Components("bkgPass"),LineColor(kBlue),LineStyle(kDashed),Name("bkgPdf"),Normalization(1.0,RooAbsReal::RelativeExpected));
   _work->data("hPass") ->plotOn( pPass );
   
   _work->data("hFail") ->plotOn( pFail );
-  _work->pdf("pdfFail")->plotOn( pFail, LineColor(kRed) );
-  _work->pdf("pdfFail")->plotOn( pFail, Components("bkgFail"),LineColor(kBlue),LineStyle(kDashed));
+  _work->pdf("pdfFail")->plotOn( pFail, LineColor(kRed), Name("totPdf"), Normalization(1.0,RooAbsReal::RelativeExpected));
+  _work->pdf("pdfFail")->plotOn( pFail, Components("bkgFail"),LineColor(kBlue),LineStyle(kDashed),Name("bkgPdf"),Normalization(1.0,RooAbsReal::RelativeExpected));
   _work->data("hFail") ->plotOn( pFail );
 
   TCanvas c("c","c",1100,450);
@@ -233,7 +242,7 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
   text->SetFillColor(0);
   text->SetBorderSize(0);
   text->SetTextAlign(12);
-  text->AddText("    --- parmeters " );
+  text->AddText("    --- parameters " );
   RooArgList listParFinalP = resP->floatParsFinal();
   for( int ip = 0; ip < listParFinalP.getSize(); ip++ ) {
     TString vName = listParFinalP[ip].GetName();
