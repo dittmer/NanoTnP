@@ -1,7 +1,8 @@
+import os
 import ROOT as rt
-rt.gROOT.LoadMacro('./libCpp/histFitter.C+')
-rt.gROOT.LoadMacro('./libCpp/RooCBExGaussShape.cc+')
-rt.gROOT.LoadMacro('./libCpp/RooCMSShape.cc+')
+rt.gROOT.LoadMacro('%s/analysis/libCpp/histFitter.C+'%os.environ.get('BASETNP'))
+rt.gROOT.LoadMacro('%s/analysis/libCpp/RooCBExGaussShape.cc+'%os.environ.get('BASETNP'))
+rt.gROOT.LoadMacro('%s/analysis/libCpp/RooCMSShape.cc+'%os.environ.get('BASETNP'))
 rt.gROOT.SetBatch(1)
 
 from ROOT import tnpFitter
@@ -168,7 +169,7 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam ):
     fitter.setOutputFile( rootfile )
     
     ## generated Z LineShape
-    fileTruth = rt.TFile('etc/inputs/ZeeGenLevel.root','read')
+    fileTruth = rt.TFile('%s/analysis/etc/inputs/ZeeGenLevel.root'%os.environ.get('BASETNP'),'read')
     histZLineShape = fileTruth.Get('Mass')
     fitter.setZLineShapes(histZLineShape,histZLineShape)
     fileTruth.Close()

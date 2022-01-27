@@ -32,8 +32,6 @@ exec(importSetting)
 
 ### tnp library
 import libPython.binUtils  as tnpBiner
-import libPython.rootUtils as tnpRoot
-
 
 if args.flag is None:
     print('[tnpEGM_fitter] flag is MANDATORY, this is the working point as defined in the settings.py')
@@ -81,6 +79,8 @@ tnpBins = pickle.load( open( '%s/bining.pkl'%(outputDirectory),'rb') )
 ####################################################################
 ##### Create Histograms
 ####################################################################
+import libPython.rootUtils as tnpRoot
+
 for s in tnpConf.samplesDef.keys():
     sample =  tnpConf.samplesDef[s]
     if sample is None: continue
@@ -160,7 +160,7 @@ if  args.doPlot:
     plottingDir = '%s/plots/%s/%s' % (outputDirectory,sampleToFit.name,fitType)
     if not os.path.exists( plottingDir ):
         os.makedirs( plottingDir )
-    shutil.copy('etc/inputs/index.php.listPlots','%s/index.php' % plottingDir)
+    shutil.copy('%s/analysis/etc/inputs/index.php.listPlots'%os.environ.get('BASETNP'), '%s/index.php'%plottingDir)
 
     for ib in range(len(tnpBins['bins'])):
         if (args.binNumber >= 0 and ib == args.binNumber) or args.binNumber < 0:

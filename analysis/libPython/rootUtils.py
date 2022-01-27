@@ -1,5 +1,6 @@
 import ROOT as rt
 import math
+import ctypes
 from libPython.fitUtils import *
 #from fitSimultaneousUtils import *
 
@@ -71,10 +72,12 @@ def makePassFailHistograms(sample, flag, bindef, var):
 
         bin1 = 1
         bin2 = hPass[ib].GetXaxis().GetNbins()
-        epass = rt.Double(-1.0)
-        efail = rt.Double(-1.0)
+        epass = ctypes.c_double(-1.0)
+        efail = ctypes.c_double(-1.0)
         passI = hPass[ib].IntegralAndError(bin1, bin2, epass)
         failI = hFail[ib].IntegralAndError(bin1, bin2, efail)
+        epass = epass.value
+        efail = efail.value
         eff = 0
         e_eff = 0
         if passI > 0:
@@ -99,13 +102,16 @@ def histPlotter(filename, tnpBin, plotDir):
 
 def computeEffi(n1, n2, e1, e2):
     effout = []
-    eff = n1/(n1+n2)
-    e_eff = 1/(n1+n2)*math.sqrt(e1*e1*n2*n2+e2*e2*n1*n1)/(n1+n2)
-    if e_eff < 0.001:
-        e_eff = 0.001
+    if n1+n2 == 0:
+        effout = [0,0]
+    else:
+        eff = n1/(n1+n2)
+        e_eff = 1/(n1+n2)*math.sqrt(e1*e1*n2*n2+e2*e2*n1*n1)/(n1+n2)
+        if e_eff < 0.001:
+            e_eff = 0.001
 
-    effout.append(eff)
-    effout.append(e_eff)
+        effout.append(eff)
+        effout.append(e_eff)
 
     return effout
 
@@ -121,11 +127,12 @@ def getAllEffi(info, bindef):
         hF = rootfile.Get('%s_Fail' % bindef['name'])
         bin1 = 1
         bin2 = hP.GetXaxis().GetNbins()
-        eP = rt.Double(-1.0)
-        eF = rt.Double(-1.0)
+        eP = ctypes.c_double(-1.0)
+        eF = ctypes.c_double(-1.0)
         nP = hP.IntegralAndError(bin1, bin2, eP)
         nF = hF.IntegralAndError(bin1, bin2, eF)
-
+        eP = eP.value
+        eF = eF.value
         effis['mcNominal'] = computeEffi(nP, nF, eP, eF)
         rootfile.Close()
     else:
@@ -137,10 +144,12 @@ def getAllEffi(info, bindef):
         hF = rootfile.Get('%s_Fail' % bindef['name'])
         bin1 = 1
         bin2 = hP.GetXaxis().GetNbins()
-        eP = rt.Double(-1.0)
-        eF = rt.Double(-1.0)
+        eP = ctypes.c_double(-1.0)
+        eF = ctypes.c_double(-1.0)
         nP = hP.IntegralAndError(bin1, bin2, eP)
         nF = hF.IntegralAndError(bin1, bin2, eF)
+        eP = eP.value
+        eF = eF.value
 
         effis['tagSel'] = computeEffi(nP, nF, eP, eF)
         rootfile.Close()
@@ -153,10 +162,12 @@ def getAllEffi(info, bindef):
         hF = rootfile.Get('%s_Fail' % bindef['name'])
         bin1 = 1
         bin2 = hP.GetXaxis().GetNbins()
-        eP = rt.Double(-1.0)
-        eF = rt.Double(-1.0)
+        eP = ctypes.c_double(-1.0)
+        eF = ctypes.c_double(-1.0)
         nP = hP.IntegralAndError(bin1, bin2, eP)
         nF = hF.IntegralAndError(bin1, bin2, eF)
+        eP = eP.value
+        eF = eF.value
 
         effis['mcAlt'] = computeEffi(nP, nF, eP, eF)
         rootfile.Close()
@@ -165,7 +176,7 @@ def getAllEffi(info, bindef):
 
     if not info['dataNominal'] is None and os.path.isfile(info['dataNominal']):
         rootfile = rt.TFile(info['dataNominal'], 'read')
-        from ROOT import RooFit, RooFitResult
+        #from ROOT import RooFit, RooFitResult
         fitresP = rootfile.Get('%s_resP' % bindef['name'])
         fitresF = rootfile.Get('%s_resF' % bindef['name'])
 
@@ -193,7 +204,7 @@ def getAllEffi(info, bindef):
         effis['dataNominal'] = [-1, -1]
     if not info['dataAltSig'] is None and os.path.isfile(info['dataAltSig']):
         rootfile = rt.TFile(info['dataAltSig'], 'read')
-        from ROOT import RooFit, RooFitResult
+        #from ROOT import RooFit, RooFitResult
         fitresP = rootfile.Get('%s_resP' % bindef['name'])
         fitresF = rootfile.Get('%s_resF' % bindef['name'])
 
@@ -220,7 +231,7 @@ def getAllEffi(info, bindef):
 
     if not info['dataAltBkg'] is None and os.path.isfile(info['dataAltBkg']):
         rootfile = rt.TFile(info['dataAltBkg'], 'read')
-        from ROOT import RooFit, RooFitResult
+        #from ROOT import RooFit, RooFitResult
         fitresP = rootfile.Get('%s_resP' % bindef['name'])
         fitresF = rootfile.Get('%s_resF' % bindef['name'])
 
