@@ -13,6 +13,7 @@ def createBins( bining, cut ):
     listOfIndex.append( index )
 
     ### first map nD bins in a single list
+    # Note -- this is a way of implementing [[x,y,...,q] for x in xrange(len(bining[0]['bins'])) for y in xrange(len(bining[1]['bins'])) ... for q in xrange(len(binning[N-1]['bins']))]
     for iv in list(range(len(bining))):
         var = bining[iv]['var']
         if 'type' not in bining[iv] or 'bins' not in bining[iv]:

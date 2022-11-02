@@ -5,7 +5,7 @@ import os
 import sys
 import pickle
 import shutil
-
+import math
 
 parser = argparse.ArgumentParser(description='tnp EGM fitter')
 parser.add_argument('--checkBins'  , action='store_true'  , help = 'check  bining definition')
@@ -207,12 +207,19 @@ if args.sumUp:
             astr = '### var2 : %s' % v2Range[1]
             print(astr)
             fOut.write( astr + '\n' )
-            
-        astr =  '%+8.3f\t%+8.3f\t%+8.3f\t%+8.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f' % (
+            astr = '### {b1}Low {b1}High {b2}Low {b2}High effData statErrData systErrData effMC statErrMC systErrMC effDataAltBkg effDataAltSig effMCAltMC effMCTagSel'.format(b1=v1Range[1].replace('Probe_',''),b2=v2Range[1].replace('Probe_',''))
+            print(astr)
+            fOut.write( astr + '\n' )
+
+        # NEW -- compute total data syst. unc. and mc syst. unc.
+        dataSyst = math.sqrt((effis['dataAltBkg'][0]-effis['dataNominal'][0]) ** 2 + (effis['dataAltSig'][0] - effis['dataNominal'][0]) ** 2)
+        mcSyst = math.sqrt((effis['mcAlt'][0]-effis['mcNominal'][0]) ** 2 + (effis['tagSel'][0] - effis['mcNominal'][0]) ** 2)
+
+        astr =  '%+8.3f\t%+8.3f\t%+8.3f\t%+8.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f' % (
             float(v1Range[0]), float(v1Range[2]),
             float(v2Range[0]), float(v2Range[2]),
-            effis['dataNominal'][0],effis['dataNominal'][1],
-            effis['mcNominal'  ][0],effis['mcNominal'  ][1],
+            effis['dataNominal'][0],effis['dataNominal'][1],dataSyst,
+            effis['mcNominal'  ][0],effis['mcNominal'  ][1],mcSyst,
             effis['dataAltBkg' ][0],
             effis['dataAltSig' ][0],
             effis['mcAlt' ][0],

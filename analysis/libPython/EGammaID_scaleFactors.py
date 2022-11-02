@@ -16,7 +16,7 @@ tdrstyle.setTDRStyle()
 effiMin = 0.68
 effiMax = 1.07
 
-sfMin = 0.78
+sfMin = 0.68
 sfMax = 1.12
 
 
@@ -172,7 +172,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
         grBinsSF.GetHistogram()     .GetXaxis().SetLimits(xMin,xMax)
         grBinsSF.GetHistogram().SetMinimum(sfMin)
         grBinsSF.GetHistogram().SetMaximum(sfMax)
-        
+ 
         grBinsSF.GetHistogram().GetXaxis().SetTitleOffset(1)
         if 'eta' in xAxis or 'Eta' in xAxis:
             grBinsSF.GetHistogram().GetXaxis().SetTitle("SuperCluster #eta")
@@ -186,7 +186,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
             
         grBinsEffData.GetHistogram().GetYaxis().SetTitleOffset(1)
         grBinsEffData.GetHistogram().GetYaxis().SetTitle("Data efficiency" )
-        grBinsEffData.GetHistogram().GetYaxis().SetRangeUser( effiMin, effiMax )
+        grBinsEffData.GetHistogram().GetYaxis().SetRangeUser( effiMin, effiMax ) #NOTE: comment out if hardcoding ranges
 
             
         ### to avoid loosing the TGraph keep it in memory by adding it to a list
@@ -216,8 +216,8 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
         if not listOfMC[use_igr] is None:
             listOfMC[use_igr].SetLineColor(graphColors[use_igr])
 
-        listOfTGraph1[use_igr].GetHistogram().SetMinimum(effiMin)
-        listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax) #HERE, expand y-axis
+        listOfTGraph1[use_igr].GetHistogram().SetMinimum(effiMin) #NOTE: can hardcode these for consistent plots
+        listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax) 
         p1.cd()
         listOfTGraph1[use_igr].Draw(option)
         if not listOfMC[use_igr] is None:
@@ -226,7 +226,7 @@ def EffiGraph1D(effDataList, effMCList, sfList ,nameout, xAxis = 'pT', yAxis = '
         p2.cd()            
         listOfTGraph2[use_igr].SetLineColor(graphColors[use_igr])
         listOfTGraph2[use_igr].SetMarkerColor(graphColors[use_igr])
-        listOfTGraph2[use_igr].GetHistogram().SetMinimum(sfMin)
+        listOfTGraph2[use_igr].GetHistogram().SetMinimum(sfMin) #NOTE: can hardcode these for consistent plots
         listOfTGraph2[use_igr].GetHistogram().SetMaximum(sfMax)
         if 'pT' in xAxis or 'pt' in xAxis :
             listOfTGraph2[use_igr].GetHistogram().GetXaxis().SetMoreLogLabels()
@@ -273,9 +273,9 @@ def diagnosticErrorPlot( effgr, ierror, nameout ):
 
     h2_sfErrorAbs = effgr.ptEtaScaleFactor_2DHisto(ierror+1, False )
     h2_sfErrorRel = effgr.ptEtaScaleFactor_2DHisto(ierror+1, True  )
-    h2_sfErrorAbs.SetMinimum(0)
+    h2_sfErrorAbs.SetMinimum(-0.00001)
     h2_sfErrorAbs.SetMaximum(min(h2_sfErrorAbs.GetMaximum(),0.2))
-    h2_sfErrorRel.SetMinimum(0)
+    h2_sfErrorRel.SetMinimum(-0.00001)
     h2_sfErrorRel.SetMaximum(1)
     h2_sfErrorAbs.SetTitle('e/#gamma absolute SF syst: %s ' % errorNames[ierror])
     h2_sfErrorRel.SetTitle('e/#gamma relative SF syst: %s ' % errorNames[ierror])
@@ -310,8 +310,8 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
             ptKey  = ( float(numbers[2]), min(500,float(numbers[3])) )
         
             myeff = efficiency(ptKey,etaKey,
-                               float(numbers[4]),float(numbers[5]),float(numbers[6] ),float(numbers[7] ),
-                               float(numbers[8]),float(numbers[9]),float(numbers[10]),float(numbers[11]) )
+                               float(numbers[4]),float(numbers[5] ),float(numbers[7] ),float(numbers[8] ), #6,9 are total syst now
+                               float(numbers[10]),float(numbers[11]),float(numbers[12]),float(numbers[13])) 
 #                           float(numbers[8]),float(numbers[9]),float(numbers[10]), -1 )
 
             effGraph.addEfficiency(myeff)
@@ -334,6 +334,7 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
 
     pdfout = nameOutBase + '_egammaPlots.pdf'
     cDummy = rt.TCanvas()
+    #cDummy = rt.TCanvas("cDummy","cDummy",800,800) #NOTE: can explicitly set canvas dimensions
     cDummy.Print( pdfout + "[" )
 
 
@@ -378,13 +379,13 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
     dmin = 1.0 - h2SF.GetMinimum()
     dmax = h2SF.GetMaximum() - 1.0
     dall = max(dmin,dmax)
-    h2SF.SetMinimum(1-dall)
+    h2SF.SetMinimum(1-dall) #NOTE: can hardcode these for consistent plots
     h2SF.SetMaximum(1+dall)
     h2SF.DrawCopy("colz TEXT45")
     
     c2D.cd(2)
     h2Error.SetMinimum(0)
-    h2Error.SetMaximum(min(h2Error.GetMaximum(),0.2))    
+    h2Error.SetMaximum(min(h2Error.GetMaximum(),0.2)) #NOTE: can hardcode this for consistent plots   
     h2Error.DrawCopy("colz TEXT45")
 
     c2D.Print( pdfout )

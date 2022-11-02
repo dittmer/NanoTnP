@@ -24,6 +24,7 @@ std::vector<std::string> TnP_variables = {
   "Probe_dxy",
   "Probe_cutBased",
   "Probe_mvaFall17V2Iso_WP90",
+  "Probe_mvaFall17V2noIso_WP90",
   "Probe_pfRelIso03_all",
   "Tag_cutBased",
   "Probe_mvaTTH",

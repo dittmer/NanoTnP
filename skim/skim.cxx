@@ -1,6 +1,7 @@
 #include "interface/helper.h"
 #include "interface/tnp.h"
 #include "interface/tmva_classical.h"
+#include "interface/tmva_tth.h"
 //#include "interface/tmva_experimental.h"
 
 /**
@@ -51,22 +52,33 @@ int main(int argc, char **argv) {
   // TnP //
   auto df1 = TnP( df , mycfg );
 
-  // BDT //
-  std::string column_name = "Probe_mva";
-  const std::string BDT_file = "data/xml/TMVAClassification_BDTG.weights.xml";
-  mycfg.outputVar.push_back( column_name );
+  // HWW MVA //
+  std::string column_hww = "Probe_mvaHWW";
+  const std::string hww_weights = "/afs/cern.ch/work/d/dittmer/private/NanoTnP/skim/data/xml/HWWMVA_el_BDTG.weights.xml";
+  mycfg.outputVar.push_back( column_hww );
 
   // 1.) Experimental
   //TMVA::Experimental::RReader model( BDT_file );
   //auto df2 = experimental_eval( df1 , model , column_name );
 
   // 2.) Classical
-  std::vector<TMVA::Reader*> readers = Tmva::BDT_Readers( "BDT::BDTG" , BDT_file );  
-  auto df2 = classic_eval( df1 , readers , column_name );
+  std::vector<TMVA::Reader*> readers_hww = Tmva::BDT_Readers( "BDT::BDTG" , hww_weights );  
+  auto df2 = classic_eval( df1 , readers_hww , column_hww );
+  
+
+  // ttH MVA //
+  std::string column_tth = "Probe_mvaTTHUL";
+  //const std::string ttH_weights = "/afs/cern.ch/work/d/dittmer/private/NanoTnP/skim/data/xml/UL20_el_TTH-like_2016_preVFP_BDTG.weights.xml";
+  const std::string ttH_weights = "/afs/cern.ch/work/d/dittmer/private/NanoTnP/skim/data/xml/UL20_el_TTH-like_2016_BDTG.weights.xml";
+  //const std::string ttH_weights = "/afs/cern.ch/work/d/dittmer/private/NanoTnP/skim/data/xml/UL20_el_TTH-like_2017_BDTG.weights.xml";
+  //const std::string ttH_weights = "/afs/cern.ch/work/d/dittmer/private/NanoTnP/skim/data/xml/UL20_el_TTH-like_2018_BDTG.weights.xml";
+  mycfg.outputVar.push_back( column_tth );
+
+  std::vector<TMVA::Reader*> readers_tth = TTH::BDT_Readers( "BDT::BDTG" , ttH_weights );  
+  auto df3 = tth_eval( df2 , readers_tth , column_tth , mycfg );
   
   // ---------- //
-  auto dfout = df2;
-  //std::cout<<"average mva : "<< *dfout.Mean(column_name) <<std::endl;
+  auto dfout = df3;
   
   dfout.Snapshot( "fitter_tree", mycfg.output , mycfg.outputVar );
 

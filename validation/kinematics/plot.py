@@ -41,7 +41,7 @@ ranges = {
     #"pair_pt"        : [ ( 50 , 0.   , 500 ) , "pair p_{T} [GeV/c^2]" ] ,
     #"pair_eta"       : [ ( 40 , -10.0 , 10.0 ) , "pair #eta" ] ,
     "pair_mass"      : [ ( 80 , 50   , 130 ) , "Mass (ll) [GeV/c]" ] ,
-    "Probe_mva"      : [ ( 50 , 0.   , 1. ) , "Probe MVA Score" ] ,
+    "Probe_mvaTTH" : [ ( 50 , 0.   , 1. ) , "Probe MVA Score" ] ,
     #"passingtagEleTightHWW" : ( 2 , -0.5 , 0.5 ),
     #"passingprobeEleTightHWW" : ( 2 , -0.5 , 0.5 ),
     #"passingprobeElettHMVA" : ( 2 , -0.5 , 1.5 ),

@@ -2,14 +2,14 @@
 dataset_config = {
     'latino16_HIPM' : {
         "lumi" : "35.867", #Don't use lumi anyway
-        "data" : "",
-        "mc"   : "",
+        "data" : "Run2016_UL2016_nAODv9_HIPM_Full2016v9",
+        "mc"   : "Summer20UL16_106x_nAODv9_HIPM_Full2016v9",
         "year" : "2016"
     },
     'latino16_noHIPM' : {
         "lumi" : "35.867",
-        "data" : "",
-        "mc"   : "",
+        "data" : "Run2016_UL2016_nAODv9_noHIPM_Full2016v9",
+        "mc"   : "Summer20UL16_106x_nAODv9_noHIPM_Full2016v9",
         "year" : "2016"
     },
     "latino17" : {
